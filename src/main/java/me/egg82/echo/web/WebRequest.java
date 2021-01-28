@@ -24,10 +24,10 @@ public class WebRequest {
     private RequestMethod method = RequestMethod.GET;
     private TimeUtil.Time timeout = new TimeUtil.Time(5L, TimeUnit.SECONDS);
     private final Map<String, String> headers = new HashMap<>();
-    private final Map<String, String> postData = new HashMap<>();
+    private final Map<String, String> formData = new HashMap<>();
+    private byte[] outputData = null;
     private int maxRedirects = 20;
     private boolean throwOnStandardErrors = true;
-    private boolean forOutput = false;
     private Proxy proxy = null;
 
     private WebRequest(@NotNull URL url) {
@@ -91,10 +91,6 @@ public class WebRequest {
         HttpURLConnection retVal = (HttpURLConnection) (proxy != null ? url.openConnection(proxy) : url.openConnection());
         setConnectionProperties(retVal, null);
 
-        if (forOutput) {
-            return retVal;
-        }
-
         Set<String> previousUrls = new HashSet<>();
         previousUrls.add(url.toExternalForm() + (headers.containsKey("Set-Cookie") ? ":" + headers.get("Set-Cookie") : ""));
 
@@ -130,7 +126,7 @@ public class WebRequest {
     }
 
     private void tryThrowOnStandardErrors(@NotNull HttpURLConnection connection) throws IOException {
-        if (!forOutput && throwOnStandardErrors) {
+        if (throwOnStandardErrors) {
             int status = connection.getResponseCode();
 
             if (status >= 200 && status < 300) {
@@ -173,10 +169,11 @@ public class WebRequest {
         if (cookies != null && !cookies.isEmpty()) {
             conn.setRequestProperty("Cookie", cookies);
         }
-        if (!postData.isEmpty()) {
+
+        if (!formData.isEmpty()) {
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
             StringBuilder data = new StringBuilder();
-            for (Map.Entry<String, String> kvp : postData.entrySet()) {
+            for (Map.Entry<String, String> kvp : formData.entrySet()) {
                 data.append(URLEncoder.encode(kvp.getKey(), StandardCharsets.UTF_8.name()));
                 data.append('=');
                 data.append(URLEncoder.encode(kvp.getValue(), StandardCharsets.UTF_8.name()));
@@ -190,6 +187,12 @@ public class WebRequest {
             conn.setDoOutput(true);
             try (OutputStream out = conn.getOutputStream()) {
                 out.write(dataBytes);
+            }
+        } else if (outputData != null) {
+            conn.setRequestProperty("Content-Length", String.valueOf(outputData.length));
+            conn.setDoOutput(true);
+            try (OutputStream out = conn.getOutputStream()) {
+                out.write(outputData);
             }
         }
     }
@@ -243,26 +246,43 @@ public class WebRequest {
         }
 
         public @NotNull WebRequest.Builder formData(@NotNull String key, String value) {
+            if (request.outputData != null) {
+                throw new IllegalStateException("Cannot add form data when output data is set.");
+            }
+
             if (value != null) {
-                if (!hasKey(request.postData, key)) {
-                    request.postData.put(key, value);
+                if (!hasKey(request.formData, key)) {
+                    request.formData.put(key, value);
                 }
             } else {
-                removeKey(request.postData, key);
+                removeKey(request.formData, key);
             }
             return this;
         }
 
         public @NotNull WebRequest.Builder formData(@NotNull Map<String, String> value) {
+            if (request.outputData != null) {
+                throw new IllegalStateException("Cannot add form data when output data is set.");
+            }
+
             for (Map.Entry<String, String> kvp : value.entrySet()) {
                 if (kvp.getValue() != null) {
-                    if (!hasKey(request.postData, kvp.getKey())) {
-                        request.postData.put(kvp.getKey(), kvp.getValue());
+                    if (!hasKey(request.formData, kvp.getKey())) {
+                        request.formData.put(kvp.getKey(), kvp.getValue());
                     }
                 } else {
-                    removeKey(request.postData, kvp.getKey());
+                    removeKey(request.formData, kvp.getKey());
                 }
             }
+            return this;
+        }
+
+        public @NotNull WebRequest.Builder outputData(byte[] value) {
+            if (!request.formData.isEmpty()) {
+                throw new IllegalStateException("Cannot add output data when form data is set.");
+            }
+
+            request.outputData = value;
             return this;
         }
 
@@ -279,11 +299,6 @@ public class WebRequest {
             return this;
         }
 
-        public @NotNull WebRequest.Builder forOutput(boolean value) {
-            request.forOutput = value;
-            return this;
-        }
-
         public @NotNull WebRequest.Builder proxy(Proxy value) {
             request.proxy = value;
             return this;
@@ -295,6 +310,7 @@ public class WebRequest {
                     request.headers.put(kvp.getKey(), kvp.getValue());
                 }
             }
+
             return request;
         }
 
