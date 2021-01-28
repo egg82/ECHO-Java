@@ -13,5 +13,7 @@ class ManchasCommandTests {
 
         Assertions.assertNotNull(ManchasCommand.get(14).get());
         System.out.println(ManchasCommand.get(14).get());
+
+        Assertions.assertThrows(ExecutionException.class, () -> ManchasCommand.get(394857934).get());
     }
 }

@@ -16,8 +16,8 @@ import me.egg82.echo.services.lookup.models.PlayerUUIDModel;
 import me.egg82.echo.services.lookup.models.ProfileModel;
 import me.egg82.echo.utils.TimeUtil;
 import me.egg82.echo.web.WebRequest;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class BotPlayerInfo implements PlayerInfo {
     private final UUID uuid;
@@ -32,7 +32,7 @@ public class BotPlayerInfo implements PlayerInfo {
     private static final Object nameCacheLock = new Object();
     private static final Object propertiesCacheLock = new Object();
 
-    BotPlayerInfo(@NonNull UUID uuid) throws IOException {
+    BotPlayerInfo(@NotNull UUID uuid) throws IOException {
         this.uuid = uuid;
 
         Optional<String> name = Optional.ofNullable(uuidCache.getIfPresent(uuid));
@@ -63,7 +63,7 @@ public class BotPlayerInfo implements PlayerInfo {
         }
     }
 
-    BotPlayerInfo(@NonNull String name) throws IOException {
+    BotPlayerInfo(@NotNull String name) throws IOException {
         this.name = name;
 
         Optional<UUID> uuid = Optional.ofNullable(nameCache.getIfPresent(name));
@@ -94,13 +94,13 @@ public class BotPlayerInfo implements PlayerInfo {
         }
     }
 
-    public @NonNull UUID getUUID() { return uuid; }
+    public @NotNull UUID getUUID() { return uuid; }
 
-    public @NonNull String getName() { return name; }
+    public @NotNull String getName() { return name; }
 
-    public @NonNull ImmutableList<ProfileModel.ProfilePropertyModel> getProperties() { return ImmutableList.copyOf(properties); }
+    public @NotNull ImmutableList<ProfileModel.ProfilePropertyModel> getProperties() { return ImmutableList.copyOf(properties); }
 
-    private static @Nullable String nameExpensive(@NonNull UUID uuid) throws IOException {
+    private static @Nullable String nameExpensive(@NotNull UUID uuid) throws IOException {
         // Network lookup
         HttpURLConnection conn = WebRequest.builder(new URL("https://api.mojang.com/user/profiles/" + uuid.toString().replace("-", "") + "/names")).timeout(new TimeUtil.Time(2500L, TimeUnit.MILLISECONDS)).userAgent("egg82/PlayerInfo").header("Accept", "application/json").build().getConnection();
         int status = conn.getResponseCode();
@@ -123,7 +123,7 @@ public class BotPlayerInfo implements PlayerInfo {
         throw new IOException("Mojang API response code: " + status);
     }
 
-    private static @Nullable UUID uuidExpensive(@NonNull String name) throws IOException {
+    private static @Nullable UUID uuidExpensive(@NotNull String name) throws IOException {
         // Network lookup
         HttpURLConnection conn = WebRequest.builder(new URL("https://api.mojang.com/users/profiles/minecraft/" + WebRequest.urlEncode(name))).timeout(new TimeUtil.Time(2500L, TimeUnit.MILLISECONDS)).userAgent("egg82/PlayerInfo").header("Accept", "application/json").build().getConnection();
         int status = conn.getResponseCode();
@@ -145,7 +145,7 @@ public class BotPlayerInfo implements PlayerInfo {
         throw new IOException("Mojang API response code: " + status);
     }
 
-    private static @Nullable List<ProfileModel.ProfilePropertyModel> propertiesExpensive(@NonNull UUID uuid) throws IOException {
+    private static @Nullable List<ProfileModel.ProfilePropertyModel> propertiesExpensive(@NotNull UUID uuid) throws IOException {
         // Network lookup
         HttpURLConnection conn = WebRequest.builder(new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString().replace("-", "") + "?unsigned=false")).timeout(new TimeUtil.Time(2500L, TimeUnit.MILLISECONDS)).userAgent("egg82/PlayerInfo").header("Accept", "application/json").build().getConnection();
         int status = conn.getResponseCode();

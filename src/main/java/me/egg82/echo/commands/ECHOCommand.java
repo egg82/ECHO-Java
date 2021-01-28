@@ -8,7 +8,6 @@ import co.aikar.commands.annotation.*;
 import me.egg82.echo.commands.internal.ReloadCommand;
 import me.egg82.echo.utils.FileUtil;
 import net.dv8tion.jda.api.JDA;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 
 @CommandAlias("echo")
@@ -24,18 +23,18 @@ public class ECHOCommand extends BaseCommand {
     @Subcommand("reload")
     @CommandPermission("echo.admin")
     @Description("{@@description.reload}")
-    public void onReload(@NonNull CommandIssuer issuer) {
+    public void onReload(@NotNull CommandIssuer issuer) {
         new ReloadCommand(issuer, FileUtil.getCwd(), manager, jda).run();
     }
 
     @CatchUnknown
     @Default
     @CommandCompletion("@subcommand")
-    public void onDefault(@NonNull CommandIssuer issuer, String[] args) {
+    public void onDefault(@NotNull CommandIssuer issuer, String[] args) {
         manager.getRootCommand("echo help").execute(issuer, null, args);
     }
 
     @HelpCommand
     @Syntax("[command]")
-    public void onHelp(@NonNull CommandIssuer issuer, @NonNull CommandHelp help) { help.showHelp(); }
+    public void onHelp(@NotNull CommandIssuer issuer, @NotNull CommandHelp help) { help.showHelp(); }
 }

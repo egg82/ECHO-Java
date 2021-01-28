@@ -51,6 +51,11 @@ public class XKCDCommand extends BaseCommand {
                 return;
             }
 
+            if (val == null) {
+                issuer.sendMessage("An error occurred, sorry :(");
+                return;
+            }
+
             EmbedBuilder embed = new EmbedBuilder();
             embed.setTitle("XKCD: " + val.getSafeTitle(), val.getLink().isEmpty() ? String.format("https://xkcd.com/%d/", val.getNum()) : val.getLink());
             embed.setImage(val.getImg());

@@ -14,6 +14,7 @@ import javax.security.auth.login.LoginException;
 import joptsimple.OptionSet;
 import me.egg82.echo.commands.ECHOCommand;
 import me.egg82.echo.commands.ManchasCommand;
+import me.egg82.echo.commands.RoryCommand;
 import me.egg82.echo.commands.XKCDCommand;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
@@ -33,7 +34,6 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import ninja.egg82.events.EventSubscriber;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -150,6 +150,7 @@ public class Bot {
         commands.add(new ECHOCommand(jda, commandManager));
         commands.add(new XKCDCommand());
         commands.add(new ManchasCommand());
+        commands.add(new RoryCommand());
 
         for (BaseCommand command : commands) {
             commandManager.registerCommand(command);
@@ -174,12 +175,12 @@ public class Bot {
         }
     }
 
-    public boolean loadYamlLanguageFile(@NonNull JDALocales locales, @NonNull File file, @NonNull Locale locale) throws IOException {
+    public boolean loadYamlLanguageFile(@NotNull JDALocales locales, @NotNull File file, @NotNull Locale locale) throws IOException {
         ConfigurationLoader<CommentedConfigurationNode> fileLoader = YamlConfigurationLoader.builder().nodeStyle(NodeStyle.BLOCK).indent(2).file(file).build();
         return loadLanguage(locales, fileLoader.load(), locale);
     }
 
-    private boolean loadLanguage(@NonNull JDALocales locales, @NonNull CommentedConfigurationNode config, @NonNull Locale locale) {
+    private boolean loadLanguage(@NotNull JDALocales locales, @NotNull CommentedConfigurationNode config, @NotNull Locale locale) {
         boolean loaded = false;
         for (Map.Entry<Object, CommentedConfigurationNode> kvp : config.childrenMap().entrySet()) {
             for (Map.Entry<Object, CommentedConfigurationNode> kvp2 : kvp.getValue().childrenMap().entrySet()) {

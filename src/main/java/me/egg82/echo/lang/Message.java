@@ -2,7 +2,7 @@ package me.egg82.echo.lang;
 
 import co.aikar.locales.MessageKey;
 import co.aikar.locales.MessageKeyProvider;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 public enum Message implements MessageKeyProvider {
     GENERAL__HEADER,
@@ -16,5 +16,5 @@ public enum Message implements MessageKeyProvider {
     RELOAD__END;
 
     private final MessageKey key = MessageKey.of(name().toLowerCase().replace("__", "."));
-    public @NonNull MessageKey getMessageKey() { return key; }
+    public @NotNull MessageKey getMessageKey() { return key; }
 }
