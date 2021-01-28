@@ -90,7 +90,7 @@ public class XKCDCommand extends BaseCommand {
     private static @NotNull CompletableFuture<XKCDSearchModel> search(@NotNull String query) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                String content = WebRequest.builder(new URL(String.format(SEARCH_URL, WebRequest.urlEncode(query))))
+                String content = WebRequest.builder(new URL(String.format(SEARCH_URL, WebRequest.urlEncode(query.replace("\\s+", "+")))))
                         .timeout(WebConstants.TIMEOUT)
                         .userAgent(WebConstants.USER_AGENT)
                         .header("Accept", "text/plain")

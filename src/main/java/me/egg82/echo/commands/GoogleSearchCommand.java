@@ -33,7 +33,7 @@ public class GoogleSearchCommand extends BaseCommand {
     public GoogleSearchCommand() { }
 
     @Default
-    @Description("{@@description.xkcd}")
+    @Description("{@@description.google}")
     @Syntax("<search>")
     public void submit(@NotNull CommandIssuer issuer, @NotNull MessageReceivedEvent event, @NotNull String query) {
         if (event.getAuthor().isBot()) {

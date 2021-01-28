@@ -21,3 +21,5 @@ reload:
 xkcd: "Find an XKCD."
 manchas: "Gives a Manchas kitty image."
 rory: "Gives a Rory kitty image."
+google: "Get Google results."
+lmgtfy: "Googles things for you."

@@ -30,7 +30,7 @@ public class RoryCommand extends BaseCommand {
     private static final String CAT_URL_ID = "https://rory.cat/purr/%d";
 
     @Default
-    @Description("{@@description.manchas}")
+    @Description("{@@description.rory}")
     @Syntax("[id]")
     public void submit(@NotNull CommandIssuer issuer, @NotNull MessageReceivedEvent event, @Default("-1") int id) {
         if (event.getAuthor().isBot()) {
