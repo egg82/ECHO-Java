@@ -2,6 +2,7 @@ package me.egg82.echo.web;
 
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.Proxy;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -12,7 +13,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.utils.TimeUtil;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +27,8 @@ public class WebRequest {
     private final Map<String, String> postData = new HashMap<>();
     private int maxRedirects = 20;
     private boolean throwOnStandardErrors = true;
+    private boolean forOutput = false;
+    private Proxy proxy = null;
 
     private WebRequest(@NotNull URL url) {
         this.url = url;
@@ -86,7 +88,7 @@ public class WebRequest {
             logger.info("Fetching URL: " + url);
         }
 
-        HttpURLConnection retVal = openConnection(url);
+        HttpURLConnection retVal = (HttpURLConnection) (proxy != null ? url.openConnection(proxy) : url.openConnection());
         setConnectionProperties(retVal, null);
 
         Set<String> previousUrls = new HashSet<>();
@@ -113,19 +115,19 @@ public class WebRequest {
                 if (ConfigUtil.getDebugOrFalse()) {
                     logger.info("Redirected to URL: " + newUrl);
                 }
-                retVal = openConnection(new URL(newUrl));
+                retVal = (HttpURLConnection) (proxy != null ? new URL(newUrl).openConnection(proxy) : new URL(newUrl).openConnection());
                 setConnectionProperties(retVal, cookies);
             }
         } while (redirect);
 
+        tryThrowOnStandardErrors(retVal);
+
         return retVal;
     }
 
-    private @NotNull HttpURLConnection openConnection(@NotNull URL url) throws IOException {
-        HttpURLConnection retVal = (HttpURLConnection) url.openConnection();
-
-        if (throwOnStandardErrors) {
-            int status = retVal.getResponseCode();
+    private void tryThrowOnStandardErrors(@NotNull HttpURLConnection connection) throws IOException {
+        if (!forOutput && throwOnStandardErrors) {
+            int status = connection.getResponseCode();
 
             if (status >= 200 && status < 300) {
                 if (status == HttpURLConnection.HTTP_RESET) {
@@ -149,8 +151,6 @@ public class WebRequest {
                 throw new IOException("Could not get connection (HTTP status " + status + ")");
             }
         }
-
-        return retVal;
     }
 
     private void setConnectionProperties(@NotNull HttpURLConnection conn, String cookies) throws IOException {
@@ -158,7 +158,7 @@ public class WebRequest {
         conn.setConnectTimeout((int) timeout.getMillis());
         conn.setReadTimeout((int) timeout.getMillis());
 
-        if (method != null) {
+        if (method != RequestMethod.GET) {
             conn.setRequestMethod(method.name());
         }
         if (!headers.isEmpty()) {
@@ -275,6 +275,16 @@ public class WebRequest {
             return this;
         }
 
+        public @NotNull WebRequest.Builder forOutput(boolean value) {
+            request.forOutput = value;
+            return this;
+        }
+
+        public @NotNull WebRequest.Builder proxy(Proxy value) {
+            request.proxy = value;
+            return this;
+        }
+
         public @NotNull WebRequest build() {
             for (Map.Entry<String, String> kvp : DEFAULT_HEADERS.entrySet()) {
                 if (kvp.getValue() != null && !hasKey(request.headers, kvp.getKey())) {
@@ -284,7 +294,7 @@ public class WebRequest {
             return request;
         }
 
-        private boolean hasKey(@NonNull Map<String, String> map, @NonNull String key) {
+        private boolean hasKey(@NotNull Map<String, String> map, @NotNull String key) {
             for (String k : map.keySet()) {
                 if (k.equalsIgnoreCase(key)) {
                     return true;
@@ -293,7 +303,7 @@ public class WebRequest {
             return false;
         }
 
-        private void removeKey(@NonNull Map<String, String> map, @NonNull String key) {
+        private void removeKey(@NotNull Map<String, String> map, @NotNull String key) {
             String newKey = null;
             do {
                 for (String k : map.keySet()) {
