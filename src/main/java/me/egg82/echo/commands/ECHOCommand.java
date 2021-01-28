@@ -1,12 +1,7 @@
 package me.egg82.echo.commands;
 
-import co.aikar.commands.BaseCommand;
-import co.aikar.commands.CommandIssuer;
-import co.aikar.commands.CommandManager;
-import co.aikar.commands.annotation.CommandAlias;
-import co.aikar.commands.annotation.CommandPermission;
-import co.aikar.commands.annotation.Description;
-import co.aikar.commands.annotation.Subcommand;
+import co.aikar.commands.*;
+import co.aikar.commands.annotation.*;
 import me.egg82.echo.commands.internal.ReloadCommand;
 import me.egg82.echo.utils.FileUtil;
 import net.dv8tion.jda.api.JDA;
@@ -16,9 +11,9 @@ import org.jetbrains.annotations.NotNull;
 @CommandAlias("echo")
 public class ECHOCommand extends BaseCommand {
     private final JDA jda;
-    private final CommandManager manager;
+    private final JDACommandManager manager;
 
-    public ECHOCommand(@NotNull JDA jda, @NotNull CommandManager manager) {
+    public ECHOCommand(@NotNull JDA jda, @NotNull JDACommandManager manager) {
         this.jda = jda;
         this.manager = manager;
     }
@@ -30,14 +25,14 @@ public class ECHOCommand extends BaseCommand {
         new ReloadCommand(issuer, FileUtil.getCwd(), manager, jda).run();
     }
 
-    /*@CatchUnknown
+    @CatchUnknown
     @Default
     @CommandCompletion("@subcommand")
-    public void onDefault(@NonNull CommandSender sender, String[] args) {
-        ProxyServer.getInstance().getPluginManager().dispatchCommand(sender, "echo help");
+    public void onDefault(@NonNull CommandIssuer issuer, String[] args) {
+        manager.getRootCommand("echo help").execute(issuer, null, args);
     }
 
     @HelpCommand
     @Syntax("[command]")
-    public void onHelp(@NonNull CommandSender sender, @NonNull CommandHelp help) { help.showHelp(); }*/
+    public void onHelp(@NonNull CommandIssuer issuer, @NonNull CommandHelp help) { help.showHelp(); }
 }

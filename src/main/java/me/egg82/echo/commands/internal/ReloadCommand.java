@@ -1,7 +1,7 @@
 package me.egg82.echo.commands.internal;
 
 import co.aikar.commands.CommandIssuer;
-import co.aikar.commands.CommandManager;
+import co.aikar.commands.JDACommandManager;
 import java.io.File;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
@@ -16,10 +16,10 @@ import org.jetbrains.annotations.NotNull;
 
 public class ReloadCommand extends AbstractCommand {
     private final File dataFolder;
-    private final CommandManager manager;
+    private final JDACommandManager manager;
     private final JDA jda;
 
-    public ReloadCommand(@NotNull CommandIssuer issuer, @NotNull File dataFolder, @NotNull CommandManager manager, @NotNull JDA jda) {
+    public ReloadCommand(@NotNull CommandIssuer issuer, @NotNull File dataFolder, @NotNull JDACommandManager manager, @NotNull JDA jda) {
         super(issuer);
         this.dataFolder = dataFolder;
         this.manager = manager;

@@ -17,3 +17,5 @@ error:
 reload:
   begin: "<c2>Reloading, please wait..</c2>"
   end: "<c4>Configuration reloaded!</c4>"
+
+xkcd: "Find an XKCD."
