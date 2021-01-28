@@ -3,10 +3,7 @@ package me.egg82.echo;
 import co.aikar.commands.JDACommandManager;
 import co.aikar.commands.JDALocales;
 import co.aikar.commands.MessageType;
-import co.aikar.commands.RegisteredCommand;
 import co.aikar.locales.MessageKey;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.SetMultimap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import java.io.File;
@@ -35,6 +32,7 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import ninja.egg82.events.EventSubscriber;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.configurate.CommentedConfigurationNode;
@@ -55,7 +53,7 @@ public class Bot {
 
     private final ECHOCommand baseCommand;
 
-    public Bot(OptionSet options) throws LoginException {
+    public Bot(@NotNull OptionSet options, @NotNull String version) throws LoginException {
         JDABuilder builder = JDABuilder.createDefault((String) options.valueOf("token"));
         builder.setActivity(Activity.watching("you"));
         jda = builder.build();
@@ -79,6 +77,12 @@ public class Bot {
         }
 
         BotLogUtil.sendInfo(logger, commandManager, Message.GENERAL__ENABLED);
+        BotLogUtil.sendInfo(logger, commandManager, Message.GENERAL__LOAD,
+                "{version}", version,
+                "{commands}", String.valueOf(commandManager.getRegisteredRootCommands().size()),
+                "{events}", String.valueOf(numEvents),
+                "{tasks}", String.valueOf(tasks.size())
+        );
     }
 
     public void destroy() {

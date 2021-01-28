@@ -6,10 +6,12 @@
 
     <groupId>me.egg82</groupId>
     <artifactId>echo</artifactId>
-    <version>1.0.0</version>
+    <version>${project.version}</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <project.version>1.0.0</project.version>
     </properties>
 
     <profiles>

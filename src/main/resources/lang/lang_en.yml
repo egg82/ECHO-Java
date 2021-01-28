@@ -9,7 +9,7 @@ general:
   header: "<c2>[</c2><c3>ECHO</c3><c2>]</c2> "
   enabled: "<c4>Enabled</c4>"
   disabled: "<c5>Disabled</c5>"
-  load: "<c2>[</c2><c3>Version</c3> {version}<c2>] [</c2><c3>API Version</c3> {apiversion}<c2>] [</c2>{commands} <c6>Commands</c6><c2>] [</c2>{events} <c7>Events</c7><c2>] [</c2>{tasks} <c8>Tasks</c8><c2>]</c2>"
+  load: "<c2>[</c2><c3>Version</c3> {version}<c2>] [</c2>{commands} <c6>Commands</c6><c2>] [</c2>{events} <c7>Events</c7><c2>] [</c2>{tasks} <c8>Tasks</c8><c2>]</c2>"
 
 error:
   internal: "Internal error"

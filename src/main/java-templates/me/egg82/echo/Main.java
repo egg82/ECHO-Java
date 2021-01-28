@@ -15,7 +15,7 @@ public class Main {
         parser.accepts("token", "Discord bot token").withRequiredArg();
 
         try {
-            bot = new Bot(parser.parse(args));
+            bot = new Bot(parser.parse(args), "${project.version}");
         } catch (LoginException ex) {
             logger.error(ex.getMessage(), ex);
         }
