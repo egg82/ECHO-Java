@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS "echo_data" (
+	"id"	INTEGER NOT NULL,
+	"version"	INTEGER NOT NULL,
+	"created"	INTEGER NOT NULL,
+	"modified"	INTEGER NOT NULL,
+	"key"	TEXT NOT NULL UNIQUE,
+	"value"	TEXT,
+	PRIMARY KEY("id" AUTOINCREMENT)
+);

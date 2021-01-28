@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS "echo_data" (
+	"id" SERIAL PRIMARY KEY,
+	"version" INTEGER NOT NULL,
+	"created" TIMESTAMP NOT NULL,
+	"modified" TIMESTAMP NOT NULL,
+	"key" VARCHAR(255) NOT NULL UNIQUE,
+	"value" VARCHAR(255)
+);
