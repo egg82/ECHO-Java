@@ -12,6 +12,8 @@ import java.util.*;
 import javax.persistence.PersistenceException;
 import me.egg82.echo.storage.models.BaseModel;
 import me.egg82.echo.storage.models.DataModel;
+import me.egg82.echo.storage.models.MessageModel;
+import me.egg82.echo.storage.models.query.QMessageModel;
 import me.egg82.echo.storage.models.query.QDataModel;
 import me.egg82.echo.utils.VersionUtil;
 import org.jetbrains.annotations.NotNull;
@@ -69,6 +71,62 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         queueLock.readLock().lock();
         try {
             connection.delete(newModel);
+        } finally {
+            queueLock.readLock().unlock();
+        }
+    }
+
+    public @NotNull MessageModel getOrCreateMessageModel(@NotNull String message) {
+        queueLock.readLock().lock();
+        try {
+            MessageModel model = new QMessageModel(connection)
+                    .message.equalTo(message)
+                    .findOne();
+            if (model == null) {
+                model = new MessageModel();
+                model.setMessage(message);
+                connection.save(model);
+                model = new QMessageModel(connection)
+                        .message.equalTo(message)
+                        .findOne();
+                if (model == null) {
+                    throw new PersistenceException("findOne() returned null after saving.");
+                }
+            }
+            return model;
+        } finally {
+            queueLock.readLock().unlock();
+        }
+    }
+
+    public @Nullable MessageModel getMessageModel(@NotNull String message) {
+        queueLock.readLock().lock();
+        try {
+            return new QMessageModel(connection)
+                    .message.equalTo(message)
+                    .findOne();
+        } finally {
+            queueLock.readLock().unlock();
+        }
+    }
+
+    public @Nullable MessageModel getMessageModel(long messageId) {
+        queueLock.readLock().lock();
+        try {
+            return new QMessageModel(connection)
+                    .id.equalTo(messageId)
+                    .findOne();
+        } finally {
+            queueLock.readLock().unlock();
+        }
+    }
+
+    public @NotNull Set<MessageModel> getAllMessages(int start, int end) {
+        queueLock.readLock().lock();
+        try {
+            return new QMessageModel(connection)
+                    .id.between(start - 1, end + 1)
+                    .findSet();
         } finally {
             queueLock.readLock().unlock();
         }
@@ -135,7 +193,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         dbConfig.setDefaultServer(false);
         dbConfig.setRegister(false);
         dbConfig.setName(name);
-        dbConfig.setClasses(Arrays.asList(BaseModel.class, DataModel.class));
+        dbConfig.setClasses(Arrays.asList(BaseModel.class, MessageModel.class, DataModel.class));
         connection = DatabaseFactory.createWithContextClassLoader(dbConfig, getClass().getClassLoader());
 
         DataModel model;
@@ -211,7 +269,11 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
 
     private @Nullable BaseModel duplicateModel(@NotNull BaseModel model, boolean keepModified) {
         BaseModel retVal = null;
-        if (model instanceof DataModel) {
+        if (model instanceof MessageModel) {
+            MessageModel m = new MessageModel();
+            m.setMessage(((MessageModel) model).getMessage());
+            retVal = m;
+        } else if (model instanceof DataModel) {
             DataModel m = new DataModel();
             m.setKey(((DataModel) model).getKey());
             m.setValue(((DataModel) model).getValue());
@@ -229,7 +291,22 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
     }
 
     private void createOrUpdate(@NotNull BaseModel model, boolean keepModified) {
-        if (model instanceof DataModel) {
+        if (model instanceof MessageModel) {
+            MessageModel m = new QMessageModel(connection)
+                    .message.equalTo(((MessageModel) model).getMessage())
+                    .findOne();
+            if (m == null) {
+                m = (MessageModel) duplicateModel(model, keepModified);
+                if (m == null) {
+                    return;
+                }
+                connection.save(m);
+            } else {
+                m.setCreated(model.getCreated());
+                m.setModified(keepModified ? model.getModified() : null);
+                connection.update(m);
+            }
+        } else if (model instanceof DataModel) {
             DataModel m = new QDataModel(connection)
                 .key.equalTo(((DataModel) model).getKey())
                 .findOne();

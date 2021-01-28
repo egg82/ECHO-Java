@@ -1,3 +1,12 @@
+CREATE TABLE IF NOT EXISTS "echo_message" (
+	"id"	INTEGER NOT NULL,
+	"version"	INTEGER NOT NULL,
+	"created"	INTEGER NOT NULL,
+	"modified"	INTEGER NOT NULL,
+	"message"	TEXT NOT NULL,
+	PRIMARY KEY("id" AUTOINCREMENT)
+);
+
 CREATE TABLE IF NOT EXISTS "echo_data" (
 	"id"	INTEGER NOT NULL,
 	"version"	INTEGER NOT NULL,

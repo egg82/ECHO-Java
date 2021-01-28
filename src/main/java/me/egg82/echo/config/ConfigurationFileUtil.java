@@ -1,6 +1,7 @@
 package me.egg82.echo.config;
 
 import co.aikar.commands.CommandManager;
+import io.paradaux.ai.MarkovMegaHal;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -31,7 +32,7 @@ public class ConfigurationFileUtil {
 
     private ConfigurationFileUtil() { }
 
-    public static void reloadConfig(@NotNull File dataDirectory, @NotNull CommandManager manager, @NotNull MessagingHandler messagingHandler) {
+    public static void reloadConfig(@NotNull File dataDirectory, @NotNull CommandManager manager, @NotNull MessagingHandler messagingHandler, @NotNull MarkovMegaHal megaHal) {
         ConfigurationNode config;
         try {
             config = getConfig("config.yml", new File(dataDirectory, "config.yml"));
@@ -61,6 +62,7 @@ public class ConfigurationFileUtil {
         CachedConfig cachedConfig = CachedConfig.builder()
                 .debug(debug)
                 .language(getLanguage(config, debug, manager))
+                .megaHal(megaHal)
                 .storage(getStorage(config, dataDirectory, debug, manager))
                 .messaging(getMessaging(config, serverId, messagingHandler, debug, manager))
                 .serverId(serverId)

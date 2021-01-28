@@ -5,6 +5,7 @@ import co.aikar.commands.JDACommandManager;
 import co.aikar.commands.JDALocales;
 import co.aikar.commands.MessageType;
 import co.aikar.locales.MessageKey;
+import io.paradaux.ai.MarkovMegaHal;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import java.io.File;
@@ -18,6 +19,7 @@ import me.egg82.echo.commands.*;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.config.ConfigurationFileUtil;
+import me.egg82.echo.events.ChatEvents;
 import me.egg82.echo.events.EventHolder;
 import me.egg82.echo.lang.LanguageFileUtil;
 import me.egg82.echo.lang.Message;
@@ -27,6 +29,7 @@ import me.egg82.echo.messaging.MessagingHandler;
 import me.egg82.echo.messaging.MessagingService;
 import me.egg82.echo.reflect.PackageFilter;
 import me.egg82.echo.storage.StorageService;
+import me.egg82.echo.storage.models.MessageModel;
 import me.egg82.echo.tasks.TaskScheduler;
 import me.egg82.echo.utils.BotLogUtil;
 import me.egg82.echo.utils.FileUtil;
@@ -71,6 +74,7 @@ public class Bot {
 
         loadServices();
         loadLanguages();
+        loadMegaHal();
         loadCommands();
         loadEvents();
         loadTasks();
@@ -146,9 +150,41 @@ public class Bot {
     }
 
     private void loadServices() {
-        MessagingHandler messagingHandler = new GenericMessagingHandler();
+        ConfigurationFileUtil.reloadConfig(FileUtil.getCwd(), commandManager, new GenericMessagingHandler(), new MarkovMegaHal());
+    }
 
-        ConfigurationFileUtil.reloadConfig(FileUtil.getCwd(), commandManager, messagingHandler);
+    private void loadMegaHal() {
+        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+        if (cachedConfig == null) {
+            logger.error("Could not get cached config.");
+            return;
+        }
+
+        MarkovMegaHal megaHal = cachedConfig.getMegaHal();
+        StorageService master = cachedConfig.getStorage().get(0);
+
+        if (cachedConfig.getDebug()) {
+            BotLogUtil.sendInfo(logger, commandManager, Message.IMPORT__BEGIN);
+            BotLogUtil.sendInfo(logger, commandManager, Message.IMPORT__MESSAGES, "{id}", "0");
+        }
+
+        int start = 1;
+        int max = 50;
+        Set<MessageModel> models;
+        do {
+            models = master.getAllMessages(start, max);
+            for (MessageModel model : models) {
+                megaHal.add(model.getMessage());
+            }
+            if (cachedConfig.getDebug()) {
+                BotLogUtil.sendInfo(logger, commandManager, Message.IMPORT__MESSAGES, "{id}", String.valueOf(start + models.size()));
+            }
+            start += max;
+        } while (models.size() == max);
+
+        if (cachedConfig.getDebug()) {
+            BotLogUtil.sendInfo(logger, commandManager, Message.IMPORT__END);
+        }
     }
 
     private void loadCommands() {
@@ -171,7 +207,7 @@ public class Bot {
     }
 
     private void loadEvents() {
-        //eventHolders.add(new ChatEvents(jda, commandManager));
+        eventHolders.add(new ChatEvents(jda, commandManager));
     }
 
     private void loadTasks() {

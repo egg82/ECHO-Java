@@ -12,7 +12,7 @@ general:
   load: "<c2>[</c2><c3>Version</c3> {version}<c2>] [</c2>{commands} <c6>Commands</c6><c2>] [</c2>{events} <c7>Events</c7><c2>] [</c2>{tasks} <c8>Tasks</c8><c2>]</c2>"
 
 error:
-  internal: "Internal error"
+  internal: "An error occurred, sorry :("
 
 reload:
   begin: "<c2>Reloading, please wait..</c2>"
@@ -23,3 +23,8 @@ manchas: "Gives a Manchas kitty image."
 rory: "Gives a Rory kitty image."
 google: "Get Google results."
 lmgtfy: "Googles things for you."
+
+import:
+  messages: "<c2>Importing messages..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
+  begin: "<c2>Importing data, please wait..</c2>"
+  end: "<c4>Data successfully imported!</c4>"

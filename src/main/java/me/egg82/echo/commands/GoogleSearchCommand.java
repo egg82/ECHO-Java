@@ -14,6 +14,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
+import me.egg82.echo.lang.Message;
 import me.egg82.echo.web.WebConstants;
 import me.egg82.echo.web.WebRequest;
 import me.egg82.echo.web.models.GoogleSearchModel;
@@ -52,12 +53,12 @@ public class GoogleSearchCommand extends BaseCommand {
                 } else {
                     logger.error(ex.getMessage());
                 }
-                issuer.sendMessage("An error occurred, sorry :(");
+                issuer.sendError(Message.ERROR__INTERNAL);
                 return;
             }
 
             if (val == null) {
-                issuer.sendMessage("An error occurred, sorry :(");
+                issuer.sendError(Message.ERROR__INTERNAL);
                 return;
             }
 

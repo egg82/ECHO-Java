@@ -1,6 +1,7 @@
 package me.egg82.echo.config;
 
 import com.google.common.collect.ImmutableList;
+import io.paradaux.ai.MarkovMegaHal;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -10,6 +11,9 @@ import org.jetbrains.annotations.NotNull;
 
 public class CachedConfig {
     private CachedConfig() { }
+
+    private MarkovMegaHal megaHal = new MarkovMegaHal();
+    public @NotNull MarkovMegaHal getMegaHal() { return megaHal; }
 
     private ImmutableList<StorageService> storage = ImmutableList.of();
     public @NotNull ImmutableList<StorageService> getStorage() { return storage; }
@@ -46,6 +50,11 @@ public class CachedConfig {
 
         public @NotNull CachedConfig.Builder language(@NotNull Locale value) {
             values.language = value;
+            return this;
+        }
+
+        public @NotNull CachedConfig.Builder megaHal(@NotNull MarkovMegaHal value) {
+            values.megaHal = value;
             return this;
         }
 

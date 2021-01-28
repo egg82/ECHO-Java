@@ -13,6 +13,7 @@ import java.net.URL;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import me.egg82.echo.config.ConfigUtil;
+import me.egg82.echo.lang.Message;
 import me.egg82.echo.web.models.XKCDInfoModel;
 import me.egg82.echo.web.models.XKCDSearchModel;
 import me.egg82.echo.web.WebConstants;
@@ -47,12 +48,12 @@ public class XKCDCommand extends BaseCommand {
                 } else {
                     logger.error(ex.getMessage());
                 }
-                issuer.sendMessage("An error occurred, sorry :(");
+                issuer.sendError(Message.ERROR__INTERNAL);
                 return;
             }
 
             if (val == null) {
-                issuer.sendMessage("An error occurred, sorry :(");
+                issuer.sendError(Message.ERROR__INTERNAL);
                 return;
             }
 

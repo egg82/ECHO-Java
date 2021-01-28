@@ -2,6 +2,7 @@ package me.egg82.echo.commands.internal;
 
 import co.aikar.commands.CommandIssuer;
 import co.aikar.commands.JDACommandManager;
+import io.paradaux.ai.MarkovMegaHal;
 import java.io.File;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
@@ -42,9 +43,7 @@ public class ReloadCommand extends AbstractCommand {
             service.close();
         }
 
-        MessagingHandler messagingHandler = new GenericMessagingHandler();
-
-        ConfigurationFileUtil.reloadConfig(dataFolder, manager, messagingHandler);
+        ConfigurationFileUtil.reloadConfig(dataFolder, manager, new GenericMessagingHandler(), new MarkovMegaHal());
 
         issuer.sendInfo(Message.RELOAD__END);
     }
