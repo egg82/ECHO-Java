@@ -10,6 +10,8 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 import javax.security.auth.login.LoginException;
 import joptsimple.OptionSet;
 import me.egg82.echo.commands.*;
@@ -28,9 +30,13 @@ import me.egg82.echo.storage.StorageService;
 import me.egg82.echo.tasks.TaskScheduler;
 import me.egg82.echo.utils.BotLogUtil;
 import me.egg82.echo.utils.FileUtil;
+import me.egg82.echo.utils.TimeUtil;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.requests.GatewayIntent;
 import ninja.egg82.events.EventSubscriber;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -54,6 +60,7 @@ public class Bot {
 
     public Bot(@NotNull OptionSet options, @NotNull String version) throws LoginException {
         JDABuilder builder = JDABuilder.createDefault((String) options.valueOf("token"));
+        builder.enableIntents(GatewayIntent.GUILD_MEMBERS);
         builder.setActivity(Activity.watching("you"));
         jda = builder.build();
 
@@ -167,7 +174,25 @@ public class Bot {
         //eventHolders.add(new ChatEvents(jda, commandManager));
     }
 
-    private void loadTasks() { }
+    private void loadTasks() {
+        TaskScheduler.createRepeatingTask(() -> {
+            ThreadLocalRandom random = ThreadLocalRandom.current();
+
+            if (jda.getGuilds().isEmpty()) {
+                return;
+            }
+
+            Guild guild = jda.getGuilds().get(random.nextInt(jda.getGuilds().size()));
+            guild.findMembers(m -> !m.getUser().isBot()).onSuccess(members -> {
+                if (members.isEmpty()) {
+                    return;
+                }
+
+                Member member = members.get(random.nextInt(guild.getMembers().size()));
+                jda.getPresence().setActivity(Activity.watching(member.getEffectiveName()));
+            });
+        }, new TimeUtil.Time(10L, TimeUnit.SECONDS), new TimeUtil.Time(5L, TimeUnit.MINUTES));
+    }
 
     public void unloadServices() {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
