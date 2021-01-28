@@ -1,5 +1,6 @@
 package me.egg82.echo;
 
+import co.aikar.commands.BaseCommand;
 import co.aikar.commands.JDACommandManager;
 import co.aikar.commands.JDALocales;
 import co.aikar.commands.MessageType;
@@ -47,11 +48,10 @@ public class Bot {
 
     private final List<EventHolder> eventHolders = new ArrayList<>();
     private final List<EventSubscriber<?>> events = new ArrayList<>();
+    private final List<BaseCommand> commands = new ArrayList<>();
     private final IntList tasks = new IntArrayList();
 
     private final JDA jda;
-
-    private final ECHOCommand baseCommand;
 
     public Bot(@NotNull OptionSet options, @NotNull String version) throws LoginException {
         JDABuilder builder = JDABuilder.createDefault((String) options.valueOf("token"));
@@ -60,8 +60,6 @@ public class Bot {
 
         commandManager = new JDACommandManager(jda);
         commandManager.enableUnstableAPI("help");
-
-        baseCommand = new ECHOCommand(jda, commandManager);
 
         setChatColors();
 
@@ -86,7 +84,9 @@ public class Bot {
     }
 
     public void destroy() {
-        commandManager.unregisterCommand(baseCommand);
+        for (BaseCommand command : commands) {
+            commandManager.unregisterCommand(command);
+        }
 
         for (int task : tasks) {
             TaskScheduler.cancelTask(task);
@@ -148,11 +148,15 @@ public class Bot {
     }
 
     private void loadCommands() {
-        commandManager.registerCommand(baseCommand);
+        commands.add(new ECHOCommand(jda, commandManager));
+
+        for (BaseCommand command : commands) {
+            commandManager.registerCommand(command);
+        }
     }
 
     private void loadEvents() {
-        //eventHolders.add(new PlayerEvents(jda, consoleCommandIssuer));
+        //eventHolders.add(new ChatEvents(jda, commandManager));
     }
 
     private void loadTasks() { }
