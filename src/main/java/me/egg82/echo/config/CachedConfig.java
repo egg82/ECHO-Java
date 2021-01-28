@@ -29,6 +29,9 @@ public class CachedConfig {
     private String serverIdString = serverId.toString();
     public @NotNull String getServerIdString() { return serverIdString; }
 
+    private String googleKey = "";
+    public @NotNull String getGoogleKey() { return googleKey; }
+
     public static @NotNull CachedConfig.Builder builder() { return new CachedConfig.Builder(); }
 
     public static class Builder {
@@ -36,29 +39,34 @@ public class CachedConfig {
 
         private Builder() { }
 
-        public CachedConfig.Builder debug(boolean value) {
+        public @NotNull CachedConfig.Builder debug(boolean value) {
             values.debug = value;
             return this;
         }
 
-        public CachedConfig.Builder language(@NotNull Locale value) {
+        public @NotNull CachedConfig.Builder language(@NotNull Locale value) {
             values.language = value;
             return this;
         }
 
-        public CachedConfig.Builder storage(@NotNull List<StorageService> value) {
+        public @NotNull CachedConfig.Builder storage(@NotNull List<StorageService> value) {
             values.storage = ImmutableList.copyOf(value);
             return this;
         }
 
-        public CachedConfig.Builder messaging(@NotNull List<MessagingService> value) {
+        public @NotNull CachedConfig.Builder messaging(@NotNull List<MessagingService> value) {
             values.messaging = ImmutableList.copyOf(value);
             return this;
         }
 
-        public CachedConfig.Builder serverId(@NotNull UUID value) {
+        public @NotNull CachedConfig.Builder serverId(@NotNull UUID value) {
             values.serverId = value;
             values.serverIdString = value.toString();
+            return this;
+        }
+
+        public @NotNull CachedConfig.Builder googleKey(@NotNull String value) {
+            values.googleKey = value;
             return this;
         }
 

@@ -13,7 +13,7 @@ import java.net.URL;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import me.egg82.echo.config.ConfigUtil;
-import me.egg82.echo.models.RoryModel;
+import me.egg82.echo.web.models.RoryModel;
 import me.egg82.echo.web.WebConstants;
 import me.egg82.echo.web.WebRequest;
 import net.dv8tion.jda.api.EmbedBuilder;

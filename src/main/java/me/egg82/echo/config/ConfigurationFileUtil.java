@@ -53,12 +53,18 @@ public class ConfigurationFileUtil {
             BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Server ID:</c2> <c1>" + serverId.toString() + "</c1>");
         }
 
+        String googleKey = config.node("keys", "google").getString("");
+        if (debug) {
+            BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Google API key:</c2> <c1>" + googleKey + "</c1>");
+        }
+
         CachedConfig cachedConfig = CachedConfig.builder()
                 .debug(debug)
                 .language(getLanguage(config, debug, manager))
                 .storage(getStorage(config, dataDirectory, debug, manager))
                 .messaging(getMessaging(config, serverId, messagingHandler, debug, manager))
                 .serverId(serverId)
+                .googleKey(googleKey)
                 .build();
 
         PacketUtil.setPoolSize(cachedConfig.getMessaging().size() + 1);

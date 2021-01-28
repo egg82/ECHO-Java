@@ -12,10 +12,7 @@ import java.io.IOException;
 import java.util.*;
 import javax.security.auth.login.LoginException;
 import joptsimple.OptionSet;
-import me.egg82.echo.commands.ECHOCommand;
-import me.egg82.echo.commands.ManchasCommand;
-import me.egg82.echo.commands.RoryCommand;
-import me.egg82.echo.commands.XKCDCommand;
+import me.egg82.echo.commands.*;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.config.ConfigurationFileUtil;
@@ -26,6 +23,7 @@ import me.egg82.echo.logging.AnsiColor;
 import me.egg82.echo.messaging.GenericMessagingHandler;
 import me.egg82.echo.messaging.MessagingHandler;
 import me.egg82.echo.messaging.MessagingService;
+import me.egg82.echo.reflect.PackageFilter;
 import me.egg82.echo.storage.StorageService;
 import me.egg82.echo.tasks.TaskScheduler;
 import me.egg82.echo.utils.BotLogUtil;
@@ -147,10 +145,18 @@ public class Bot {
     }
 
     private void loadCommands() {
+        List<Class<BaseCommand>> commandClasses = PackageFilter.getClasses(BaseCommand.class, "me.egg82.echo.commands", false, false, false);
+        for (Class<BaseCommand> command : commandClasses) {
+            if (!ECHOCommand.class.equals(command)) {
+                try {
+                    commands.add(command.newInstance());
+                } catch (InstantiationException | IllegalAccessException ex) {
+                    logger.warn(ex.getMessage(), ex);
+                }
+            }
+        }
+
         commands.add(new ECHOCommand(jda, commandManager));
-        commands.add(new XKCDCommand());
-        commands.add(new ManchasCommand());
-        commands.add(new RoryCommand());
 
         for (BaseCommand command : commands) {
             commandManager.registerCommand(command);

@@ -1,4 +1,4 @@
-package me.egg82.echo.models;
+package me.egg82.echo.web.models;
 
 import flexjson.JSON;
 import java.io.Serializable;

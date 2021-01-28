@@ -1,4 +1,4 @@
-package me.egg82.echo.models;
+package me.egg82.echo.web.models;
 
 import it.unimi.dsi.fastutil.ints.IntObjectImmutablePair;
 import java.io.Serializable;
