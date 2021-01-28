@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 class XKCDCommandTests {
     @Test
-    void testJSON() throws ExecutionException, InterruptedException {
+    void testResponse() throws ExecutionException, InterruptedException {
         Assertions.assertNotNull(XKCDCommand.getModel("standards").get());
         System.out.println(XKCDCommand.getModel("standards").get());
     }

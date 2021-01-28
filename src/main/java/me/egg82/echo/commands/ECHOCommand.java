@@ -1,6 +1,9 @@
 package me.egg82.echo.commands;
 
-import co.aikar.commands.*;
+import co.aikar.commands.BaseCommand;
+import co.aikar.commands.CommandHelp;
+import co.aikar.commands.CommandIssuer;
+import co.aikar.commands.JDACommandManager;
 import co.aikar.commands.annotation.*;
 import me.egg82.echo.commands.internal.ReloadCommand;
 import me.egg82.echo.utils.FileUtil;

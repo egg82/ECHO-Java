@@ -19,3 +19,5 @@ reload:
   end: "<c4>Configuration reloaded!</c4>"
 
 xkcd: "Find an XKCD."
+manchas: "Gives a Manchas kitty image."
+rory: "Gives a Rory kitty image."

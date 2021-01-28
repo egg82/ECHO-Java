@@ -30,14 +30,16 @@ public class XKCDCommand extends BaseCommand {
     private static final String SEARCH_URL = "https://relevantxkcd.appspot.com/process?action=xkcd&query=%s";
     private static final String INFO_URL = "https://xkcd.com/%d/info.0.json";
 
-    public XKCDCommand() {
-
-    }
+    public XKCDCommand() { }
 
     @Default
     @Description("{@@description.xkcd}")
     @Syntax("<search>")
     public void submit(@NotNull CommandIssuer issuer, @NotNull MessageReceivedEvent event, @NotNull String query) {
+        if (event.getAuthor().isBot()) {
+            return;
+        }
+
         getModel(query).whenCompleteAsync((val, ex) -> {
             if (ex != null) {
                 if (ConfigUtil.getDebugOrFalse()) {
@@ -45,13 +47,14 @@ public class XKCDCommand extends BaseCommand {
                 } else {
                     logger.error(ex.getMessage());
                 }
+                issuer.sendMessage("An error occurred, sorry :(");
                 return;
             }
 
             EmbedBuilder embed = new EmbedBuilder();
             embed.setTitle("XKCD: " + val.getSafeTitle(), val.getLink().isEmpty() ? String.format("https://xkcd.com/%d/", val.getNum()) : val.getLink());
             embed.setImage(val.getImg());
-            embed.setFooter(val.getAlt());
+            embed.setFooter("For " + event.getAuthor().getAsTag() + " | " + val.getAlt());
 
             event.getChannel().sendMessage(embed.build()).queue();
         });
@@ -64,7 +67,12 @@ public class XKCDCommand extends BaseCommand {
             }
 
             try {
-                String content = WebRequest.builder(new URL(String.format(INFO_URL, v.getComics().get(v.getSelection()).leftInt()))).timeout(WebConstants.TIMEOUT).userAgent(WebConstants.USER_AGENT).header("Accept", "application/json").build().getString();
+                String content = WebRequest.builder(new URL(String.format(INFO_URL, v.getComics().get(v.getSelection()).leftInt())))
+                        .timeout(WebConstants.TIMEOUT)
+                        .userAgent(WebConstants.USER_AGENT)
+                        .header("Accept", "application/json")
+                        .build().getString();
+
                 JSONDeserializer<XKCDInfoModel> modelDeserializer = new JSONDeserializer<>();
                 XKCDInfoModel retVal = modelDeserializer.deserialize(content, XKCDInfoModel.class);
                 return retVal == null || retVal.getNum() == -1 ? null : retVal;
@@ -77,7 +85,12 @@ public class XKCDCommand extends BaseCommand {
     private static @NotNull CompletableFuture<XKCDSearchModel> search(@NotNull String query) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                String content = WebRequest.builder(new URL(String.format(SEARCH_URL, WebRequest.urlEncode(query)))).timeout(WebConstants.TIMEOUT).userAgent(WebConstants.USER_AGENT).header("Accept", "text/plain").build().getString();
+                String content = WebRequest.builder(new URL(String.format(SEARCH_URL, WebRequest.urlEncode(query))))
+                        .timeout(WebConstants.TIMEOUT)
+                        .userAgent(WebConstants.USER_AGENT)
+                        .header("Accept", "text/plain")
+                        .build().getString();
+
                 String[] splitContent = content.replace("\r", "").replace("\n", " ").split("\\s+");
                 if (splitContent.length < 2) {
                     return null;

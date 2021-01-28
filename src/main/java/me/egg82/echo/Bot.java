@@ -13,12 +13,12 @@ import java.util.*;
 import javax.security.auth.login.LoginException;
 import joptsimple.OptionSet;
 import me.egg82.echo.commands.ECHOCommand;
+import me.egg82.echo.commands.ManchasCommand;
 import me.egg82.echo.commands.XKCDCommand;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.config.ConfigurationFileUtil;
 import me.egg82.echo.events.EventHolder;
-import me.egg82.echo.lang.BotMessageFormatter;
 import me.egg82.echo.lang.LanguageFileUtil;
 import me.egg82.echo.lang.Message;
 import me.egg82.echo.logging.AnsiColor;
@@ -132,8 +132,6 @@ public class Bot {
         locales.setDefaultLocale(cachedConfig.getLanguage());
         commandManager.usePerIssuerLocale(true);
 
-        /*commandManager.setFormat(MessageType.ERROR, new BotMessageFormatter(commandManager, Message.GENERAL__HEADER));
-        commandManager.setFormat(MessageType.INFO, new BotMessageFormatter(commandManager, Message.GENERAL__HEADER));*/
         setChatColors();
     }
 
@@ -151,6 +149,7 @@ public class Bot {
     private void loadCommands() {
         commands.add(new ECHOCommand(jda, commandManager));
         commands.add(new XKCDCommand());
+        commands.add(new ManchasCommand());
 
         for (BaseCommand command : commands) {
             commandManager.registerCommand(command);
