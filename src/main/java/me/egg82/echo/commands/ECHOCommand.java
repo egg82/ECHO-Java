@@ -5,6 +5,7 @@ import co.aikar.commands.CommandHelp;
 import co.aikar.commands.CommandIssuer;
 import co.aikar.commands.JDACommandManager;
 import co.aikar.commands.annotation.*;
+import me.egg82.echo.commands.internal.LearnCommand;
 import me.egg82.echo.commands.internal.ReloadCommand;
 import me.egg82.echo.utils.FileUtil;
 import net.dv8tion.jda.api.JDA;
@@ -25,6 +26,14 @@ public class ECHOCommand extends BaseCommand {
     @Description("{@@description.reload}")
     public void onReload(@NotNull CommandIssuer issuer) {
         new ReloadCommand(issuer, FileUtil.getCwd(), manager, jda).run();
+    }
+
+    @Subcommand("learn")
+    @CommandPermission("echo.admin")
+    @Description("{@@description.learn}")
+    @Syntax("<url> [delimiter]")
+    public void onReload(@NotNull CommandIssuer issuer, @NotNull String url, @Default("\n") String delimiter) {
+        new LearnCommand(issuer, url, delimiter).run();
     }
 
     @CatchUnknown

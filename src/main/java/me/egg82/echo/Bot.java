@@ -15,7 +15,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import javax.security.auth.login.LoginException;
 import joptsimple.OptionSet;
-import me.egg82.echo.commands.*;
+import me.egg82.echo.commands.ECHOCommand;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.config.ConfigurationFileUtil;
@@ -25,7 +25,6 @@ import me.egg82.echo.lang.LanguageFileUtil;
 import me.egg82.echo.lang.Message;
 import me.egg82.echo.logging.AnsiColor;
 import me.egg82.echo.messaging.GenericMessagingHandler;
-import me.egg82.echo.messaging.MessagingHandler;
 import me.egg82.echo.messaging.MessagingService;
 import me.egg82.echo.reflect.PackageFilter;
 import me.egg82.echo.storage.StorageService;
@@ -33,6 +32,7 @@ import me.egg82.echo.storage.models.MessageModel;
 import me.egg82.echo.tasks.TaskScheduler;
 import me.egg82.echo.utils.BotLogUtil;
 import me.egg82.echo.utils.FileUtil;
+import me.egg82.echo.utils.PacketUtil;
 import me.egg82.echo.utils.TimeUtil;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -211,7 +211,7 @@ public class Bot {
     }
 
     private void loadTasks() {
-        TaskScheduler.createRepeatingTask(() -> {
+        tasks.add(TaskScheduler.createRepeatingTask(() -> {
             ThreadLocalRandom random = ThreadLocalRandom.current();
 
             if (jda.getGuilds().isEmpty()) {
@@ -227,7 +227,9 @@ public class Bot {
                 Member member = members.get(random.nextInt(guild.getMembers().size()));
                 jda.getPresence().setActivity(Activity.watching(member.getEffectiveName()));
             });
-        }, new TimeUtil.Time(10L, TimeUnit.SECONDS), new TimeUtil.Time(5L, TimeUnit.MINUTES));
+        }, new TimeUtil.Time(10L, TimeUnit.SECONDS), new TimeUtil.Time(5L, TimeUnit.MINUTES)));
+
+        tasks.add(TaskScheduler.createRepeatingTask(PacketUtil::trySendQueue, new TimeUtil.Time(1L, TimeUnit.SECONDS), new TimeUtil.Time(1L, TimeUnit.SECONDS)));
     }
 
     public void unloadServices() {

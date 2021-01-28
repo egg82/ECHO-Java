@@ -9,7 +9,6 @@ import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.config.ConfigurationFileUtil;
 import me.egg82.echo.lang.Message;
 import me.egg82.echo.messaging.GenericMessagingHandler;
-import me.egg82.echo.messaging.MessagingHandler;
 import me.egg82.echo.messaging.MessagingService;
 import me.egg82.echo.storage.StorageService;
 import net.dv8tion.jda.api.JDA;

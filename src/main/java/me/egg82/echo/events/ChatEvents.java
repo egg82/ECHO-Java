@@ -22,6 +22,7 @@ public class ChatEvents extends EventHolder {
         JDAEvents.subscribe(jda, MessageReceivedEvent.class)
                 .filter(e -> !e.getAuthor().isBot())
                 .filter(e -> !e.isWebhookMessage())
+                .filter(e -> !e.getMessage().getContentStripped().startsWith("!"))
                 .handler(this::learn);
     }
 

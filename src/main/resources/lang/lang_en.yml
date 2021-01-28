@@ -18,6 +18,10 @@ reload:
   begin: "<c2>Reloading, please wait..</c2>"
   end: "<c4>Configuration reloaded!</c4>"
 
+learn:
+  begin: "<c2>Learning, please wait..</c2>"
+  end: "<c4>Learned from</c4> <c3>{url}</c3><c4>!</c4>"
+
 xkcd: "Find an XKCD."
 manchas: "Gives a Manchas kitty image."
 rory: "Gives a Rory kitty image."
