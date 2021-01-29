@@ -66,6 +66,12 @@ public class ConfigurationFileUtil {
             BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Alot emote:</c2> <c1>" + alotEmote + "</c1>");
         }
 
+        double replyChance = config.node("chat", "random").getDouble(0.15d);
+        replyChance = Math.max(0.0d, Math.min(1.0d, replyChance));
+        if (debug) {
+            BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Reply chance:</c2> <c1>" + replyChance + "</c1>");
+        }
+
         CachedConfig cachedConfig = CachedConfig.builder()
                 .debug(debug)
                 .language(getLanguage(config, debug, manager))
@@ -76,6 +82,8 @@ public class ConfigurationFileUtil {
                 .googleKey(googleKey)
                 .alotEmote(alotEmote)
                 .disabledCommands(getDisabledCommands(config, debug, manager))
+                .replyChance(replyChance)
+                .replyPhrases(getReplyPhrases(config, debug, manager))
                 .build();
 
         PacketUtil.setPoolSize(cachedConfig.getMessaging().size() + 1);
@@ -372,6 +380,29 @@ public class ConfigurationFileUtil {
         for (String command : retVal) {
             if (debug) {
                 BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Disabling command:</c2> <c1>" + command + "</c1>");
+            }
+        }
+
+        return retVal;
+    }
+
+    private static @NonNull Set<String> getReplyPhrases(@NonNull ConfigurationNode config, boolean debug, @NonNull JDACommandManager manager) {
+        Set<String> phrases;
+        try {
+            phrases = new HashSet<>(!config.node("chat", "respond").empty() ? config.node("chat", "respond").getList(String.class) : new ArrayList<>());
+        } catch (SerializationException ex) {
+            logger.error(ex.getMessage(), ex);
+            phrases = new HashSet<>();
+        }
+
+        Set<String> retVal = new HashSet<>();
+        for (String phrase : phrases) {
+            retVal.add(phrase.toLowerCase());
+        }
+
+        for (String phrase : retVal) {
+            if (debug) {
+                BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Enabling reply phrase:</c2> <c1>" + phrase + "</c1>");
             }
         }
 

@@ -1,19 +1,26 @@
 package me.egg82.echo.events;
 
 import co.aikar.commands.JDACommandManager;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import io.paradaux.ai.MarkovMegaHal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.messaging.packets.MessagePacket;
+import me.egg82.echo.messaging.packets.MessageUpdatePacket;
 import me.egg82.echo.storage.StorageService;
+import me.egg82.echo.storage.models.MessageModel;
 import me.egg82.echo.utils.PacketUtil;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
 import ninja.egg82.events.JDAEvents;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,6 +33,8 @@ public class ChatEvents extends EventHolder {
 
     private final Pattern RE_SPACE = Pattern.compile("[\\s\\t]+");
     private final Pattern RE_NOT_WORD = Pattern.compile("[^\\w]");
+
+    private final Cache<Long, String> oldMessages = Caffeine.newBuilder().expireAfterWrite(20L, TimeUnit.MINUTES).expireAfterAccess(5L, TimeUnit.MINUTES).build();
 
     public ChatEvents(@NotNull JDA jda, @NotNull JDACommandManager manager) {
         this.jda = jda;
@@ -41,11 +50,15 @@ public class ChatEvents extends EventHolder {
                 .filter(e -> !e.getAuthor().isBot())
                 .filter(e -> !e.isWebhookMessage())
                 .filter(e -> !e.getMessage().getContentStripped().startsWith("!"))
-                .filter(e -> rand.nextDouble() <= 0.15)
                 .handler(this::speak));
 
+        events.add(JDAEvents.subscribe(jda, GuildMessageUpdateEvent.class)
+                .filter(e -> !e.getAuthor().isBot())
+                .filter(e -> !e.getMessage().getContentStripped().startsWith("!"))
+                .handler(this::replace));
+
         events.add(JDAEvents.subscribe(jda, GuildMessageReceivedEvent.class)
-                .filter(this::isAlot)
+                .filter(e -> containsWord(e.getMessage().getContentStripped(), "alot"))
                 .handler(this::reactAlot));
     }
 
@@ -56,6 +69,8 @@ public class ChatEvents extends EventHolder {
             return;
         }
 
+        oldMessages.put(event.getMessageIdLong(), event.getMessage().getContentStripped());
+
         cachedConfig.getMegaHal().add(event.getMessage().getContentStripped());
 
         for (StorageService service : cachedConfig.getStorage()) {
@@ -63,7 +78,7 @@ public class ChatEvents extends EventHolder {
         }
 
         MessagePacket packet = new MessagePacket();
-        packet.setMessage(event.getMessage().getContentRaw());
+        packet.setMessage(event.getMessage().getContentStripped());
         PacketUtil.queuePacket(packet);
     }
 
@@ -74,12 +89,64 @@ public class ChatEvents extends EventHolder {
             return;
         }
 
-        String seed  =getSeed(event.getMessage().getContentStripped());
+        boolean contains = false;
+        for (String phrase : cachedConfig.getReplyPhrases()) {
+            if (RE_SPACE.matcher(phrase).find()) {
+                if (event.getMessage().getContentStripped().toLowerCase().contains(phrase)) {
+                    contains = true;
+                    break;
+                }
+            } else {
+                if (containsWord(event.getMessage().getContentStripped(), phrase)) {
+                    contains = true;
+                    break;
+                }
+            }
+        }
+
+        if (!contains && rand.nextDouble() > cachedConfig.getReplyChance()) {
+            return;
+        }
+
+        String seed = getSeed(event.getMessage().getContentStripped());
         if (seed == null) {
             return;
         }
 
+        if (cachedConfig.getDebug()) {
+            logger.info("Got seed: " + seed);
+        }
+
         event.getChannel().sendMessage(cachedConfig.getMegaHal().getSentence(seed)).queue();
+    }
+
+    private void replace(@NotNull GuildMessageUpdateEvent event) {
+        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+        if (cachedConfig == null) {
+            logger.error("Could not get cached config.");
+            return;
+        }
+
+        String old = oldMessages.getIfPresent(event.getMessageIdLong());
+        if (old == null) {
+            logger.warn("Could not get old message for new edited message: " + event.getMessageId());
+            return;
+        }
+
+        MarkovMegaHal megaHal = cachedConfig.getMegaHal();
+        //megaHal.remove(old); // TODO: Add MegaHal removal once that becomes a thing in the library
+        megaHal.add(event.getMessage().getContentStripped());
+
+        for (StorageService service : cachedConfig.getStorage()) {
+            MessageModel model = service.getOrCreateMessageModel(old);
+            model.setMessage(event.getMessage().getContentStripped());
+            service.storeModel(model);
+        }
+
+        MessageUpdatePacket packet = new MessageUpdatePacket();
+        packet.setOldMessage(old);
+        packet.setNewMessage(event.getMessage().getContentStripped());
+        PacketUtil.queuePacket(packet);
     }
 
     private @Nullable String getSeed(@NotNull String message) {
@@ -102,16 +169,17 @@ public class ChatEvents extends EventHolder {
         List<Emote> emotes = event.getGuild().getEmotesByName(cachedConfig.getAlotEmote(), true);
         if (emotes.isEmpty()) {
             logger.warn("Could not find alot emote \"" + cachedConfig.getAlotEmote() + "\" for guild.");
+            return;
         }
 
         event.getMessage().addReaction(emotes.get(0)).queue();
     }
 
-    private boolean isAlot(@NotNull GuildMessageReceivedEvent event) {
-        String[] split = RE_SPACE.split(event.getMessage().getContentStripped().toLowerCase());
-        for (String word : split) {
-            word = RE_NOT_WORD.matcher(word).replaceAll("");
-            if (word.equalsIgnoreCase("alot")) {
+    private boolean containsWord(@NotNull String content, @NotNull String word) {
+        String[] split = RE_SPACE.split(content.toLowerCase());
+        for (String w : split) {
+            w = RE_NOT_WORD.matcher(w).replaceAll("");
+            if (word.equalsIgnoreCase(w)) {
                 return true;
             }
         }

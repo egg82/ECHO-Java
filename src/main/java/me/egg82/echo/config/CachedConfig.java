@@ -44,6 +44,12 @@ public class CachedConfig {
     private Set<String> disabledCommands = ImmutableSet.of();
     public @NotNull Set<String> getDisabledCommands() { return disabledCommands; }
 
+    private double replyChance = 0.15d;
+    public double getReplyChance() { return replyChance; }
+
+    private Set<String> replyPhrases = ImmutableSet.of();
+    public @NotNull Set<String> getReplyPhrases() { return replyPhrases; }
+
     public static @NotNull CachedConfig.Builder builder() { return new CachedConfig.Builder(); }
 
     public static class Builder {
@@ -94,6 +100,16 @@ public class CachedConfig {
 
         public @NotNull CachedConfig.Builder disabledCommands(@NotNull Set<String> value) {
             values.disabledCommands = value;
+            return this;
+        }
+
+        public @NotNull CachedConfig.Builder replyChance(@NotNull double value) {
+            values.replyChance = value;
+            return this;
+        }
+
+        public @NotNull CachedConfig.Builder replyPhrases(@NotNull Set<String> value) {
+            values.replyPhrases = value;
             return this;
         }
 

@@ -39,6 +39,8 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.ChunkingFilter;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import ninja.egg82.events.EventSubscriber;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -62,6 +64,8 @@ public class Bot {
 
     public Bot(@NotNull OptionSet options, @NotNull String version) throws LoginException {
         JDABuilder builder = JDABuilder.createDefault((String) options.valueOf("token"));
+        builder.setChunkingFilter(ChunkingFilter.ALL);
+        builder.setMemberCachePolicy(MemberCachePolicy.ALL);
         builder.enableIntents(GatewayIntent.GUILD_MEMBERS);
         builder.setActivity(Activity.watching("you"));
         jda = builder.build();

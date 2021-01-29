@@ -2,11 +2,17 @@ package me.egg82.echo.messaging;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import io.paradaux.ai.MarkovMegaHal;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
+import me.egg82.echo.messaging.packets.MessagePacket;
+import me.egg82.echo.messaging.packets.MessageUpdatePacket;
 import me.egg82.echo.messaging.packets.MultiPacket;
 import me.egg82.echo.messaging.packets.Packet;
+import me.egg82.echo.storage.StorageService;
+import me.egg82.echo.storage.models.MessageModel;
 import me.egg82.echo.utils.PacketUtil;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -32,6 +38,46 @@ public class GenericMessagingHandler implements MessagingHandler {
         }
     }
 
+    private void handleMessage(@NotNull MessagePacket packet) {
+        if (ConfigUtil.getDebugOrFalse()) {
+            logger.info("Handling message packet: " + packet.getMessage());
+        }
+
+        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+        if (cachedConfig == null) {
+            logger.error("Could not get cached config.");
+            return;
+        }
+
+        cachedConfig.getMegaHal().add(packet.getMessage());
+
+        for (StorageService service : cachedConfig.getStorage()) {
+            service.getOrCreateMessageModel(packet.getMessage());
+        }
+    }
+
+    private void handleMessageUpdate(@NotNull MessageUpdatePacket packet) {
+        if (ConfigUtil.getDebugOrFalse()) {
+            logger.info("Handling message update packet: " + packet.getNewMessage());
+        }
+
+        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+        if (cachedConfig == null) {
+            logger.error("Could not get cached config.");
+            return;
+        }
+
+        MarkovMegaHal megaHal = cachedConfig.getMegaHal();
+        //megaHal.remove(packet.getOldMessage()); // TODO: Add MegaHal removal once that becomes a thing in the library
+        megaHal.add(packet.getNewMessage());
+
+        for (StorageService service : cachedConfig.getStorage()) {
+            MessageModel model = service.getOrCreateMessageModel(packet.getOldMessage());
+            model.setMessage(packet.getNewMessage());
+            service.storeModel(model);
+        }
+    }
+
     private void handleMulti(@NotNull MultiPacket packet) {
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Handling multi-packet.");
@@ -43,7 +89,11 @@ public class GenericMessagingHandler implements MessagingHandler {
     }
 
     private void handleGenericPacket(@NotNull Packet packet) {
-        if (packet instanceof MultiPacket) {
+        if (packet instanceof MessagePacket) {
+            handleMessage((MessagePacket) packet);
+        } else if (packet instanceof MessageUpdatePacket) {
+            handleMessageUpdate((MessageUpdatePacket) packet);
+        } else if (packet instanceof MultiPacket) {
             handleMulti((MultiPacket) packet);
         }
     }
