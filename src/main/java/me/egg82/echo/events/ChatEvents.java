@@ -1,6 +1,7 @@
 package me.egg82.echo.events;
 
 import co.aikar.commands.JDACommandManager;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -29,8 +30,6 @@ public class ChatEvents extends EventHolder {
     public ChatEvents(@NotNull JDA jda, @NotNull JDACommandManager manager) {
         this.jda = jda;
         this.manager = manager;
-
-        events.add(JDAEvents.subscribe(jda, GuildMessageReceivedEvent.class).handler(e -> logger.info("Got event: " + e)));
 
         events.add(JDAEvents.subscribe(jda, GuildMessageReceivedEvent.class)
                 .filter(e -> !e.getAuthor().isBot())
@@ -84,7 +83,7 @@ public class ChatEvents extends EventHolder {
     }
 
     private @Nullable String getSeed(@NotNull String message) {
-        List<String> words = Arrays.asList(RE_SPACE.split(message));
+        List<String> words = new ArrayList<>(Arrays.asList(RE_SPACE.split(message)));
         for (int i = 0; i < words.size(); i++) {
             words.set(i, RE_NOT_WORD.matcher(words.get(i)).replaceAll(""));
         }
