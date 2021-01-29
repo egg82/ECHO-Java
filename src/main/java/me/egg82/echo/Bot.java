@@ -11,7 +11,6 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import javax.security.auth.login.LoginException;
 import joptsimple.OptionSet;
@@ -210,10 +209,10 @@ public class Bot {
         eventHolders.add(new ChatEvents(jda, commandManager));
     }
 
+    private final Random random = new Random();
+
     private void loadTasks() {
         tasks.add(TaskScheduler.createRepeatingTask(() -> {
-            ThreadLocalRandom random = ThreadLocalRandom.current();
-
             if (jda.getGuilds().isEmpty()) {
                 return;
             }
