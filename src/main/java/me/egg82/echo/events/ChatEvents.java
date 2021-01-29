@@ -133,6 +133,8 @@ public class ChatEvents extends EventHolder {
             return;
         }
 
+        oldMessages.put(event.getMessageIdLong(), event.getMessage().getContentStripped());
+
         MarkovMegaHal megaHal = cachedConfig.getMegaHal();
         //megaHal.remove(old); // TODO: Add MegaHal removal once that becomes a thing in the library
         megaHal.add(event.getMessage().getContentStripped());
