@@ -4,12 +4,11 @@ import co.aikar.commands.JDACommandManager;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import io.paradaux.ai.MarkovMegaHal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
+import me.egg82.echo.commands.GoogleSearchCommand;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.messaging.packets.MessagePacket;
@@ -17,6 +16,7 @@ import me.egg82.echo.messaging.packets.MessageUpdatePacket;
 import me.egg82.echo.storage.StorageService;
 import me.egg82.echo.storage.models.MessageModel;
 import me.egg82.echo.utils.PacketUtil;
+import me.egg82.echo.web.models.GoogleSearchModel;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -33,6 +33,7 @@ public class ChatEvents extends EventHolder {
 
     private final Pattern RE_SPACE = Pattern.compile("[\\s\\t]+");
     private final Pattern RE_NOT_WORD = Pattern.compile("[^\\w]");
+    private final Pattern RE_URL = Pattern.compile("<url>");
 
     private final Cache<Long, String> oldMessages = Caffeine.newBuilder().expireAfterWrite(20L, TimeUnit.MINUTES).expireAfterAccess(5L, TimeUnit.MINUTES).build();
 
@@ -137,9 +138,9 @@ public class ChatEvents extends EventHolder {
         }
 
         if (reversed) {
-            event.getChannel().sendMessage(reverse(cachedConfig.getMegaHal().getSentence(reverse(seed)))).queue();
+            event.getChannel().sendMessage(reverse(generateSentence(cachedConfig.getMegaHal(), reverse(event.getMessage().getContentStripped()), reverse(seed)))).queue();
         } else {
-            event.getChannel().sendMessage(cachedConfig.getMegaHal().getSentence(seed)).queue();
+            event.getChannel().sendMessage(generateSentence(cachedConfig.getMegaHal(), event.getMessage().getContentStripped(), seed)).queue();
         }
     }
 
@@ -198,6 +199,35 @@ public class ChatEvents extends EventHolder {
         }
 
         event.getMessage().addReaction(emotes.get(0)).queue();
+    }
+
+    private @NotNull String generateSentence(@NotNull MarkovMegaHal megaHal, @NotNull String sentence, @NotNull String seed) {
+        Set<String> previousUrls = new HashSet<>();
+
+        String retVal = megaHal.getSentence(seed);
+        return RE_URL.matcher(retVal).replaceAll(v -> {
+            String s = rand.nextDouble() >= 0.5 ? getSeed(sentence) : getSeed(retVal);
+            if (s == null) {
+                s = seed;
+            }
+            try {
+                List<GoogleSearchModel.GoogleSearchItemModel> items = GoogleSearchCommand.getModel(s).get().getItems();
+                for (GoogleSearchModel.GoogleSearchItemModel item : items) {
+                    if (previousUrls.add(item.getLink())) {
+                        return item.getLink();
+                    }
+                }
+            } catch (ExecutionException ex) {
+                if (ConfigUtil.getDebugOrFalse()) {
+                    logger.error(ex.getMessage(), ex);
+                } else {
+                    logger.error(ex.getMessage());
+                }
+            } catch (InterruptedException ignored) {
+                Thread.currentThread().interrupt();
+            }
+            return "";
+        });
     }
 
     private boolean containsWord(@NotNull String content, @NotNull String word) {

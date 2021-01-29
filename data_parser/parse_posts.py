@@ -34,8 +34,9 @@ from granularity import decrease_granularity
 
 #START_TIME = 1119484800 # Reddit creation date
 #START_TIME = 1514764800 # 1/1/18
-START_TIME = 1577836800 # 1/1/20
-MAX_POSTS = 100000
+#START_TIME = 1577836800 # 1/1/20
+START_TIME = 1606780800 # 12/1/20
+MAX_POSTS = 500000
 
 # https://github.com/pender/chatbot-rnn/blob/master/reddit-parse/parser_config_standard.json
 

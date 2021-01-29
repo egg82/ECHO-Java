@@ -71,7 +71,7 @@ public class XKCDCommand extends BaseCommand {
             EmbedBuilder embed = new EmbedBuilder();
             embed.setTitle("XKCD: " + val.getSafeTitle(), val.getLink().isEmpty() ? String.format("https://xkcd.com/%d/", val.getNum()) : val.getLink());
             embed.setImage(val.getImg());
-            embed.setFooter("For " + event.getAuthor().getAsTag() + " | " + val.getAlt());
+            embed.setFooter("For " + (event.getMember() != null ? event.getMember().getEffectiveName() : event.getAuthor().getAsTag()) + " | " + val.getAlt());
 
             event.getChannel().sendMessage(embed.build()).queue();
         });

@@ -68,7 +68,7 @@ public class RoryCommand extends BaseCommand {
             EmbedBuilder embed = new EmbedBuilder();
             embed.setImage(val.getUrl());
             embed.setColor(new Color(0x09E214));
-            embed.setFooter("For " + event.getAuthor().getAsTag() + " | ID: " + val.getId());
+            embed.setFooter("For " + (event.getMember() != null ? event.getMember().getEffectiveName() : event.getAuthor().getAsTag()) + " | ID: " + val.getId());
 
             event.getChannel().sendMessage(embed.build()).queue();
         });

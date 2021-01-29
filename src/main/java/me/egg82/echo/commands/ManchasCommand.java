@@ -68,7 +68,7 @@ public class ManchasCommand extends BaseCommand {
             EmbedBuilder embed = new EmbedBuilder();
             embed.setImage(val);
             embed.setColor(new Color(0x09E214));
-            embed.setFooter("For " + event.getAuthor().getAsTag() + " | ID: " + val.substring(val.lastIndexOf('/') + 1));
+            embed.setFooter("For " + (event.getMember() != null ? event.getMember().getEffectiveName() : event.getAuthor().getAsTag()) + " | ID: " + val.substring(val.lastIndexOf('/') + 1));
 
             event.getChannel().sendMessage(embed.build()).queue();
         });

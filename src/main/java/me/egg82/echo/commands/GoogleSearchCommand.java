@@ -85,7 +85,7 @@ public class GoogleSearchCommand extends BaseCommand {
                 }
             }
 
-            embed.setFooter("For " + event.getAuthor().getAsTag());
+            embed.setFooter("For " + (event.getMember() != null ? event.getMember().getEffectiveName() : event.getAuthor().getAsTag()));
 
             event.getChannel().sendMessage(embed.build()).queue();
         });

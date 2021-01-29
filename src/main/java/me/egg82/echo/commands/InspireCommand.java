@@ -66,7 +66,7 @@ public class InspireCommand extends BaseCommand {
             embed.setTitle("Inspiration");
             embed.setColor(new Color(0x09E214));
             embed.setImage(val);
-            embed.setFooter("For " + event.getAuthor().getAsTag());
+            embed.setFooter("For " + (event.getMember() != null ? event.getMember().getEffectiveName() : event.getAuthor().getAsTag()));
 
             event.getChannel().sendMessage(embed.build()).queue();
         });

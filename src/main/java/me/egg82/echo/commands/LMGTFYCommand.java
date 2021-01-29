@@ -44,7 +44,7 @@ public class LMGTFYCommand extends BaseCommand {
         EmbedBuilder embed = new EmbedBuilder();
         embed.setTitle("Click for answer!", String.format(SEARCH_URL, query.replace("\\s+", "+")));
         embed.setColor(new Color(0x17E77E));
-        embed.setFooter("For " + event.getAuthor().getAsTag());
+        embed.setFooter("For " + (event.getMember() != null ? event.getMember().getEffectiveName() : event.getAuthor().getAsTag()));
 
         event.getChannel().sendMessage(embed.build()).queue();
     }
