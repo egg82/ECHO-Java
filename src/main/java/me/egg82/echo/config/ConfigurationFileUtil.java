@@ -1,6 +1,6 @@
 package me.egg82.echo.config;
 
-import co.aikar.commands.CommandManager;
+import co.aikar.commands.JDACommandManager;
 import io.paradaux.ai.MarkovMegaHal;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -14,6 +14,7 @@ import me.egg82.echo.storage.*;
 import me.egg82.echo.utils.BotLogUtil;
 import me.egg82.echo.utils.LogUtil;
 import me.egg82.echo.utils.PacketUtil;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.reflections.Reflections;
@@ -23,6 +24,7 @@ import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.ConfigurationOptions;
 import org.spongepowered.configurate.loader.ConfigurationLoader;
+import org.spongepowered.configurate.serialize.SerializationException;
 import org.spongepowered.configurate.yaml.NodeStyle;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 import redis.clients.jedis.exceptions.JedisException;
@@ -32,7 +34,7 @@ public class ConfigurationFileUtil {
 
     private ConfigurationFileUtil() { }
 
-    public static void reloadConfig(@NotNull File dataDirectory, @NotNull CommandManager manager, @NotNull MessagingHandler messagingHandler, @NotNull MarkovMegaHal megaHal) {
+    public static void reloadConfig(@NotNull File dataDirectory, @NotNull JDACommandManager manager, @NotNull MessagingHandler messagingHandler, @NotNull MarkovMegaHal megaHal) {
         ConfigurationNode config;
         try {
             config = getConfig("config.yml", new File(dataDirectory, "config.yml"));
@@ -73,6 +75,7 @@ public class ConfigurationFileUtil {
                 .serverId(serverId)
                 .googleKey(googleKey)
                 .alotEmote(alotEmote)
+                .disabledCommands(getDisabledCommands(config, debug, manager))
                 .build();
 
         PacketUtil.setPoolSize(cachedConfig.getMessaging().size() + 1);
@@ -80,7 +83,7 @@ public class ConfigurationFileUtil {
         ConfigUtil.setConfiguration(config, cachedConfig);
     }
 
-    private static @NotNull Locale getLanguage(@NotNull ConfigurationNode config, boolean debug, @NotNull CommandManager manager) {
+    private static @NotNull Locale getLanguage(@NotNull ConfigurationNode config, boolean debug, @NotNull JDACommandManager manager) {
         String configLanguage = config.node("lang").getString("en");
         Locale retVal = null;
         for (Locale locale : Locale.getAvailableLocales()) {
@@ -102,7 +105,7 @@ public class ConfigurationFileUtil {
         return retVal;
     }
 
-    private static @NotNull List<StorageService> getStorage(@NotNull ConfigurationNode config, @NotNull File dataDirectory, boolean debug, @NotNull CommandManager manager) {
+    private static @NotNull List<StorageService> getStorage(@NotNull ConfigurationNode config, @NotNull File dataDirectory, boolean debug, @NotNull JDACommandManager manager) {
         List<StorageService> retVal = new ArrayList<>();
 
         PoolSettings poolSettings = new PoolSettings(config.node("storage", "settings"));
@@ -121,7 +124,7 @@ public class ConfigurationFileUtil {
         return retVal;
     }
 
-    private static @Nullable StorageService getStorageOf(@NotNull String name, @NotNull ConfigurationNode engineNode, @NotNull File dataDirectory, @NotNull PoolSettings poolSettings, boolean debug, @NotNull CommandManager manager) {
+    private static @Nullable StorageService getStorageOf(@NotNull String name, @NotNull ConfigurationNode engineNode, @NotNull File dataDirectory, @NotNull PoolSettings poolSettings, boolean debug, @NotNull JDACommandManager manager) {
         if (!engineNode.node("enabled").getBoolean()) {
             if (debug) {
                 BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c9>Storage engine</c9> <c1>" + name + "</c1> <c9>is disabled. Removing.</c9>");
@@ -286,7 +289,7 @@ public class ConfigurationFileUtil {
         return null;
     }
 
-    private static @NotNull List<MessagingService> getMessaging(@NotNull ConfigurationNode config, @NotNull UUID serverId, @NotNull MessagingHandler handler, boolean debug, @NotNull CommandManager manager) {
+    private static @NotNull List<MessagingService> getMessaging(@NotNull ConfigurationNode config, @NotNull UUID serverId, @NotNull MessagingHandler handler, boolean debug, @NotNull JDACommandManager manager) {
         List<MessagingService> retVal = new ArrayList<>();
 
         PoolSettings poolSettings = new PoolSettings(config.node("messaging", "settings"));
@@ -305,7 +308,7 @@ public class ConfigurationFileUtil {
         return retVal;
     }
 
-    private static @Nullable MessagingService getMessagingOf(@NotNull String name, @NotNull ConfigurationNode engineNode, @NotNull UUID serverId, @NotNull MessagingHandler handler, @NotNull PoolSettings poolSettings, boolean debug, @NotNull CommandManager manager) {
+    private static @Nullable MessagingService getMessagingOf(@NotNull String name, @NotNull ConfigurationNode engineNode, @NotNull UUID serverId, @NotNull MessagingHandler handler, @NotNull PoolSettings poolSettings, boolean debug, @NotNull JDACommandManager manager) {
         if (!engineNode.node("enabled").getBoolean()) {
             if (debug) {
                 BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c9>Messaging engine</c9> <c1>" + name + "</c1> <c9>is disabled. Removing.</c9>");
@@ -355,6 +358,24 @@ public class ConfigurationFileUtil {
             }
         }
         return null;
+    }
+
+    private static @NonNull Set<String> getDisabledCommands(@NonNull ConfigurationNode config, boolean debug, @NonNull JDACommandManager manager) {
+        Set<String> retVal;
+        try {
+            retVal = new HashSet<>(!config.node("disabled-commands").empty() ? config.node("disabled-commands").getList(String.class) : new ArrayList<>());
+        } catch (SerializationException ex) {
+            logger.error(ex.getMessage(), ex);
+            retVal = new HashSet<>();
+        }
+
+        for (String command : retVal) {
+            if (debug) {
+                BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Disabling command:</c2> <c1>" + command + "</c1>");
+            }
+        }
+
+        return retVal;
     }
 
     private static @NotNull CommentedConfigurationNode getConfig(@NotNull String resourcePath, @NotNull File fileOnDisk) throws IOException {

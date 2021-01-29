@@ -1,9 +1,11 @@
 package me.egg82.echo.config;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import io.paradaux.ai.MarkovMegaHal;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
 import me.egg82.echo.messaging.MessagingService;
 import me.egg82.echo.storage.StorageService;
@@ -38,6 +40,9 @@ public class CachedConfig {
 
     private String alotEmote = "alot";
     public @NotNull String getAlotEmote() { return alotEmote; }
+
+    private Set<String> disabledCommands = ImmutableSet.of();
+    public @NotNull Set<String> getDisabledCommands() { return disabledCommands; }
 
     public static @NotNull CachedConfig.Builder builder() { return new CachedConfig.Builder(); }
 
@@ -84,6 +89,11 @@ public class CachedConfig {
 
         public @NotNull CachedConfig.Builder alotEmote(@NotNull String value) {
             values.alotEmote = value;
+            return this;
+        }
+
+        public @NotNull CachedConfig.Builder disabledCommands(@NotNull Set<String> value) {
+            values.disabledCommands = value;
             return this;
         }
 

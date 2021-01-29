@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.lang.Message;
 import me.egg82.echo.web.WebConstants;
@@ -35,6 +36,16 @@ public class RoryCommand extends BaseCommand {
     @Syntax("[id]")
     public void submit(@NotNull CommandIssuer issuer, @NotNull MessageReceivedEvent event, @Default("-1") int id) {
         if (event.getAuthor().isBot()) {
+            return;
+        }
+
+        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+        if (cachedConfig == null) {
+            logger.error("Could not get cached config.");
+            return;
+        }
+
+        if (cachedConfig.getDisabledCommands().contains(getName())) {
             return;
         }
 

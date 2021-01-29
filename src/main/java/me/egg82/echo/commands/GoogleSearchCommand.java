@@ -41,6 +41,16 @@ public class GoogleSearchCommand extends BaseCommand {
             return;
         }
 
+        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+        if (cachedConfig == null) {
+            logger.error("Could not get cached config.");
+            return;
+        }
+
+        if (cachedConfig.getDisabledCommands().contains(getName())) {
+            return;
+        }
+
         if (query.contains("@")) { // TODO: find a better way to do this
             issuer.sendMessage("An error occurred, sorry :(");
             return;

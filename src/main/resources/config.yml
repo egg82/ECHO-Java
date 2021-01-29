@@ -116,6 +116,11 @@ emotes:
   # The "alot" emote
   alot: "alot"
 
+# Commands to disable
+disabled-commands:
+#  - google
+#  - lmgtfy
+
 # When true, logs some extra output to the console so you can see if/why things might be failing
 debug: false
 # Default language (affects console output)
