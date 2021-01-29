@@ -55,17 +55,7 @@ public class TaskScheduler {
                 logger.error(ex.getMessage(), ex);
             }
 
-            threadPool.schedule(() -> {
-                if (!aliveIds.contains(retVal)) {
-                    return;
-                }
-
-                try {
-                    task.run();
-                } catch (Exception ex) {
-                    logger.error(ex.getMessage(), ex);
-                }
-            }, repeatedDelay.getTime(), repeatedDelay.getUnit());
+            repeatTask(retVal, task, repeatedDelay);
         }, initialDelay.getTime(), initialDelay.getUnit());
 
         return retVal;
@@ -73,5 +63,21 @@ public class TaskScheduler {
 
     public static void cancelTask(int id) {
         aliveIds.remove(id);
+    }
+
+    private static void repeatTask(int id, @NotNull Runnable task, @NotNull TimeUtil.Time time) {
+        threadPool.schedule(() -> {
+            if (!aliveIds.contains(id)) {
+                return;
+            }
+
+            try {
+                task.run();
+            } catch (Exception ex) {
+                logger.error(ex.getMessage(), ex);
+            }
+
+            repeatTask(id, task, time);
+        }, time.getTime(), time.getUnit());
     }
 }
