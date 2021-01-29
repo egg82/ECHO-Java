@@ -223,10 +223,10 @@ public class Bot {
                     return;
                 }
 
-                Member member = members.get(random.nextInt(guild.getMembers().size()));
+                Member member = members.get(random.nextInt(members.size()));
                 jda.getPresence().setActivity(Activity.watching(member.getEffectiveName()));
             });
-        }, new TimeUtil.Time(10L, TimeUnit.SECONDS), new TimeUtil.Time(5L, TimeUnit.MINUTES)));
+        }, new TimeUtil.Time(10L, TimeUnit.SECONDS), new TimeUtil.Time(10L, TimeUnit.MINUTES)));
 
         tasks.add(TaskScheduler.createRepeatingTask(PacketUtil::trySendQueue, new TimeUtil.Time(1L, TimeUnit.SECONDS), new TimeUtil.Time(1L, TimeUnit.SECONDS)));
     }
