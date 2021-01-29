@@ -130,6 +130,11 @@ chat:
   # The phrases to respond to (case-insensitive)
   respond:
     - 'echo'
+    - 'good bot'
+    - 'bad bot'
+    - 'smart bot'
+    - 'stupid bot'
+    - 'dumb bot'
 
 # When true, logs some extra output to the console so you can see if/why things might be failing
 debug: false

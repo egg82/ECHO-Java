@@ -3,10 +3,7 @@ package me.egg82.echo.config;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import io.paradaux.ai.MarkovMegaHal;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import me.egg82.echo.messaging.MessagingService;
 import me.egg82.echo.storage.StorageService;
 import org.jetbrains.annotations.NotNull;
@@ -49,6 +46,9 @@ public class CachedConfig {
 
     private Set<String> replyPhrases = ImmutableSet.of();
     public @NotNull Set<String> getReplyPhrases() { return replyPhrases; }
+
+    private Set<String> replyPhrasesReversed = ImmutableSet.of();
+    public @NotNull Set<String> getReplyPhrasesReversed() { return replyPhrasesReversed; }
 
     public static @NotNull CachedConfig.Builder builder() { return new CachedConfig.Builder(); }
 
@@ -99,7 +99,7 @@ public class CachedConfig {
         }
 
         public @NotNull CachedConfig.Builder disabledCommands(@NotNull Set<String> value) {
-            values.disabledCommands = value;
+            values.disabledCommands = ImmutableSet.copyOf(value);
             return this;
         }
 
@@ -109,10 +109,22 @@ public class CachedConfig {
         }
 
         public @NotNull CachedConfig.Builder replyPhrases(@NotNull Set<String> value) {
-            values.replyPhrases = value;
+            values.replyPhrases = ImmutableSet.copyOf(value);
+            Set<String> reversedPhrases = new HashSet<>();
+            for (String phrase : value) {
+                reversedPhrases.add(reverse(phrase));
+            }
+            values.replyPhrasesReversed = ImmutableSet.copyOf(reversedPhrases);
             return this;
         }
 
         public CachedConfig build() { return values; }
+
+        private @NotNull String reverse(@NotNull String input) {
+            StringBuilder builder = new StringBuilder();
+            builder.append(input);
+            builder.reverse();
+            return builder.toString();
+        }
     }
 }

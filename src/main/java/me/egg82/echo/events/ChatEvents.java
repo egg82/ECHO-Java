@@ -104,6 +104,25 @@ public class ChatEvents extends EventHolder {
             }
         }
 
+        boolean reversed = false;
+        if (!contains) {
+            for (String phrase : cachedConfig.getReplyPhrasesReversed()) {
+                if (RE_SPACE.matcher(phrase).find()) {
+                    if (event.getMessage().getContentStripped().toLowerCase().contains(phrase)) {
+                        contains = true;
+                        reversed = true;
+                        break;
+                    }
+                } else {
+                    if (containsWord(event.getMessage().getContentStripped(), phrase)) {
+                        contains = true;
+                        reversed = true;
+                        break;
+                    }
+                }
+            }
+        }
+
         if (!contains && rand.nextDouble() > cachedConfig.getReplyChance()) {
             return;
         }
@@ -117,7 +136,11 @@ public class ChatEvents extends EventHolder {
             logger.info("Got seed: " + seed);
         }
 
-        event.getChannel().sendMessage(cachedConfig.getMegaHal().getSentence(seed)).queue();
+        if (reversed) {
+            event.getChannel().sendMessage(reverse(cachedConfig.getMegaHal().getSentence(reverse(seed)))).queue();
+        } else {
+            event.getChannel().sendMessage(cachedConfig.getMegaHal().getSentence(seed)).queue();
+        }
     }
 
     private void replace(@NotNull GuildMessageUpdateEvent event) {
@@ -186,5 +209,12 @@ public class ChatEvents extends EventHolder {
             }
         }
         return false;
+    }
+
+    private @NotNull String reverse(@NotNull String input) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(input);
+        builder.reverse();
+        return builder.toString();
     }
 }
