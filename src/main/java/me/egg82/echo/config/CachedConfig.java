@@ -36,6 +36,9 @@ public class CachedConfig {
     private String googleKey = "";
     public @NotNull String getGoogleKey() { return googleKey; }
 
+    private String alotEmote = "alot";
+    public @NotNull String getAlotEmote() { return alotEmote; }
+
     public static @NotNull CachedConfig.Builder builder() { return new CachedConfig.Builder(); }
 
     public static class Builder {
@@ -76,6 +79,11 @@ public class CachedConfig {
 
         public @NotNull CachedConfig.Builder googleKey(@NotNull String value) {
             values.googleKey = value;
+            return this;
+        }
+
+        public @NotNull CachedConfig.Builder alotEmote(@NotNull String value) {
+            values.alotEmote = value;
             return this;
         }
 

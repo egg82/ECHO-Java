@@ -59,6 +59,11 @@ public class ConfigurationFileUtil {
             BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Google API key:</c2> <c1>" + googleKey + "</c1>");
         }
 
+        String alotEmote = config.node("emotes", "alot").getString("");
+        if (debug) {
+            BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Alot emote:</c2> <c1>" + alotEmote + "</c1>");
+        }
+
         CachedConfig cachedConfig = CachedConfig.builder()
                 .debug(debug)
                 .language(getLanguage(config, debug, manager))
@@ -67,6 +72,7 @@ public class ConfigurationFileUtil {
                 .messaging(getMessaging(config, serverId, messagingHandler, debug, manager))
                 .serverId(serverId)
                 .googleKey(googleKey)
+                .alotEmote(alotEmote)
                 .build();
 
         PacketUtil.setPoolSize(cachedConfig.getMessaging().size() + 1);

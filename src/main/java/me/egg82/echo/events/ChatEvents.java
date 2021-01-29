@@ -93,13 +93,15 @@ public class ChatEvents extends EventHolder {
     }
 
     private void reactAlot(@NotNull GuildMessageReceivedEvent event) {
-        List<Emote> emotes = event.getGuild().getEmotesByName("alot_2", true);
+        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+        if (cachedConfig == null) {
+            logger.error("Could not get cached config.");
+            return;
+        }
+
+        List<Emote> emotes = event.getGuild().getEmotesByName(cachedConfig.getAlotEmote(), true);
         if (emotes.isEmpty()) {
-            emotes = event.getGuild().getEmotesByName("alot", true);
-            if (emotes.isEmpty()) {
-                logger.warn("Could not find alot emote for guild.");
-                return;
-            }
+            logger.warn("Could not find alot emote \"" + cachedConfig.getAlotEmote() + "\" for guild.");
         }
 
         event.getMessage().addReaction(emotes.get(0)).queue();
