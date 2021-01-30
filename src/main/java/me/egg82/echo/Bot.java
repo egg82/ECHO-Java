@@ -27,7 +27,6 @@ import me.egg82.echo.messaging.GenericMessagingHandler;
 import me.egg82.echo.messaging.MessagingService;
 import me.egg82.echo.reflect.PackageFilter;
 import me.egg82.echo.storage.StorageService;
-import me.egg82.echo.storage.models.MessageModel;
 import me.egg82.echo.tasks.TaskScheduler;
 import me.egg82.echo.utils.*;
 import net.dv8tion.jda.api.JDA;
