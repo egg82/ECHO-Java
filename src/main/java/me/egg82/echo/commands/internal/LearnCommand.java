@@ -33,13 +33,13 @@ public class LearnCommand extends AbstractCommand {
 
         issuer.sendInfo(Message.LEARN__BEGIN);
 
-        String[] splitContent = null;
+        String[] splitContent;
         try {
             splitContent = WebRequest.builder(new URL(url))
                     .timeout(WebConstants.TIMEOUT)
                     .userAgent(WebConstants.USER_AGENT)
                     .header("Content-Type", "text/plain")
-                    .build().getString().split(delimiter);
+                    .build().getString().replace("\r", "").split(delimiter);
         } catch (IOException ex) {
             if (cachedConfig.getDebug()) {
                 logger.error(ex.getMessage(), ex);

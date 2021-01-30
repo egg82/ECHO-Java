@@ -55,12 +55,16 @@ public class WebRequest {
     public @NotNull String getString() throws IOException { return getString(getConnection()); }
 
     public static @NotNull String getString(@NotNull HttpURLConnection connection) throws IOException {
+        String sep = System.lineSeparator();
+
         try (InputStream in = getInputStream(connection); InputStreamReader reader = new InputStreamReader(in); BufferedReader buffer = new BufferedReader(reader)) {
             StringBuilder builder = new StringBuilder();
             String line;
             while ((line = buffer.readLine()) != null) {
                 builder.append(line);
+                builder.append(sep);
             }
+            builder.delete(builder.length() - sep.length(), builder.length());
             return builder.toString();
         }
     }
