@@ -16,7 +16,7 @@ import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.lang.Message;
 import me.egg82.echo.utils.WebUtil;
 import me.egg82.echo.web.models.EightBallModel;
-import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -67,11 +67,12 @@ public class EightBallCommand extends BaseCommand {
                 return;
             }
 
-            EmbedBuilder embed = new EmbedBuilder();
-            embed.setTitle(val.getMagic().getAnswer());
-            embed.setFooter("For " + (event.getMember() != null ? event.getMember().getEffectiveName() : event.getAuthor().getAsTag()));
+            MessageBuilder message = new MessageBuilder();
+            message.append(event.getAuthor());
+            message.append(" ");
+            message.append(val.getMagic().getAnswer());
 
-            event.getChannel().sendMessage(embed.build()).queue();
+            event.getChannel().sendMessage(message.build()).queue();
         });
     }
 
