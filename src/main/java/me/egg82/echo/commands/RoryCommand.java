@@ -42,6 +42,7 @@ public class RoryCommand extends BaseCommand {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
         if (cachedConfig == null) {
             logger.error("Could not get cached config.");
+            issuer.sendError(Message.ERROR__INTERNAL);
             return;
         }
 
@@ -80,6 +81,7 @@ public class RoryCommand extends BaseCommand {
                 String content = WebRequest.builder(new URL(id == -1 ? CAT_URL : String.format(CAT_URL_ID, id)))
                         .timeout(WebConstants.TIMEOUT)
                         .userAgent(WebConstants.USER_AGENT)
+                        .header("Accept", "application/json")
                         .build().getString();
 
                 JSONDeserializer<RoryModel> modelDeserializer = new JSONDeserializer<>();

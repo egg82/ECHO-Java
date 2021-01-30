@@ -40,17 +40,7 @@ public class WebRequest {
         DEFAULT_HEADERS.put("Accept-Language", "en-US,en;q=0.8");
     }
 
-    public static @NotNull String urlEncode(@NotNull String part) {
-        try {
-            return URLEncoder.encode(part, StandardCharsets.UTF_8.toString());
-        } catch (UnsupportedEncodingException ignored) {
-            try {
-                return URLEncoder.encode(part, StandardCharsets.US_ASCII.toString());
-            } catch (UnsupportedEncodingException ignored2) {
-                return part;
-            }
-        }
-    }
+    public static @NotNull String urlEncode(@NotNull String part) { return URLEncoder.encode(part, StandardCharsets.UTF_8); }
 
     public @NotNull String getString() throws IOException { return getString(getConnection()); }
 
@@ -85,7 +75,7 @@ public class WebRequest {
 
     public @NotNull InputStream getInputStream() throws IOException { return getInputStream(getConnection()); }
 
-    public static @NotNull InputStream getInputStream(@NotNull HttpURLConnection connection) throws IOException { return connection.getInputStream(); }
+    public static @NotNull InputStream getInputStream(@NotNull HttpURLConnection connection) throws IOException { return connection.getResponseCode() >= 200 && connection.getResponseCode() < 400 ? connection.getInputStream() : connection.getErrorStream(); }
 
     public @NotNull HttpURLConnection getConnection() throws IOException {
         if (ConfigUtil.getDebugOrFalse()) {
@@ -175,7 +165,6 @@ public class WebRequest {
         }
 
         if (!formData.isEmpty()) {
-            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
             StringBuilder data = new StringBuilder();
             for (Map.Entry<String, String> kvp : formData.entrySet()) {
                 data.append(URLEncoder.encode(kvp.getKey(), StandardCharsets.UTF_8.name()));
@@ -313,6 +302,10 @@ public class WebRequest {
                 if (kvp.getValue() != null && !hasKey(request.headers, kvp.getKey())) {
                     request.headers.put(kvp.getKey(), kvp.getValue());
                 }
+            }
+
+            if (!request.formData.isEmpty() && !hasKey(request.headers, "Content-Type")) {
+                request.headers.put("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
             }
 
             return request;

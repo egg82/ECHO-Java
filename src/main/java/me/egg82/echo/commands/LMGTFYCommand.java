@@ -9,6 +9,8 @@ import co.aikar.commands.annotation.Syntax;
 import java.awt.*;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
+import me.egg82.echo.lang.Message;
+import me.egg82.echo.web.WebRequest;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
@@ -34,6 +36,7 @@ public class LMGTFYCommand extends BaseCommand {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
         if (cachedConfig == null) {
             logger.error("Could not get cached config.");
+            issuer.sendError(Message.ERROR__INTERNAL);
             return;
         }
 
@@ -42,7 +45,7 @@ public class LMGTFYCommand extends BaseCommand {
         }
 
         EmbedBuilder embed = new EmbedBuilder();
-        embed.setTitle("Click for answer!", String.format(SEARCH_URL, query.replace("\\s+", "+")));
+        embed.setTitle("Click for answer!", String.format(SEARCH_URL, WebRequest.urlEncode(query.replace("\\s+", "+"))));
         embed.setColor(new Color(0x17E77E));
         embed.setFooter("For " + (event.getMember() != null ? event.getMember().getEffectiveName() : event.getAuthor().getAsTag()));
 

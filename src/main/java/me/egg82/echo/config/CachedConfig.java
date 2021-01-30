@@ -35,6 +35,12 @@ public class CachedConfig {
     private String googleKey = "";
     public @NotNull String getGoogleKey() { return googleKey; }
 
+    private String wolframKey = "";
+    public @NotNull String getWolframKey() { return wolframKey; }
+
+    private String imgurKey = "";
+    public @NotNull String getImgurKey() { return imgurKey; }
+
     private String alotEmote = "alot";
     public @NotNull String getAlotEmote() { return alotEmote; }
 
@@ -90,6 +96,16 @@ public class CachedConfig {
 
         public @NotNull CachedConfig.Builder googleKey(@NotNull String value) {
             values.googleKey = value;
+            return this;
+        }
+
+        public @NotNull CachedConfig.Builder wolframKey(@NotNull String value) {
+            values.wolframKey = value;
+            return this;
+        }
+
+        public @NotNull CachedConfig.Builder imgurKey(@NotNull String value) {
+            values.imgurKey = value;
             return this;
         }
 

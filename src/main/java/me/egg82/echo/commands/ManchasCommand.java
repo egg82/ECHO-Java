@@ -42,6 +42,7 @@ public class ManchasCommand extends BaseCommand {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
         if (cachedConfig == null) {
             logger.error("Could not get cached config.");
+            issuer.sendError(Message.ERROR__INTERNAL);
             return;
         }
 

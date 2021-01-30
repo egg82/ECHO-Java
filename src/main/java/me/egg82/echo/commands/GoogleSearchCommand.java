@@ -44,6 +44,7 @@ public class GoogleSearchCommand extends BaseCommand {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
         if (cachedConfig == null) {
             logger.error("Could not get cached config.");
+            issuer.sendError(Message.ERROR__INTERNAL);
             return;
         }
 
@@ -51,8 +52,14 @@ public class GoogleSearchCommand extends BaseCommand {
             return;
         }
 
+        if (cachedConfig.getGoogleKey().isEmpty()) {
+            logger.error("Google key was not defined.");
+            issuer.sendError(Message.ERROR__INTERNAL);
+            return;
+        }
+
         if (query.contains("@")) { // TODO: find a better way to do this
-            issuer.sendMessage("An error occurred, sorry :(");
+            issuer.sendError(Message.ERROR__INTERNAL);
             return;
         }
 
@@ -102,7 +109,7 @@ public class GoogleSearchCommand extends BaseCommand {
             }
 
             try {
-                String content = WebRequest.builder(new URL(String.format(SEARCH_URL, cachedConfig.getGoogleKey(), WebRequest.urlEncode(query))))
+                String content = WebRequest.builder(new URL(String.format(SEARCH_URL, cachedConfig.getGoogleKey(), WebRequest.urlEncode(query.replace("\\s+", "+")))))
                         .timeout(WebConstants.TIMEOUT)
                         .userAgent(WebConstants.USER_AGENT)
                         .header("Accept", "application/json")

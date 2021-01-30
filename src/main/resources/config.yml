@@ -110,6 +110,10 @@ messaging:
 keys:
   # Google search API key
   google: ''
+  # Wolfram Alpha app ID
+  wolfram: ''
+  # Imgur bearer token
+  imgur: ''
 
 # Emotes to use for various functions
 emotes:

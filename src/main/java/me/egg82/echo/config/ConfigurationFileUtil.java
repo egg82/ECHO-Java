@@ -61,6 +61,16 @@ public class ConfigurationFileUtil {
             BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Google API key:</c2> <c1>" + googleKey + "</c1>");
         }
 
+        String wolframKey = config.node("keys", "wolfram").getString("");
+        if (debug) {
+            BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Wolfram Alpha app ID:</c2> <c1>" + wolframKey + "</c1>");
+        }
+
+        String imgurKey = config.node("keys", "imgur").getString("");
+        if (debug) {
+            BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Imgur client ID:</c2> <c1>" + imgurKey + "</c1>");
+        }
+
         String alotEmote = config.node("emotes", "alot").getString("");
         if (debug) {
             BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Alot emote:</c2> <c1>" + alotEmote + "</c1>");
@@ -80,6 +90,8 @@ public class ConfigurationFileUtil {
                 .messaging(getMessaging(config, serverId, messagingHandler, debug, manager))
                 .serverId(serverId)
                 .googleKey(googleKey)
+                .wolframKey(wolframKey)
+                .imgurKey(imgurKey)
                 .alotEmote(alotEmote)
                 .disabledCommands(getDisabledCommands(config, debug, manager))
                 .replyChance(replyChance)

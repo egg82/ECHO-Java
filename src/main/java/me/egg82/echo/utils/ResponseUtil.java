@@ -33,7 +33,7 @@ public class ResponseUtil {
         }
 
         int start = 1;
-        int max = 50;
+        int max = 1000;
         Set<MessageModel> models;
         do {
             models = master.getAllMessages(start, max);
