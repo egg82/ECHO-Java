@@ -63,15 +63,11 @@ public class ImgurUploadModel implements Serializable {
         private String section = null;
         @JSON(name = "account_url")
         private String accountUrl = null;
-        @JSON(name = "account_id")
-        private String accountId = null;
         @JSON(name = "is_ad")
         private boolean ad = false;
         @JSON(name = "in_most_viral")
         private boolean inMostViral = false;
         private List<String> tags = new ArrayList<>();
-        @JSON(name = "ad_type")
-        private String adType = null;
         @JSON(name = "ad_url")
         private String adUrl = null;
         @JSON(name = "in_gallery")
@@ -151,12 +147,6 @@ public class ImgurUploadModel implements Serializable {
         @JSON(name = "account_url")
         public void setAccountUrl(String accountUrl) { this.accountUrl = accountUrl; }
 
-        @JSON(name = "account_id")
-        public String getAccountId() { return accountId; }
-
-        @JSON(name = "account_id")
-        public void setAccountId(String accountId) { this.accountId = accountId; }
-
         @JSON(name = "is_ad")
         public boolean isAd() { return ad; }
 
@@ -172,12 +162,6 @@ public class ImgurUploadModel implements Serializable {
         public @NotNull List<String> getTags() { return tags; }
 
         public void setTags(@NotNull List<String> tags) { this.tags = tags; }
-
-        @JSON(name = "ad_type")
-        public String getAdType() { return adType; }
-
-        @JSON(name = "ad_type")
-        public void setAdType(String adType) { this.adType = adType; }
 
         @JSON(name = "ad_url")
         public @Nullable String getAdUrl() { return adUrl; }
@@ -209,10 +193,10 @@ public class ImgurUploadModel implements Serializable {
             if (this == o) return true;
             if (!(o instanceof ImgurUploadDataModel)) return false;
             ImgurUploadDataModel that = (ImgurUploadDataModel) o;
-            return dateTime == that.dateTime && animated == that.animated && width == that.width && height == that.height && size == that.size && views == that.views && bandwidth == that.bandwidth && favorite == that.favorite && ad == that.ad && inMostViral == that.inMostViral && inGallery == that.inGallery && id.equals(that.id) && Objects.equals(title, that.title) && Objects.equals(description, that.description) && type.equals(that.type) && Objects.equals(vote, that.vote) && Objects.equals(nsfw, that.nsfw) && Objects.equals(section, that.section) && Objects.equals(accountUrl, that.accountUrl) && Objects.equals(accountId, that.accountId) && tags.equals(that.tags) && Objects.equals(adType, that.adType) && Objects.equals(adUrl, that.adUrl) && deleteHash.equals(that.deleteHash) && name.equals(that.name) && link.equals(that.link);
+            return dateTime == that.dateTime && animated == that.animated && width == that.width && height == that.height && size == that.size && views == that.views && bandwidth == that.bandwidth && favorite == that.favorite && ad == that.ad && inMostViral == that.inMostViral && inGallery == that.inGallery && id.equals(that.id) && Objects.equals(title, that.title) && Objects.equals(description, that.description) && type.equals(that.type) && Objects.equals(vote, that.vote) && Objects.equals(nsfw, that.nsfw) && Objects.equals(section, that.section) && Objects.equals(accountUrl, that.accountUrl) && tags.equals(that.tags) && Objects.equals(adUrl, that.adUrl) && deleteHash.equals(that.deleteHash) && name.equals(that.name) && link.equals(that.link);
         }
 
-        public int hashCode() { return Objects.hash(id, title, description, dateTime, type, animated, width, height, size, views, bandwidth, vote, favorite, nsfw, section, accountUrl, accountId, ad, inMostViral, tags, adType, adUrl, inGallery, deleteHash, name, link); }
+        public int hashCode() { return Objects.hash(id, title, description, dateTime, type, animated, width, height, size, views, bandwidth, vote, favorite, nsfw, section, accountUrl, ad, inMostViral, tags, adUrl, inGallery, deleteHash, name, link); }
 
         public String toString() {
             return "ImgurUploadDataModel{" +
@@ -232,11 +216,9 @@ public class ImgurUploadModel implements Serializable {
                     ", nsfw='" + nsfw + '\'' +
                     ", section='" + section + '\'' +
                     ", accountUrl='" + accountUrl + '\'' +
-                    ", accountId='" + accountId + '\'' +
                     ", ad=" + ad +
                     ", inMostViral=" + inMostViral +
                     ", tags=" + tags +
-                    ", adType='" + adType + '\'' +
                     ", adUrl='" + adUrl + '\'' +
                     ", inGallery=" + inGallery +
                     ", deleteHash='" + deleteHash + '\'' +

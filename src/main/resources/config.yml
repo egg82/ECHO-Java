@@ -112,7 +112,7 @@ keys:
   google: ''
   # Wolfram Alpha app ID
   wolfram: ''
-  # Imgur bearer token
+  # Imgur client ID
   imgur: ''
 
 # Emotes to use for various functions

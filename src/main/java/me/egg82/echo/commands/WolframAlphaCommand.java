@@ -34,9 +34,12 @@ public class WolframAlphaCommand extends BaseCommand {
     private static final String IMAGE_URL = "https://api.wolframalpha.com/v1/simple?appid=%s&i=%s";
     private static final String QUERY_LINK = "https://www.wolframalpha.com/input/?i=%s";
 
-    private static final String IMGUR_URL = "https://api.imgur.com/3/upload";
+    private static final String IMGUR_URL = "https://api.imgur.com/3/image";
 
-    private static final OkHttpClient client = new OkHttpClient();
+    private static final OkHttpClient client = new OkHttpClient.Builder()
+            .connectTimeout(WebConstants.TIMEOUT.getTime(), WebConstants.TIMEOUT.getUnit())
+            .readTimeout(WebConstants.TIMEOUT.getTime(), WebConstants.TIMEOUT.getUnit())
+            .build();
 
     @Default
     @Description("{@@description.wolfram}")
@@ -111,10 +114,21 @@ public class WolframAlphaCommand extends BaseCommand {
     public static @NotNull CompletableFuture<String> getResult(@NotNull String key, @NotNull String query) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                return WebRequest.builder(new URL(String.format(RESULT_URL, key, WebRequest.urlEncode(query.replace("\\s+", "+")))))
-                        .timeout(WebConstants.TIMEOUT)
-                        .userAgent(WebConstants.USER_AGENT)
-                        .build().getString();
+                Request request = new Request.Builder()
+                        .url(new URL(String.format(RESULT_URL, key, WebRequest.urlEncode(query.replace("\\s+", "+")))))
+                        .header("User-Agent", WebConstants.USER_AGENT)
+                        .build();
+
+                try (Response response = client.newCall(request).execute()) {
+                    if (!response.isSuccessful()) {
+                        if (response.code() == 501) {
+                            return "No short answer available";
+                        }
+                        throw new IOException("Could not get connection (HTTP status " + response.code() + ")");
+                    }
+
+                    return response.body().string();
+                }
             } catch (IOException ex) {
                 throw new CompletionException(ex);
             }
@@ -124,10 +138,18 @@ public class WolframAlphaCommand extends BaseCommand {
     public static @NotNull CompletableFuture<byte[]> getImage(@NotNull String key, @NotNull String query) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                return WebRequest.builder(new URL(String.format(IMAGE_URL, key, WebRequest.urlEncode(query.replace("\\s+", "+")))))
-                        .timeout(WebConstants.TIMEOUT)
-                        .userAgent(WebConstants.USER_AGENT)
-                        .build().getBytes();
+                Request request = new Request.Builder()
+                        .url(new URL(String.format(IMAGE_URL, key, WebRequest.urlEncode(query.replace("\\s+", "+")))))
+                        .header("User-Agent", WebConstants.USER_AGENT)
+                        .build();
+
+                try (Response response = client.newCall(request).execute()) {
+                    if (!response.isSuccessful()) {
+                        throw new IOException("Could not get connection (HTTP status " + response.code() + ")");
+                    }
+
+                    return response.body().bytes();
+                }
             } catch (IOException ex) {
                 throw new CompletionException(ex);
             }
@@ -145,7 +167,8 @@ public class WolframAlphaCommand extends BaseCommand {
 
                 Request request = new Request.Builder()
                         .header("Accept", "application/json")
-                        .header("Authorization", "Bearer " + key)
+                        .header("User-Agent", WebConstants.USER_AGENT)
+                        .header("Authorization", "Client-ID " + key)
                         .url(new URL(IMGUR_URL))
                         .post(body)
                         .build();
