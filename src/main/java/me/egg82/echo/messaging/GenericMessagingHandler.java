@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.messaging.packets.*;
+import me.egg82.echo.services.CollectionProvider;
 import me.egg82.echo.storage.StorageService;
 import me.egg82.echo.storage.models.LearnModel;
 import me.egg82.echo.storage.models.MessageModel;
@@ -86,6 +87,8 @@ public class GenericMessagingHandler implements MessagingHandler {
             logger.error("Could not get cached config.");
             return;
         }
+
+        CollectionProvider.getCanLearnCache().put(packet.getUser(), packet.isLearning());
 
         for (StorageService service : cachedConfig.getStorage()) {
             LearnModel model = service.getOrCreateLearnModel(packet.getUser(), packet.isLearning());
