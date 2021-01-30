@@ -8,13 +8,23 @@ import co.aikar.commands.annotation.*;
 import me.egg82.echo.commands.internal.DoNotLearnCommand;
 import me.egg82.echo.commands.internal.LearnCommand;
 import me.egg82.echo.commands.internal.ReloadCommand;
+import me.egg82.echo.config.CachedConfig;
+import me.egg82.echo.config.ConfigUtil;
+import me.egg82.echo.lang.Message;
+import me.egg82.echo.utils.EmoteUtil;
 import me.egg82.echo.utils.FileUtil;
+import me.egg82.echo.utils.RoleUtil;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Emote;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @CommandAlias("echo")
 public class ECHOCommand extends BaseCommand {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     private final JDA jda;
     private final JDACommandManager manager;
 
@@ -24,26 +34,74 @@ public class ECHOCommand extends BaseCommand {
     }
 
     @Subcommand("reload")
-    @CommandPermission("echo.admin")
     @Description("{@@description.reload}")
-    public void onReload(@NotNull CommandIssuer issuer) {
+    public void onReload(@NotNull CommandIssuer issuer, @NotNull MessageReceivedEvent event) {
+        if (event.getMember() != null && !RoleUtil.isAdmin(event.getMember())) {
+            CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+            if (cachedConfig == null) {
+                logger.error("Could not get cached config.");
+                issuer.sendError(Message.ERROR__INTERNAL);
+                return;
+            }
+
+            Emote emote = EmoteUtil.getEmote(cachedConfig.getDisallowedEmote(), event.getGuild());
+            if (emote == null) {
+                logger.warn("Could not find disallowed emote \"" + cachedConfig.getAlotEmote() + "\" for guild \"" + event.getGuild().getName() + "\".");
+                return;
+            }
+            event.getMessage().addReaction(emote).queue();
+            return;
+        }
+
         new ReloadCommand(issuer, FileUtil.getCwd(), manager, jda).run();
     }
 
     @Subcommand("learn")
-    @CommandPermission("echo.admin")
     @Description("{@@description.learn}")
     @Syntax("<url> [delimiter]")
-    public void onReload(@NotNull CommandIssuer issuer, @NotNull String url, @Default("\n") String delimiter) {
+    public void onLearn(@NotNull CommandIssuer issuer, @NotNull MessageReceivedEvent event, @NotNull String url, @Default("\n") String delimiter) {
+        if (event.getMember() != null && !RoleUtil.isAdmin(event.getMember())) {
+            CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+            if (cachedConfig == null) {
+                logger.error("Could not get cached config.");
+                issuer.sendError(Message.ERROR__INTERNAL);
+                return;
+            }
+
+            Emote emote = EmoteUtil.getEmote(cachedConfig.getDisallowedEmote(), event.getGuild());
+            if (emote == null) {
+                logger.warn("Could not find disallowed emote \"" + cachedConfig.getAlotEmote() + "\" for guild \"" + event.getGuild().getName() + "\".");
+                return;
+            }
+            event.getMessage().addReaction(emote).queue();
+            return;
+        }
+
         new LearnCommand(issuer, url, delimiter).run();
     }
 
-    @Subcommand("dnl")
-    @CommandPermission("echo.admin")
+    @Subcommand("donotlearn|dnl")
     @Description("{@@description.no-learn}")
     @Syntax("<user> [learn]")
-    public void onDnl(@NotNull CommandIssuer issuer, @NotNull Guild guild, @NotNull String user, @Default("false") boolean learning) {
-        new DoNotLearnCommand(issuer, user, guild, learning).run();
+    public void onDnl(@NotNull CommandIssuer issuer, @NotNull MessageReceivedEvent event, @NotNull String user, @Default("false") boolean learning) {
+        if (event.getMember() != null && !RoleUtil.isAdmin(event.getMember())) {
+            CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+            if (cachedConfig == null) {
+                logger.error("Could not get cached config.");
+                issuer.sendError(Message.ERROR__INTERNAL);
+                return;
+            }
+
+            Emote emote = EmoteUtil.getEmote(cachedConfig.getDisallowedEmote(), event.getGuild());
+            if (emote == null) {
+                logger.warn("Could not find disallowed emote \"" + cachedConfig.getAlotEmote() + "\" for guild \"" + event.getGuild().getName() + "\".");
+                return;
+            }
+            event.getMessage().addReaction(emote).queue();
+            return;
+        }
+
+        new DoNotLearnCommand(issuer, user, event.getGuild(), learning).run();
     }
 
     @CatchUnknown

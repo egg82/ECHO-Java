@@ -47,6 +47,12 @@ public class CachedConfig {
     private String disallowedEmote = "no";
     public @NotNull String getDisallowedEmote() { return disallowedEmote; }
 
+    private String adminRole = "owner";
+    public @NotNull String getAdminRole() { return adminRole; }
+
+    private String disallowedRole = "";
+    public @NotNull String getDisallowedRole() { return disallowedRole; }
+
     private Set<String> disabledCommands = ImmutableSet.of();
     public @NotNull Set<String> getDisabledCommands() { return disabledCommands; }
 
@@ -119,6 +125,16 @@ public class CachedConfig {
 
         public @NotNull CachedConfig.Builder disallowedEmote(@NotNull String value) {
             values.disallowedEmote = value;
+            return this;
+        }
+
+        public @NotNull CachedConfig.Builder adminRole(@NotNull String value) {
+            values.adminRole = value;
+            return this;
+        }
+
+        public @NotNull CachedConfig.Builder disallowedRole(@NotNull String value) {
+            values.disallowedRole = value;
             return this;
         }
 

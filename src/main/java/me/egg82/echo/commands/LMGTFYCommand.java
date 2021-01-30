@@ -10,8 +10,11 @@ import java.awt.*;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.lang.Message;
+import me.egg82.echo.utils.EmoteUtil;
+import me.egg82.echo.utils.RoleUtil;
 import me.egg82.echo.utils.WebUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -41,6 +44,16 @@ public class LMGTFYCommand extends BaseCommand {
         }
 
         if (cachedConfig.getDisabledCommands().contains(getName())) {
+            return;
+        }
+
+        if (event.getMember() != null && !RoleUtil.isAllowed(event.getMember())) {
+            Emote emote = EmoteUtil.getEmote(cachedConfig.getDisallowedEmote(), event.getGuild());
+            if (emote == null) {
+                logger.warn("Could not find disallowed emote \"" + cachedConfig.getAlotEmote() + "\" for guild \"" + event.getGuild().getName() + "\".");
+                return;
+            }
+            event.getMessage().addReaction(emote).queue();
             return;
         }
 

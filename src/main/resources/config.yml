@@ -125,7 +125,7 @@ emotes:
 # Roles defined for bot functionality
 roles:
   # The bot admin role. Allowed to perform internal bot commands
-  admin: 'Owner'
+  admin: 'owner'
   # Role added to users who are not allowed to interact with the bot in any way
   # The default blank state allows everyone to interact with it
   disallowed: ''

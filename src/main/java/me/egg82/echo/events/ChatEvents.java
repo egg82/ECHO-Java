@@ -15,6 +15,7 @@ import me.egg82.echo.messaging.packets.MessagePacket;
 import me.egg82.echo.messaging.packets.MessageUpdatePacket;
 import me.egg82.echo.storage.StorageService;
 import me.egg82.echo.storage.models.MessageModel;
+import me.egg82.echo.utils.EmoteUtil;
 import me.egg82.echo.utils.PacketUtil;
 import me.egg82.echo.utils.ResponseUtil;
 import me.egg82.echo.web.models.GoogleSearchModel;
@@ -212,13 +213,13 @@ public class ChatEvents extends EventHolder {
             return;
         }
 
-        List<Emote> emotes = event.getGuild().getEmotesByName(cachedConfig.getAlotEmote(), true);
-        if (emotes.isEmpty()) {
-            logger.warn("Could not find alot emote \"" + cachedConfig.getAlotEmote() + "\" for guild.");
+        Emote emote = EmoteUtil.getEmote(cachedConfig.getAlotEmote(), event.getGuild());
+        if (emote == null) {
+            logger.warn("Could not find alot emote \"" + cachedConfig.getAlotEmote() + "\" for guild \"" + event.getGuild().getName() + "\".");
             return;
         }
 
-        event.getMessage().addReaction(emotes.get(0)).queue();
+        event.getMessage().addReaction(emote).queue();
     }
 
     private @NotNull String generateSentence(@NotNull MarkovMegaHal megaHal, @NotNull String sentence, @NotNull String seed) {

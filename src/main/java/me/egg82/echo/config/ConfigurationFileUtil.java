@@ -71,6 +71,16 @@ public class ConfigurationFileUtil {
             BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Imgur client ID:</c2> <c1>" + imgurKey + "</c1>");
         }
 
+        String adminRole = config.node("roles", "admin").getString("owner");
+        if (debug) {
+            BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Admin role:</c2> <c1>" + adminRole + "</c1>");
+        }
+
+        String disallowedRole = config.node("roles", "disallowed").getString("");
+        if (debug) {
+            BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Disallowed role:</c2> <c1>" + disallowedRole + "</c1>");
+        }
+
         String alotEmote = config.node("emotes", "alot").getString("");
         if (debug) {
             BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Alot emote:</c2> <c1>" + alotEmote + "</c1>");
@@ -97,6 +107,8 @@ public class ConfigurationFileUtil {
                 .googleKey(googleKey)
                 .wolframKey(wolframKey)
                 .imgurKey(imgurKey)
+                .adminRole(adminRole)
+                .disallowedRole(disallowedRole)
                 .alotEmote(alotEmote)
                 .disallowedEmote(disallowedEmote)
                 .disabledCommands(getDisabledCommands(config, debug, manager))
