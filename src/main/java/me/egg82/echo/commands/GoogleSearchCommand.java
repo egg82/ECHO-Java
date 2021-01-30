@@ -15,11 +15,12 @@ import java.util.concurrent.CompletionException;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.lang.Message;
-import me.egg82.echo.web.WebConstants;
-import me.egg82.echo.web.WebRequest;
+import me.egg82.echo.utils.WebUtil;
 import me.egg82.echo.web.models.GoogleSearchModel;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,15 +110,19 @@ public class GoogleSearchCommand extends BaseCommand {
             }
 
             try {
-                String content = WebRequest.builder(new URL(String.format(SEARCH_URL, cachedConfig.getGoogleKey(), WebRequest.urlEncode(query.replace("\\s+", "+")))))
-                        .timeout(WebConstants.TIMEOUT)
-                        .userAgent(WebConstants.USER_AGENT)
-                        .header("Accept", "application/json")
-                        .build().getString();
+                Request request = WebUtil.getDefaultRequestBuilder(new URL(String.format(SEARCH_URL, cachedConfig.getGoogleKey(), WebUtil.urlEncode(query.replace("\\s+", "+")))))
+                        .header("Content-Type", "application/json")
+                        .build();
 
-                JSONDeserializer<GoogleSearchModel> modelDeserializer = new JSONDeserializer<>();
-                GoogleSearchModel retVal = modelDeserializer.deserialize(content, GoogleSearchModel.class);
-                return retVal == null || retVal.getItems().isEmpty() ? null : retVal;
+                try (Response response = WebUtil.getResponse(request)) {
+                    if (!response.isSuccessful()) {
+                        throw new IOException("Could not get connection (HTTP status " + response.code() + ")");
+                    }
+
+                    JSONDeserializer<GoogleSearchModel> modelDeserializer = new JSONDeserializer<>();
+                    GoogleSearchModel retVal = modelDeserializer.deserialize(response.body().string(), GoogleSearchModel.class);
+                    return retVal == null || retVal.getItems().isEmpty() ? null : retVal;
+                }
             } catch (IOException ex) {
                 throw new CompletionException(ex);
             }

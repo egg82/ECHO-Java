@@ -13,10 +13,11 @@ import java.util.concurrent.CompletionException;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.lang.Message;
-import me.egg82.echo.web.WebConstants;
-import me.egg82.echo.web.WebRequest;
+import me.egg82.echo.utils.WebUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,11 +77,17 @@ public class InspireCommand extends BaseCommand {
     public static @NotNull CompletableFuture<String> get() {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                return WebRequest.builder(new URL(API_URL))
-                        .timeout(WebConstants.TIMEOUT)
-                        .userAgent(WebConstants.USER_AGENT)
-                        .header("Accept", "text/plain")
-                        .build().getString();
+                Request request = WebUtil.getDefaultRequestBuilder(new URL(API_URL))
+                        .header("Content-Type", "text/plain")
+                        .build();
+
+                try (Response response = WebUtil.getResponse(request)) {
+                    if (!response.isSuccessful()) {
+                        throw new IOException("Could not get connection (HTTP status " + response.code() + ")");
+                    }
+
+                    return response.body().string();
+                }
             } catch (IOException ex) {
                 throw new CompletionException(ex);
             }

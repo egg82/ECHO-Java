@@ -15,11 +15,12 @@ import java.util.concurrent.CompletionException;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.lang.Message;
-import me.egg82.echo.web.WebConstants;
-import me.egg82.echo.web.WebRequest;
+import me.egg82.echo.utils.WebUtil;
 import me.egg82.echo.web.models.RoryModel;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,15 +79,19 @@ public class RoryCommand extends BaseCommand {
     public static @NotNull CompletableFuture<RoryModel> get(int id) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                String content = WebRequest.builder(new URL(id == -1 ? CAT_URL : String.format(CAT_URL_ID, id)))
-                        .timeout(WebConstants.TIMEOUT)
-                        .userAgent(WebConstants.USER_AGENT)
+                Request request = WebUtil.getDefaultRequestBuilder(new URL(id == -1 ? CAT_URL : String.format(CAT_URL_ID, id)))
                         .header("Accept", "application/json")
-                        .build().getString();
+                        .build();
 
-                JSONDeserializer<RoryModel> modelDeserializer = new JSONDeserializer<>();
-                RoryModel retVal = modelDeserializer.deserialize(content, RoryModel.class);
-                return retVal == null || retVal.getId() == -1 ? null : retVal;
+                try (Response response = WebUtil.getResponse(request)) {
+                    if (!response.isSuccessful()) {
+                        throw new IOException("Could not get connection (HTTP status " + response.code() + ")");
+                    }
+
+                    JSONDeserializer<RoryModel> modelDeserializer = new JSONDeserializer<>();
+                    RoryModel retVal = modelDeserializer.deserialize(response.body().string(), RoryModel.class);
+                    return retVal == null || retVal.getId() == -1 ? null : retVal;
+                }
             } catch (IOException ex) {
                 throw new CompletionException(ex);
             }

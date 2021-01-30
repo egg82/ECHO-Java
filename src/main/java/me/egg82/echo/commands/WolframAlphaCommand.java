@@ -16,8 +16,7 @@ import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.core.Pair;
 import me.egg82.echo.lang.Message;
-import me.egg82.echo.web.WebConstants;
-import me.egg82.echo.web.WebRequest;
+import me.egg82.echo.utils.WebUtil;
 import me.egg82.echo.web.models.ImgurUploadModel;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -35,11 +34,6 @@ public class WolframAlphaCommand extends BaseCommand {
     private static final String QUERY_LINK = "https://www.wolframalpha.com/input/?i=%s";
 
     private static final String IMGUR_URL = "https://api.imgur.com/3/image";
-
-    private static final OkHttpClient client = new OkHttpClient.Builder()
-            .connectTimeout(WebConstants.TIMEOUT.getTime(), WebConstants.TIMEOUT.getUnit())
-            .readTimeout(WebConstants.TIMEOUT.getTime(), WebConstants.TIMEOUT.getUnit())
-            .build();
 
     @Default
     @Description("{@@description.wolfram}")
@@ -100,7 +94,7 @@ public class WolframAlphaCommand extends BaseCommand {
                     }
 
                     EmbedBuilder embed = new EmbedBuilder();
-                    embed.setTitle("Wolfram Alpha query: " + query, String.format(QUERY_LINK, WebRequest.urlEncode(query.replace("\\s+", "+"))));
+                    embed.setTitle("Wolfram Alpha query: " + query, String.format(QUERY_LINK, WebUtil.urlEncode(query.replace("\\s+", "+"))));
                     embed.setColor(Color.GREEN);
                     embed.appendDescription("Answer");
                     embed.appendDescription(String.format("```%s```", val.getT1()));
@@ -114,12 +108,10 @@ public class WolframAlphaCommand extends BaseCommand {
     public static @NotNull CompletableFuture<String> getResult(@NotNull String key, @NotNull String query) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                Request request = new Request.Builder()
-                        .url(new URL(String.format(RESULT_URL, key, WebRequest.urlEncode(query.replace("\\s+", "+")))))
-                        .header("User-Agent", WebConstants.USER_AGENT)
+                Request request = WebUtil.getDefaultRequestBuilder(new URL(String.format(RESULT_URL, key, WebUtil.urlEncode(query.replace("\\s+", "+")))))
                         .build();
 
-                try (Response response = client.newCall(request).execute()) {
+                try (Response response = WebUtil.getResponse(request)) {
                     if (!response.isSuccessful()) {
                         if (response.code() == 501) {
                             return "No short answer available";
@@ -138,12 +130,10 @@ public class WolframAlphaCommand extends BaseCommand {
     public static @NotNull CompletableFuture<byte[]> getImage(@NotNull String key, @NotNull String query) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                Request request = new Request.Builder()
-                        .url(new URL(String.format(IMAGE_URL, key, WebRequest.urlEncode(query.replace("\\s+", "+")))))
-                        .header("User-Agent", WebConstants.USER_AGENT)
+                Request request = WebUtil.getDefaultRequestBuilder(new URL(String.format(IMAGE_URL, key, WebUtil.urlEncode(query.replace("\\s+", "+")))))
                         .build();
 
-                try (Response response = client.newCall(request).execute()) {
+                try (Response response = WebUtil.getResponse(request)) {
                     if (!response.isSuccessful()) {
                         throw new IOException("Could not get connection (HTTP status " + response.code() + ")");
                     }
@@ -156,7 +146,7 @@ public class WolframAlphaCommand extends BaseCommand {
         });
     }
 
-    public static @NotNull CompletableFuture<ImgurUploadModel> uploadImage(@NotNull String key, @NotNull byte[] data) {
+    public static @NotNull CompletableFuture<ImgurUploadModel> uploadImage(@NotNull String key, byte @NotNull [] data) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 RequestBody body = new MultipartBody.Builder()
@@ -165,15 +155,13 @@ public class WolframAlphaCommand extends BaseCommand {
                         .addFormDataPart("image", "wolfram.gif", RequestBody.create(data, MediaType.get("image/gif")))
                         .build();
 
-                Request request = new Request.Builder()
+                Request request = WebUtil.getDefaultRequestBuilder(new URL(IMGUR_URL))
                         .header("Accept", "application/json")
-                        .header("User-Agent", WebConstants.USER_AGENT)
                         .header("Authorization", "Client-ID " + key)
-                        .url(new URL(IMGUR_URL))
                         .post(body)
                         .build();
 
-                try (Response response = client.newCall(request).execute()) {
+                try (Response response = WebUtil.getResponse(request)) {
                     if (!response.isSuccessful()) {
                         throw new IOException("Could not get connection (HTTP status " + response.code() + ")");
                     }

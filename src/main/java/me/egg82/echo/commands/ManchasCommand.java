@@ -14,10 +14,11 @@ import java.util.concurrent.CompletionException;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.lang.Message;
-import me.egg82.echo.web.WebConstants;
-import me.egg82.echo.web.WebRequest;
+import me.egg82.echo.utils.WebUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,10 +79,16 @@ public class ManchasCommand extends BaseCommand {
     public static @NotNull CompletableFuture<String> get(int id) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                return WebRequest.builder(new URL(id == -1 ? CAT_URL : String.format(CAT_URL_ID, id)))
-                        .timeout(WebConstants.TIMEOUT)
-                        .userAgent(WebConstants.USER_AGENT)
-                        .build().getConnection().getURL().toExternalForm();
+                Request request = WebUtil.getDefaultRequestBuilder(new URL(id == -1 ? CAT_URL : String.format(CAT_URL_ID, id)))
+                        .build();
+
+                try (Response response = WebUtil.getResponse(request)) {
+                    if (!response.isSuccessful()) {
+                        throw new IOException("Could not get connection (HTTP status " + response.code() + ")");
+                    }
+
+                    return response.request().url().toString();
+                }
             } catch (IOException ex) {
                 throw new CompletionException(ex);
             }

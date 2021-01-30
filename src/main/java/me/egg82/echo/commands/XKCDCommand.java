@@ -15,12 +15,13 @@ import java.util.concurrent.CompletionException;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.lang.Message;
-import me.egg82.echo.web.WebConstants;
-import me.egg82.echo.web.WebRequest;
+import me.egg82.echo.utils.WebUtil;
 import me.egg82.echo.web.models.XKCDInfoModel;
 import me.egg82.echo.web.models.XKCDSearchModel;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,15 +86,19 @@ public class XKCDCommand extends BaseCommand {
             }
 
             try {
-                String content = WebRequest.builder(new URL(String.format(INFO_URL, v.getComics().get(v.getSelection()).leftInt())))
-                        .timeout(WebConstants.TIMEOUT)
-                        .userAgent(WebConstants.USER_AGENT)
+                Request request = WebUtil.getDefaultRequestBuilder(new URL(String.format(INFO_URL, v.getComics().get(v.getSelection()).leftInt())))
                         .header("Accept", "application/json")
-                        .build().getString();
+                        .build();
 
-                JSONDeserializer<XKCDInfoModel> modelDeserializer = new JSONDeserializer<>();
-                XKCDInfoModel retVal = modelDeserializer.deserialize(content, XKCDInfoModel.class);
-                return retVal == null || retVal.getNum() == -1 ? null : retVal;
+                try (Response response = WebUtil.getResponse(request)) {
+                    if (!response.isSuccessful()) {
+                        throw new IOException("Could not get connection (HTTP status " + response.code() + ")");
+                    }
+
+                    JSONDeserializer<XKCDInfoModel> modelDeserializer = new JSONDeserializer<>();
+                    XKCDInfoModel retVal = modelDeserializer.deserialize(response.body().string(), XKCDInfoModel.class);
+                    return retVal == null || retVal.getNum() == -1 ? null : retVal;
+                }
             } catch (IOException ex) {
                 throw new CompletionException(ex);
             }
@@ -103,25 +108,29 @@ public class XKCDCommand extends BaseCommand {
     private static @NotNull CompletableFuture<XKCDSearchModel> search(@NotNull String query) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                String content = WebRequest.builder(new URL(String.format(SEARCH_URL, WebRequest.urlEncode(query.replace("\\s+", "+")))))
-                        .timeout(WebConstants.TIMEOUT)
-                        .userAgent(WebConstants.USER_AGENT)
+                Request request = WebUtil.getDefaultRequestBuilder(new URL(String.format(SEARCH_URL, WebUtil.urlEncode(query.replace("\\s+", "+")))))
                         .header("Accept", "text/plain")
-                        .build().getString();
+                        .build();
 
-                String[] splitContent = content.replace("\r", "").replace("\n", " ").split("\\s+");
-                if (splitContent.length < 2) {
-                    return null;
+                try (Response response = WebUtil.getResponse(request)) {
+                    if (!response.isSuccessful()) {
+                        throw new IOException("Could not get connection (HTTP status " + response.code() + ")");
+                    }
+
+                    String[] splitContent = response.body().string().replace("\r", "").replace("\n", " ").split("\\s+");
+                    if (splitContent.length < 2) {
+                        return null;
+                    }
+
+                    XKCDSearchModel retVal = new XKCDSearchModel();
+                    retVal.setWeight(Float.parseFloat(splitContent[0]));
+                    retVal.setSelection(Integer.parseInt(splitContent[1]));
+                    for (int i = 2; i < splitContent.length; i += 2) {
+                        retVal.getComics().add(new IntObjectImmutablePair<>(Integer.parseInt(splitContent[i]), splitContent[i + 1]));
+                    }
+
+                    return retVal;
                 }
-
-                XKCDSearchModel retVal = new XKCDSearchModel();
-                retVal.setWeight(Float.parseFloat(splitContent[0]));
-                retVal.setSelection(Integer.parseInt(splitContent[1]));
-                for (int i = 2; i < splitContent.length; i += 2) {
-                    retVal.getComics().add(new IntObjectImmutablePair<>(Integer.parseInt(splitContent[i]), splitContent[i + 1]));
-                }
-
-                return retVal;
             } catch (IOException ex) {
                 throw new CompletionException(ex);
             }

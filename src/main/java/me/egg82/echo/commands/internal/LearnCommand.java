@@ -10,8 +10,9 @@ import me.egg82.echo.lang.Message;
 import me.egg82.echo.messaging.packets.MessagePacket;
 import me.egg82.echo.storage.StorageService;
 import me.egg82.echo.utils.PacketUtil;
-import me.egg82.echo.web.WebConstants;
-import me.egg82.echo.web.WebRequest;
+import me.egg82.echo.utils.WebUtil;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
 
 public class LearnCommand extends AbstractCommand {
@@ -35,11 +36,17 @@ public class LearnCommand extends AbstractCommand {
 
         String[] splitContent;
         try {
-            splitContent = WebRequest.builder(new URL(url))
-                    .timeout(WebConstants.TIMEOUT)
-                    .userAgent(WebConstants.USER_AGENT)
+            Request request = WebUtil.getDefaultRequestBuilder(new URL(url))
                     .header("Content-Type", "text/plain")
-                    .build().getString().replace("\r", "").split(delimiter);
+                    .build();
+
+            try (Response response = WebUtil.getResponse(request)) {
+                if (!response.isSuccessful()) {
+                    throw new IOException("Could not get connection (HTTP status " + response.code() + ")");
+                }
+
+                splitContent = response.body().string().replace("\r", "").split(delimiter);
+            }
         } catch (IOException ex) {
             if (cachedConfig.getDebug()) {
                 logger.error(ex.getMessage(), ex);

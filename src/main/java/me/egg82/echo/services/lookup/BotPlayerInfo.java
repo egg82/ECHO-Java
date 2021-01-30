@@ -5,7 +5,6 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.collect.ImmutableList;
 import flexjson.JSONDeserializer;
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
@@ -14,8 +13,9 @@ import java.util.concurrent.TimeUnit;
 import me.egg82.echo.services.lookup.models.PlayerNameModel;
 import me.egg82.echo.services.lookup.models.PlayerUUIDModel;
 import me.egg82.echo.services.lookup.models.ProfileModel;
-import me.egg82.echo.utils.TimeUtil;
-import me.egg82.echo.web.WebRequest;
+import me.egg82.echo.utils.WebUtil;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,6 +31,10 @@ public class BotPlayerInfo implements PlayerInfo {
     private static final Object uuidCacheLock = new Object();
     private static final Object nameCacheLock = new Object();
     private static final Object propertiesCacheLock = new Object();
+
+    private static final String NAME_URL = "https://api.mojang.com/user/profiles/%s/names";
+    private static final String UUID_URL = "https://api.mojang.com/users/profiles/minecraft/%s";
+    private static final String PROFILE_URL = "https://sessionserver.mojang.com/session/minecraft/profile/%s?unsigned=false";
 
     BotPlayerInfo(@NotNull UUID uuid) throws IOException {
         this.uuid = uuid;
@@ -102,62 +106,83 @@ public class BotPlayerInfo implements PlayerInfo {
 
     private static @Nullable String nameExpensive(@NotNull UUID uuid) throws IOException {
         // Network lookup
-        HttpURLConnection conn = WebRequest.builder(new URL("https://api.mojang.com/user/profiles/" + uuid.toString().replace("-", "") + "/names")).timeout(new TimeUtil.Time(2500L, TimeUnit.MILLISECONDS)).userAgent("egg82/PlayerInfo").header("Accept", "application/json").build().getConnection();
-        int status = conn.getResponseCode();
+        Request request = WebUtil.getDefaultRequestBuilder(new URL(String.format(NAME_URL, uuid.toString().replace("-", ""))))
+                .header("Accept", "application/json")
+                .build();
 
-        if (status == 204) {
-            // No data exists
-            return null;
-        } else if (status == 200) {
-            JSONDeserializer<List<PlayerNameModel>> modelDeserializer = new JSONDeserializer<>();
-            modelDeserializer.use("values", PlayerNameModel.class);
-            List<PlayerNameModel> model = modelDeserializer.deserialize(WebRequest.getString(conn));
-
-            String name = model.get(model.size() - 1).getName();
-            synchronized (nameCacheLock) {
-                nameCache.put(name, uuid);
+        try (Response response = WebUtil.getResponse(request)) {
+            if (!response.isSuccessful()) {
+                throw new IOException("Could not get connection (HTTP status " + response.code() + ")");
             }
-            return name;
-        }
 
-        throw new IOException("Mojang API response code: " + status);
+            if (response.code() == 204) {
+                // No data exists
+                return null;
+            } else if (response.code() == 200) {
+                JSONDeserializer<List<PlayerNameModel>> modelDeserializer = new JSONDeserializer<>();
+                modelDeserializer.use("values", PlayerNameModel.class);
+                List<PlayerNameModel> model = modelDeserializer.deserialize(response.body().string());
+
+                String name = model.get(model.size() - 1).getName();
+                synchronized (nameCacheLock) {
+                    nameCache.put(name, uuid);
+                }
+                return name;
+            }
+
+            throw new IOException("Mojang API response code: " + response.code());
+        }
     }
 
     private static @Nullable UUID uuidExpensive(@NotNull String name) throws IOException {
         // Network lookup
-        HttpURLConnection conn = WebRequest.builder(new URL("https://api.mojang.com/users/profiles/minecraft/" + WebRequest.urlEncode(name))).timeout(new TimeUtil.Time(2500L, TimeUnit.MILLISECONDS)).userAgent("egg82/PlayerInfo").header("Accept", "application/json").build().getConnection();
-        int status = conn.getResponseCode();
+        Request request = WebUtil.getDefaultRequestBuilder(new URL(String.format(UUID_URL, WebUtil.urlEncode(name))))
+                .header("Accept", "application/json")
+                .build();
 
-        if (status == 204) {
-            // No data exists
-            return null;
-        } else if (status == 200) {
-            JSONDeserializer<PlayerUUIDModel> modelDeserializer = new JSONDeserializer<>();
-            PlayerUUIDModel model = modelDeserializer.deserialize(WebRequest.getString(conn), PlayerUUIDModel.class);
-
-            UUID uuid = UUID.fromString(model.getId().replaceFirst("(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"));
-            synchronized (uuidCacheLock) {
-                uuidCache.put(uuid, name);
+        try (Response response = WebUtil.getResponse(request)) {
+            if (!response.isSuccessful()) {
+                throw new IOException("Could not get connection (HTTP status " + response.code() + ")");
             }
-            return uuid;
-        }
 
-        throw new IOException("Mojang API response code: " + status);
+            if (response.code() == 204) {
+                // No data exists
+                return null;
+            } else if (response.code() == 200) {
+                JSONDeserializer<PlayerUUIDModel> modelDeserializer = new JSONDeserializer<>();
+                PlayerUUIDModel model = modelDeserializer.deserialize(response.body().string(), PlayerUUIDModel.class);
+
+                UUID uuid = UUID.fromString(model.getId().replaceFirst("(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"));
+                synchronized (uuidCacheLock) {
+                    uuidCache.put(uuid, name);
+                }
+                return uuid;
+            }
+
+            throw new IOException("Mojang API response code: " + response.code());
+        }
     }
 
     private static @Nullable List<ProfileModel.ProfilePropertyModel> propertiesExpensive(@NotNull UUID uuid) throws IOException {
         // Network lookup
-        HttpURLConnection conn = WebRequest.builder(new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString().replace("-", "") + "?unsigned=false")).timeout(new TimeUtil.Time(2500L, TimeUnit.MILLISECONDS)).userAgent("egg82/PlayerInfo").header("Accept", "application/json").build().getConnection();
-        int status = conn.getResponseCode();
+        Request request = WebUtil.getDefaultRequestBuilder(new URL(String.format(PROFILE_URL, uuid.toString().replace("-", ""))))
+                .header("Accept", "application/json")
+                .build();
 
-        if (status == 204) {
-            // No data exists
-            return null;
-        } else if (status == 200) {
-            JSONDeserializer<ProfileModel> modelDeserializer = new JSONDeserializer<>();
-            return modelDeserializer.deserialize(WebRequest.getString(conn), ProfileModel.class).getProperties();
+        try (Response response = WebUtil.getResponse(request)) {
+            if (!response.isSuccessful()) {
+                throw new IOException("Could not get connection (HTTP status " + response.code() + ")");
+            }
+
+            if (response.code() == 204) {
+                // No data exists
+                return null;
+            } else if (response.code() == 200) {
+                JSONDeserializer<ProfileModel> modelDeserializer = new JSONDeserializer<>();
+                return modelDeserializer.deserialize(response.body().string(), ProfileModel.class).getProperties();
+            }
+
+            throw new IOException("Mojang API response code: " + response.code());
         }
-
-        throw new IOException("Mojang API response code: " + status);
     }
 }
