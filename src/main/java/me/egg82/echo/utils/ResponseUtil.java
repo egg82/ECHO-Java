@@ -59,4 +59,14 @@ public class ResponseUtil {
     public static boolean canLearn(@NotNull User user) { return Boolean.TRUE.equals(CollectionProvider.getCanLearnCache().get(user.getIdLong())); }
 
     public static boolean canLearn(@NotNull Member member) { return Boolean.TRUE.equals(CollectionProvider.getCanLearnCache().get(member.getIdLong())); }
+
+    public static boolean isCommand(@NotNull String content) {
+        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+        if (cachedConfig == null) {
+            logger.error("Could not get cached config.");
+            return false;
+        }
+
+        return cachedConfig.getCommandPrefixes().contains(content);
+    }
 }

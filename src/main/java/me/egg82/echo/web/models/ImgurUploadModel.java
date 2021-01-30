@@ -2,6 +2,7 @@ package me.egg82.echo.web.models;
 
 import flexjson.JSON;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -49,7 +50,7 @@ public class ImgurUploadModel implements Serializable {
         private String title = null;
         private String description = null;
         @JSON(name = "datetime")
-        private long dateTime = -1L;
+        private Instant dateTime = Instant.now();
         private String type = "";
         private boolean animated = false;
         private long width = -1L;
@@ -92,10 +93,10 @@ public class ImgurUploadModel implements Serializable {
         public void setDescription(String description) { this.description = description; }
 
         @JSON(name = "datetime")
-        public long getDateTime() { return dateTime; }
+        public @NotNull Instant getDateTime() { return dateTime; }
 
         @JSON(name = "datetime")
-        public void setDateTime(long dateTime) { this.dateTime = dateTime; }
+        public void setDateTime(@NotNull Instant dateTime) { this.dateTime = dateTime; }
 
         public @NotNull String getType() { return type; }
 

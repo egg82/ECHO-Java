@@ -20,6 +20,8 @@ import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.config.ConfigurationFileUtil;
 import me.egg82.echo.events.ChatEvents;
 import me.egg82.echo.events.EventHolder;
+import me.egg82.echo.events.ReactEvents;
+import me.egg82.echo.events.ReplyEvents;
 import me.egg82.echo.lang.LanguageFileUtil;
 import me.egg82.echo.lang.Message;
 import me.egg82.echo.logging.AnsiColor;
@@ -175,6 +177,8 @@ public class Bot {
 
     private void loadEvents() {
         eventHolders.add(new ChatEvents(jda, commandManager));
+        eventHolders.add(new ReactEvents(jda, commandManager));
+        eventHolders.add(new ReplyEvents(jda, commandManager));
     }
 
     private final Random random = new Random();

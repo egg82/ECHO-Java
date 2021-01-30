@@ -32,6 +32,9 @@ public class CachedConfig {
     private String serverIdString = serverId.toString();
     public @NotNull String getServerIdString() { return serverIdString; }
 
+    private ImmutableSet<String> commandPrefixes = ImmutableSet.of();
+    public @NotNull ImmutableSet<String> getCommandPrefixes() { return commandPrefixes; }
+
     private String googleKey = "";
     public @NotNull String getGoogleKey() { return googleKey; }
 
@@ -53,17 +56,17 @@ public class CachedConfig {
     private String disallowedRole = "";
     public @NotNull String getDisallowedRole() { return disallowedRole; }
 
-    private Set<String> disabledCommands = ImmutableSet.of();
-    public @NotNull Set<String> getDisabledCommands() { return disabledCommands; }
+    private ImmutableSet<String> disabledCommands = ImmutableSet.of();
+    public @NotNull ImmutableSet<String> getDisabledCommands() { return disabledCommands; }
 
     private double replyChance = 0.15d;
     public double getReplyChance() { return replyChance; }
 
-    private Set<String> replyPhrases = ImmutableSet.of();
-    public @NotNull Set<String> getReplyPhrases() { return replyPhrases; }
+    private ImmutableSet<String> replyPhrases = ImmutableSet.of();
+    public @NotNull ImmutableSet<String> getReplyPhrases() { return replyPhrases; }
 
-    private Set<String> replyPhrasesReversed = ImmutableSet.of();
-    public @NotNull Set<String> getReplyPhrasesReversed() { return replyPhrasesReversed; }
+    private ImmutableSet<String> replyPhrasesReversed = ImmutableSet.of();
+    public @NotNull ImmutableSet<String> getReplyPhrasesReversed() { return replyPhrasesReversed; }
 
     public static @NotNull CachedConfig.Builder builder() { return new CachedConfig.Builder(); }
 
@@ -100,6 +103,11 @@ public class CachedConfig {
         public @NotNull CachedConfig.Builder serverId(@NotNull UUID value) {
             values.serverId = value;
             values.serverIdString = value.toString();
+            return this;
+        }
+
+        public @NotNull CachedConfig.Builder commandPrefixes(@NotNull Set<String> value) {
+            values.commandPrefixes = ImmutableSet.copyOf(value);
             return this;
         }
 

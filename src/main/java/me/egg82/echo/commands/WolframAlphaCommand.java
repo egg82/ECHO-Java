@@ -6,10 +6,13 @@ import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Description;
 import co.aikar.commands.annotation.Syntax;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import flexjson.JSONDeserializer;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
+import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import me.egg82.echo.config.CachedConfig;
@@ -20,6 +23,7 @@ import me.egg82.echo.utils.EmoteUtil;
 import me.egg82.echo.utils.RoleUtil;
 import me.egg82.echo.utils.WebUtil;
 import me.egg82.echo.web.models.ImgurUploadModel;
+import me.egg82.echo.web.transformers.InstantTransformer;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -28,7 +32,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@CommandAlias("wa|wolfram")
+@CommandAlias("wolfram|wa")
 public class WolframAlphaCommand extends BaseCommand {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -118,10 +122,12 @@ public class WolframAlphaCommand extends BaseCommand {
                 });
     }
 
+    private static final Cache<String, String> resultCache = Caffeine.newBuilder().build();
+
     public static @NotNull CompletableFuture<String> getResult(@NotNull String key, @NotNull String query) {
-        return CompletableFuture.supplyAsync(() -> {
+        return CompletableFuture.supplyAsync(() -> resultCache.get(query, q -> {
             try {
-                Request request = WebUtil.getDefaultRequestBuilder(new URL(String.format(RESULT_URL, key, WebUtil.urlEncode(query.replace("\\s+", "+")))))
+                Request request = WebUtil.getDefaultRequestBuilder(new URL(String.format(RESULT_URL, key, WebUtil.urlEncode(q.replace("\\s+", "+")))))
                         .build();
 
                 try (Response response = WebUtil.getResponse(request)) {
@@ -137,13 +143,15 @@ public class WolframAlphaCommand extends BaseCommand {
             } catch (IOException ex) {
                 throw new CompletionException(ex);
             }
-        });
+        }));
     }
 
+    private static final Cache<String, byte[]> imageCache = Caffeine.newBuilder().build();
+
     public static @NotNull CompletableFuture<byte[]> getImage(@NotNull String key, @NotNull String query) {
-        return CompletableFuture.supplyAsync(() -> {
+        return CompletableFuture.supplyAsync(() -> imageCache.get(query, q -> {
             try {
-                Request request = WebUtil.getDefaultRequestBuilder(new URL(String.format(IMAGE_URL, key, WebUtil.urlEncode(query.replace("\\s+", "+")))))
+                Request request = WebUtil.getDefaultRequestBuilder(new URL(String.format(IMAGE_URL, key, WebUtil.urlEncode(q.replace("\\s+", "+")))))
                         .build();
 
                 try (Response response = WebUtil.getResponse(request)) {
@@ -156,16 +164,18 @@ public class WolframAlphaCommand extends BaseCommand {
             } catch (IOException ex) {
                 throw new CompletionException(ex);
             }
-        });
+        }));
     }
 
+    private static final Cache<byte[], ImgurUploadModel> imgurCache = Caffeine.newBuilder().build();
+
     public static @NotNull CompletableFuture<ImgurUploadModel> uploadImage(@NotNull String key, byte @NotNull [] data) {
-        return CompletableFuture.supplyAsync(() -> {
+        return CompletableFuture.supplyAsync(() -> imgurCache.get(data, d -> {
             try {
                 RequestBody body = new MultipartBody.Builder()
                         .setType(MultipartBody.FORM)
                         .addFormDataPart("title", "Wolfram Result")
-                        .addFormDataPart("image", "wolfram.gif", RequestBody.create(data, MediaType.get("image/gif")))
+                        .addFormDataPart("image", "wolfram.gif", RequestBody.create(d, MediaType.get("image/gif")))
                         .build();
 
                 Request request = WebUtil.getDefaultRequestBuilder(new URL(IMGUR_URL))
@@ -180,12 +190,13 @@ public class WolframAlphaCommand extends BaseCommand {
                     }
 
                     JSONDeserializer<ImgurUploadModel> modelDeserializer = new JSONDeserializer<>();
+                    modelDeserializer.use(Instant.class, new InstantTransformer());
                     ImgurUploadModel retVal = modelDeserializer.deserialize(response.body().string(), ImgurUploadModel.class);
                     return retVal == null || !retVal.isSuccess() ? null : retVal;
                 }
             } catch (IOException ex) {
                 throw new CompletionException(ex);
             }
-        });
+        }));
     }
 }

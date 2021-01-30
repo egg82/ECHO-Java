@@ -124,7 +124,7 @@ public class GoogleSearchCommand extends BaseCommand {
 
             try {
                 Request request = WebUtil.getDefaultRequestBuilder(new URL(String.format(SEARCH_URL, cachedConfig.getGoogleKey(), WebUtil.urlEncode(query.replace("\\s+", "+")))))
-                        .header("Content-Type", "application/json")
+                        .header("Accept", "application/json")
                         .build();
 
                 try (Response response = WebUtil.getResponse(request)) {

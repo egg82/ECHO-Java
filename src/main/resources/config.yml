@@ -106,6 +106,10 @@ messaging:
     # The maximum amount of time that the bot will wait for a new connection from the pool before timing out
     timeout: '5seconds'
 
+# Command prefixes
+prefixes:
+  - '!'
+
 # Service/API keys
 keys:
   # Google search API key

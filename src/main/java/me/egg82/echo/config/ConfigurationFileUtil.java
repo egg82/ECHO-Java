@@ -56,6 +56,11 @@ public class ConfigurationFileUtil {
             BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Server ID:</c2> <c1>" + serverId.toString() + "</c1>");
         }
 
+        Set<String> commandPrefixes = getCommandPrefixes(config, debug, manager);
+        List<String> prefixes = manager.getDefaultConfig().getCommandPrefixes();
+        prefixes.clear();
+        prefixes.addAll(commandPrefixes);
+
         String googleKey = config.node("keys", "google").getString("");
         if (debug) {
             BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Google API key:</c2> <c1>" + googleKey + "</c1>");
@@ -104,6 +109,7 @@ public class ConfigurationFileUtil {
                 .storage(getStorage(config, dataDirectory, debug, manager))
                 .messaging(getMessaging(config, serverId, messagingHandler, debug, manager))
                 .serverId(serverId)
+                .commandPrefixes(commandPrefixes)
                 .googleKey(googleKey)
                 .wolframKey(wolframKey)
                 .imgurKey(imgurKey)
@@ -138,6 +144,24 @@ public class ConfigurationFileUtil {
         }
         if (debug) {
             BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Default language:</c2> <c1>" + (retVal.getCountry() == null || retVal.getCountry().isEmpty() ? retVal.getLanguage() : retVal.getLanguage() + "-" + retVal.getCountry()) + "</c1>");
+        }
+
+        return retVal;
+    }
+
+    private static @NonNull Set<String> getCommandPrefixes(@NonNull ConfigurationNode config, boolean debug, @NonNull JDACommandManager manager) {
+        Set<String> retVal;
+        try {
+            retVal = new HashSet<>(!config.node("prefixes").empty() ? config.node("prefixes").getList(String.class) : new ArrayList<>());
+        } catch (SerializationException ex) {
+            logger.error(ex.getMessage(), ex);
+            retVal = new HashSet<>();
+        }
+
+        for (String prefix : retVal) {
+            if (debug) {
+                BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Adding command prefix:</c2> <c1>" + prefix + "</c1>");
+            }
         }
 
         return retVal;

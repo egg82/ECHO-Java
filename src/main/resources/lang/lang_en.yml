@@ -38,6 +38,8 @@ lmgtfy: "Googles things for you."
 inspire: "Get some inspiration."
 wolfram: "Do some math."
 eight-ball: "Ask the all-knowing ball."
+github: "Get some information about various repos."
+issues: "Get information about issues on a repo."
 
 import:
   messages: "<c2>Importing messages..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"

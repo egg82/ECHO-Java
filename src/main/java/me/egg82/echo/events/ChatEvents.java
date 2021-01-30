@@ -15,12 +15,10 @@ import me.egg82.echo.messaging.packets.MessagePacket;
 import me.egg82.echo.messaging.packets.MessageUpdatePacket;
 import me.egg82.echo.storage.StorageService;
 import me.egg82.echo.storage.models.MessageModel;
-import me.egg82.echo.utils.EmoteUtil;
 import me.egg82.echo.utils.PacketUtil;
 import me.egg82.echo.utils.ResponseUtil;
 import me.egg82.echo.web.models.GoogleSearchModel;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
@@ -47,7 +45,7 @@ public class ChatEvents extends EventHolder {
         events.add(JDAEvents.subscribe(jda, GuildMessageReceivedEvent.class)
                 .filter(e -> !e.getAuthor().isBot())
                 .filter(e -> !e.isWebhookMessage())
-                .filter(e -> !e.getMessage().getContentStripped().startsWith("!"))
+                .filter(e -> !ResponseUtil.isCommand(e.getMessage().getContentStripped()))
                 .filter(e -> {
                     boolean retVal = ResponseUtil.canLearn(e.getAuthor());
                     if (!retVal && ConfigUtil.getDebugOrFalse()) {
@@ -60,12 +58,12 @@ public class ChatEvents extends EventHolder {
         events.add(JDAEvents.subscribe(jda, MessageReceivedEvent.class)
                 .filter(e -> !e.getAuthor().isBot())
                 .filter(e -> !e.isWebhookMessage())
-                .filter(e -> !e.getMessage().getContentStripped().startsWith("!"))
+                .filter(e -> !ResponseUtil.isCommand(e.getMessage().getContentStripped()))
                 .handler(this::speak));
 
         events.add(JDAEvents.subscribe(jda, GuildMessageUpdateEvent.class)
                 .filter(e -> !e.getAuthor().isBot())
-                .filter(e -> !e.getMessage().getContentStripped().startsWith("!"))
+                .filter(e -> !ResponseUtil.isCommand(e.getMessage().getContentStripped()))
                 .filter(e -> {
                     boolean retVal = ResponseUtil.canLearn(e.getAuthor());
                     if (!retVal && ConfigUtil.getDebugOrFalse()) {
@@ -74,10 +72,6 @@ public class ChatEvents extends EventHolder {
                     return retVal;
                 })
                 .handler(this::replace));
-
-        events.add(JDAEvents.subscribe(jda, GuildMessageReceivedEvent.class)
-                .filter(e -> containsWord(e.getMessage().getContentStripped(), "alot"))
-                .handler(this::reactAlot));
     }
 
     private void learn(@NotNull GuildMessageReceivedEvent event) {
@@ -205,22 +199,6 @@ public class ChatEvents extends EventHolder {
         words.removeIf(word -> word.length() < 4);
 
         return words.isEmpty() ? null : words.get(rand.nextInt(words.size()));
-    }
-
-    private void reactAlot(@NotNull GuildMessageReceivedEvent event) {
-        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig == null) {
-            logger.error("Could not get cached config.");
-            return;
-        }
-
-        Emote emote = EmoteUtil.getEmote(cachedConfig.getAlotEmote(), event.getGuild());
-        if (emote == null) {
-            logger.warn("Could not find alot emote \"" + cachedConfig.getAlotEmote() + "\" for guild \"" + event.getGuild().getName() + "\".");
-            return;
-        }
-
-        event.getMessage().addReaction(emote).queue();
     }
 
     private @NotNull String generateSentence(@NotNull MarkovMegaHal megaHal, @NotNull String sentence, @NotNull String seed) {
