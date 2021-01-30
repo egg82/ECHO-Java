@@ -21,6 +21,7 @@ import me.egg82.echo.utils.ResponseUtil;
 import me.egg82.echo.web.models.GoogleSearchModel;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Emote;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
 import ninja.egg82.events.JDAEvents;
@@ -56,7 +57,7 @@ public class ChatEvents extends EventHolder {
                 })
                 .handler(this::learn));
 
-        events.add(JDAEvents.subscribe(jda, GuildMessageReceivedEvent.class)
+        events.add(JDAEvents.subscribe(jda, MessageReceivedEvent.class)
                 .filter(e -> !e.getAuthor().isBot())
                 .filter(e -> !e.isWebhookMessage())
                 .filter(e -> !e.getMessage().getContentStripped().startsWith("!"))
@@ -99,7 +100,7 @@ public class ChatEvents extends EventHolder {
         PacketUtil.queuePacket(packet);
     }
 
-    private void speak(@NotNull GuildMessageReceivedEvent event) {
+    private void speak(@NotNull MessageReceivedEvent event) {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
         if (cachedConfig == null) {
             logger.error("Could not get cached config.");
@@ -140,7 +141,7 @@ public class ChatEvents extends EventHolder {
             }
         }
 
-        if (!contains && rand.nextDouble() > cachedConfig.getReplyChance()) {
+        if (event.isFromGuild() && !contains && rand.nextDouble() > cachedConfig.getReplyChance()) {
             return;
         }
 
