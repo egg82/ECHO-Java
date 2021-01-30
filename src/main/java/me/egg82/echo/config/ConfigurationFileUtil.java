@@ -76,6 +76,11 @@ public class ConfigurationFileUtil {
             BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Alot emote:</c2> <c1>" + alotEmote + "</c1>");
         }
 
+        String disallowedEmote = config.node("emotes", "disallowed").getString("");
+        if (debug) {
+            BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Disallowed emote:</c2> <c1>" + disallowedEmote + "</c1>");
+        }
+
         double replyChance = config.node("chat", "random").getDouble(0.15d);
         replyChance = Math.max(0.0d, Math.min(1.0d, replyChance));
         if (debug) {
@@ -93,6 +98,7 @@ public class ConfigurationFileUtil {
                 .wolframKey(wolframKey)
                 .imgurKey(imgurKey)
                 .alotEmote(alotEmote)
+                .disallowedEmote(disallowedEmote)
                 .disabledCommands(getDisabledCommands(config, debug, manager))
                 .replyChance(replyChance)
                 .replyPhrases(getReplyPhrases(config, debug, manager))

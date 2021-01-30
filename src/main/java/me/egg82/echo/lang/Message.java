@@ -11,6 +11,7 @@ public enum Message implements MessageKeyProvider {
     GENERAL__LOAD,
 
     ERROR__INTERNAL,
+    ERROR__NOT_EXIST,
 
     IMPORT__BEGIN,
     IMPORT__MESSAGES,
@@ -18,6 +19,10 @@ public enum Message implements MessageKeyProvider {
 
     LEARN__BEGIN,
     LEARN__END,
+
+    NO_LEARN__BEGIN,
+    NO_LEARN__LEARNING,
+    NO_LEARN__NOT_LEARNING,
 
     RELOAD__BEGIN,
     RELOAD__END;

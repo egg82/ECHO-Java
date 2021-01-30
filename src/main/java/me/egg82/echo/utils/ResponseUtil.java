@@ -6,8 +6,11 @@ import java.util.Set;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.lang.Message;
+import me.egg82.echo.services.CollectionProvider;
 import me.egg82.echo.storage.StorageService;
 import me.egg82.echo.storage.models.MessageModel;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,4 +55,8 @@ public class ResponseUtil {
             BotLogUtil.sendInfo(logger, manager, Message.IMPORT__END);
         }
     }
+
+    public static boolean canLearn(@NotNull User user) { return Boolean.TRUE.equals(CollectionProvider.getCanLearnCache().get(user.getIdLong())); }
+
+    public static boolean canLearn(@NotNull Member member) { return Boolean.TRUE.equals(CollectionProvider.getCanLearnCache().get(member.getIdLong())); }
 }

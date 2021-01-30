@@ -5,10 +5,12 @@ import co.aikar.commands.CommandHelp;
 import co.aikar.commands.CommandIssuer;
 import co.aikar.commands.JDACommandManager;
 import co.aikar.commands.annotation.*;
+import me.egg82.echo.commands.internal.DoNotLearnCommand;
 import me.egg82.echo.commands.internal.LearnCommand;
 import me.egg82.echo.commands.internal.ReloadCommand;
 import me.egg82.echo.utils.FileUtil;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Guild;
 import org.jetbrains.annotations.NotNull;
 
 @CommandAlias("echo")
@@ -34,6 +36,14 @@ public class ECHOCommand extends BaseCommand {
     @Syntax("<url> [delimiter]")
     public void onReload(@NotNull CommandIssuer issuer, @NotNull String url, @Default("\n") String delimiter) {
         new LearnCommand(issuer, url, delimiter).run();
+    }
+
+    @Subcommand("dnl")
+    @CommandPermission("echo.admin")
+    @Description("{@@description.no-learn}")
+    @Syntax("<user> [learn]")
+    public void onDnl(@NotNull CommandIssuer issuer, @NotNull Guild guild, @NotNull String user, @Default("false") boolean learning) {
+        new DoNotLearnCommand(issuer, user, guild, learning).run();
     }
 
     @CatchUnknown

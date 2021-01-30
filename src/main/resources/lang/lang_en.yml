@@ -4,6 +4,8 @@ acf-minecraft:
 
 description:
   reload: "Reloads the bot."
+  learn: "Learn from an online text file."
+  no-learn: "Prevent language learning from a user."
 
 general:
   header: "<c2>[</c2><c3>ECHO</c3><c2>]</c2> "
@@ -13,6 +15,7 @@ general:
 
 error:
   internal: "An error occurred, sorry :("
+  not_exist: "Sorry, that user doesn't seem to exist."
 
 reload:
   begin: "<c2>Reloading, please wait..</c2>"
@@ -21,6 +24,11 @@ reload:
 learn:
   begin: "<c2>Learning, please wait..</c2>"
   end: "<c4>Learned from</c4> <c3>{url}</c3><c4>!</c4>"
+
+no_learn:
+  begin: "<c2>Adding user to DNL database, please wait..</c2>"
+  learning: "<c4>Now learning from {user}!</c4>"
+  not_learning: "<c4>No longer learning from {user}!</c4>"
 
 xkcd: "Find an XKCD."
 manchas: "Gives a Manchas kitty image."

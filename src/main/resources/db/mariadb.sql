@@ -7,6 +7,16 @@ CREATE TABLE IF NOT EXISTS `echo_message` (
 	PRIMARY KEY( `id` )
 );
 
+CREATE TABLE IF NOT EXISTS `echo_learn` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`version` INT NOT NULL,
+	`created` DATETIME NOT NULL,
+	`modified` DATETIME NOT NULL,
+	`user` BIGINT NOT NULL,
+	`learning` BOOLEAN NOT NULL,
+	PRIMARY KEY( `id` )
+);
+
 CREATE TABLE IF NOT EXISTS `echo_data` (
 	`id` INT NOT NULL AUTO_INCREMENT,
 	`version` INT NOT NULL,

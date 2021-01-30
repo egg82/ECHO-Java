@@ -16,6 +16,7 @@ import me.egg82.echo.messaging.packets.MessageUpdatePacket;
 import me.egg82.echo.storage.StorageService;
 import me.egg82.echo.storage.models.MessageModel;
 import me.egg82.echo.utils.PacketUtil;
+import me.egg82.echo.utils.ResponseUtil;
 import me.egg82.echo.web.models.GoogleSearchModel;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Emote;
@@ -31,11 +32,11 @@ public class ChatEvents extends EventHolder {
 
     private final Random rand = new Random();
 
-    private final Pattern RE_SPACE = Pattern.compile("[\\s\\t]+");
-    private final Pattern RE_NOT_WORD = Pattern.compile("[^\\w]");
-    private final Pattern RE_URL = Pattern.compile("<url>");
+    private static final Pattern RE_SPACE = Pattern.compile("[\\s\\t]+");
+    private static final Pattern RE_NOT_WORD = Pattern.compile("[^\\w]");
+    private static final Pattern RE_URL = Pattern.compile("<url>");
 
-    private final Cache<Long, String> oldMessages = Caffeine.newBuilder().expireAfterWrite(20L, TimeUnit.MINUTES).expireAfterAccess(5L, TimeUnit.MINUTES).build();
+    private final Cache<Long, String> oldMessages = Caffeine.newBuilder().expireAfterWrite(1L, TimeUnit.HOURS).expireAfterAccess(30L, TimeUnit.MINUTES).build();
 
     public ChatEvents(@NotNull JDA jda, @NotNull JDACommandManager manager) {
         this.jda = jda;
@@ -45,6 +46,13 @@ public class ChatEvents extends EventHolder {
                 .filter(e -> !e.getAuthor().isBot())
                 .filter(e -> !e.isWebhookMessage())
                 .filter(e -> !e.getMessage().getContentStripped().startsWith("!"))
+                .filter(e -> {
+                    boolean retVal = ResponseUtil.canLearn(e.getAuthor());
+                    if (!retVal && ConfigUtil.getDebugOrFalse()) {
+                        logger.info("Not learning from " + e.getAuthor().getAsTag());
+                    }
+                    return retVal;
+                })
                 .handler(this::learn));
 
         events.add(JDAEvents.subscribe(jda, GuildMessageReceivedEvent.class)
@@ -56,6 +64,13 @@ public class ChatEvents extends EventHolder {
         events.add(JDAEvents.subscribe(jda, GuildMessageUpdateEvent.class)
                 .filter(e -> !e.getAuthor().isBot())
                 .filter(e -> !e.getMessage().getContentStripped().startsWith("!"))
+                .filter(e -> {
+                    boolean retVal = ResponseUtil.canLearn(e.getAuthor());
+                    if (!retVal && ConfigUtil.getDebugOrFalse()) {
+                        logger.info("Not learning from " + e.getAuthor().getAsTag());
+                    }
+                    return retVal;
+                })
                 .handler(this::replace));
 
         events.add(JDAEvents.subscribe(jda, GuildMessageReceivedEvent.class)
@@ -137,10 +152,15 @@ public class ChatEvents extends EventHolder {
             logger.info("Got seed: " + seed);
         }
 
+        String message;
         if (reversed) {
-            event.getChannel().sendMessage(reverse(generateSentence(cachedConfig.getMegaHal(), reverse(event.getMessage().getContentStripped()), reverse(seed)))).queue();
+            message = reverse(generateSentence(cachedConfig.getMegaHal(), reverse(event.getMessage().getContentStripped()), reverse(seed)));
         } else {
-            event.getChannel().sendMessage(generateSentence(cachedConfig.getMegaHal(), event.getMessage().getContentStripped(), seed)).queue();
+            message = generateSentence(cachedConfig.getMegaHal(), event.getMessage().getContentStripped(), seed);
+        }
+
+        if (!message.isEmpty()) {
+            event.getChannel().sendMessage(message).queue();
         }
     }
 

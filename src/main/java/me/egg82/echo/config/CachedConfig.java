@@ -44,6 +44,9 @@ public class CachedConfig {
     private String alotEmote = "alot";
     public @NotNull String getAlotEmote() { return alotEmote; }
 
+    private String disallowedEmote = "no";
+    public @NotNull String getDisallowedEmote() { return disallowedEmote; }
+
     private Set<String> disabledCommands = ImmutableSet.of();
     public @NotNull Set<String> getDisabledCommands() { return disabledCommands; }
 
@@ -111,6 +114,11 @@ public class CachedConfig {
 
         public @NotNull CachedConfig.Builder alotEmote(@NotNull String value) {
             values.alotEmote = value;
+            return this;
+        }
+
+        public @NotNull CachedConfig.Builder disallowedEmote(@NotNull String value) {
+            values.disallowedEmote = value;
             return this;
         }
 

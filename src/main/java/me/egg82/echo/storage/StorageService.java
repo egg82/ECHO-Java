@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Set;
 import me.egg82.echo.storage.models.BaseModel;
 import me.egg82.echo.storage.models.DataModel;
+import me.egg82.echo.storage.models.LearnModel;
 import me.egg82.echo.storage.models.MessageModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,6 +26,13 @@ public interface StorageService {
     @Nullable MessageModel getMessageModel(@NotNull String message);
     @Nullable MessageModel getMessageModel(long messageId);
     @NotNull Set<MessageModel> getAllMessages(int start, int max);
+
+    /*
+   Note: Can be an expensive operation
+    */
+    @NotNull LearnModel getOrCreateLearnModel(long user, boolean learn);
+    @Nullable LearnModel getLearnModel(long userOrId);
+    @NotNull Set<LearnModel> getAllLearning(int start, int max);
 
     /*
    Note: Can be an expensive operation

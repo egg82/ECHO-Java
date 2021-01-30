@@ -12,8 +12,10 @@ import java.util.*;
 import javax.persistence.PersistenceException;
 import me.egg82.echo.storage.models.BaseModel;
 import me.egg82.echo.storage.models.DataModel;
+import me.egg82.echo.storage.models.LearnModel;
 import me.egg82.echo.storage.models.MessageModel;
 import me.egg82.echo.storage.models.query.QDataModel;
+import me.egg82.echo.storage.models.query.QLearnModel;
 import me.egg82.echo.storage.models.query.QMessageModel;
 import me.egg82.echo.utils.VersionUtil;
 import org.jetbrains.annotations.NotNull;
@@ -132,6 +134,58 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    public @NotNull LearnModel getOrCreateLearnModel(long user, boolean learn) {
+        queueLock.readLock().lock();
+        try {
+            LearnModel model = new QLearnModel(connection)
+                    .user.equalTo(user)
+                    .findOne();
+            if (model == null) {
+                model = new LearnModel();
+                model.setUser(user);
+                model.setLearning(learn);
+                connection.save(model);
+                model = new QLearnModel(connection)
+                        .user.equalTo(user)
+                        .findOne();
+                if (model == null) {
+                    throw new PersistenceException("findOne() returned null after saving.");
+                }
+            }
+            return model;
+        } finally {
+            queueLock.readLock().unlock();
+        }
+    }
+
+    public @Nullable LearnModel getLearnModel(long userOrId) {
+        queueLock.readLock().lock();
+        try {
+            LearnModel retVal = new QLearnModel(connection)
+                    .user.equalTo(userOrId)
+                    .findOne();
+            if (retVal == null) {
+                retVal = new QLearnModel(connection)
+                        .id.equalTo(userOrId)
+                        .findOne();
+            }
+            return retVal;
+        } finally {
+            queueLock.readLock().unlock();
+        }
+    }
+
+    public @NotNull Set<LearnModel> getAllLearning(int start, int max) {
+        queueLock.readLock().lock();
+        try {
+            return new QLearnModel(connection)
+                    .id.between(start, start + max - 1)
+                    .findSet();
+        } finally {
+            queueLock.readLock().unlock();
+        }
+    }
+
     public @NotNull DataModel getOrCreateDataModel(@NotNull String key, String value) {
         queueLock.readLock().lock();
         try {
@@ -193,7 +247,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         dbConfig.setDefaultServer(false);
         dbConfig.setRegister(false);
         dbConfig.setName(name);
-        dbConfig.setClasses(Arrays.asList(BaseModel.class, MessageModel.class, DataModel.class));
+        dbConfig.setClasses(Arrays.asList(BaseModel.class, MessageModel.class, LearnModel.class, DataModel.class));
         connection = DatabaseFactory.createWithContextClassLoader(dbConfig, getClass().getClassLoader());
 
         DataModel model;
@@ -273,6 +327,11 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
             MessageModel m = new MessageModel();
             m.setMessage(((MessageModel) model).getMessage());
             retVal = m;
+        } else if (model instanceof LearnModel) {
+            LearnModel m = new LearnModel();
+            m.setUser(((LearnModel) model).getUser());
+            m.setLearning(((LearnModel) model).isLearning());
+            retVal = m;
         } else if (model instanceof DataModel) {
             DataModel m = new DataModel();
             m.setKey(((DataModel) model).getKey());
@@ -302,6 +361,24 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
                 }
                 connection.save(m);
             } else {
+                m.setMessage(((MessageModel) model).getMessage());
+                m.setCreated(model.getCreated());
+                m.setModified(keepModified ? model.getModified() : null);
+                connection.update(m);
+            }
+        } else if (model instanceof LearnModel) {
+            LearnModel m = new QLearnModel(connection)
+                    .user.equalTo(((LearnModel) model).getUser())
+                    .findOne();
+            if (m == null) {
+                m = (LearnModel) duplicateModel(model, keepModified);
+                if (m == null) {
+                    return;
+                }
+                connection.save(m);
+            } else {
+                m.setUser(((LearnModel) model).getUser());
+                m.setLearning(((LearnModel) model).isLearning());
                 m.setCreated(model.getCreated());
                 m.setModified(keepModified ? model.getModified() : null);
                 connection.update(m);

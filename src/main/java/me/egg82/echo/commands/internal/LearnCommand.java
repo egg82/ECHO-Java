@@ -29,6 +29,7 @@ public class LearnCommand extends AbstractCommand {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
         if (cachedConfig == null) {
             logger.error("Could not get cached config.");
+            issuer.sendError(Message.ERROR__INTERNAL);
             return;
         }
 
@@ -75,6 +76,6 @@ public class LearnCommand extends AbstractCommand {
             PacketUtil.queuePacket(packet);
         }
 
-        issuer.sendInfo(Message.LEARN__END);
+        issuer.sendInfo(Message.LEARN__END, "{url}", url);
     }
 }

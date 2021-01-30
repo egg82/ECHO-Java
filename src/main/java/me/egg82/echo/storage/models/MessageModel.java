@@ -11,6 +11,7 @@ public class MessageModel extends BaseModel {
     private String message;
 
     public MessageModel() {
+        super();
         this.message = "";
     }
 

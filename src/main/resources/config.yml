@@ -118,12 +118,22 @@ keys:
 # Emotes to use for various functions
 emotes:
   # The "alot" emote
-  alot: "alot"
+  alot: 'alot'
+  # Emote used for disallowed actions
+  disallowed: 'no'
+
+# Roles defined for bot functionality
+roles:
+  # The bot admin role. Allowed to perform internal bot commands
+  admin: 'Owner'
+  # Role added to users who are not allowed to interact with the bot in any way
+  # The default blank state allows everyone to interact with it
+  disallowed: ''
 
 # Commands to disable
 disabled-commands:
-#  - google
-#  - lmgtfy
+#  - 'google'
+#  - 'lmgtfy'
 
 # Chat reply events
 chat:

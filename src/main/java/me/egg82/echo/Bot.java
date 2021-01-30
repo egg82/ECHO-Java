@@ -37,6 +37,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import ninja.egg82.events.EventSubscriber;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -62,6 +63,7 @@ public class Bot {
         JDABuilder builder = JDABuilder.createDefault((String) options.valueOf("token"));
         builder.setChunkingFilter(ChunkingFilter.ALL);
         builder.setMemberCachePolicy(MemberCachePolicy.ALL);
+        builder.enableCache(CacheFlag.EMOTE);
         builder.enableIntents(GatewayIntent.GUILD_MEMBERS);
         builder.setActivity(Activity.watching("you"));
         jda = builder.build();

@@ -7,11 +7,9 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
-import me.egg82.echo.messaging.packets.MessagePacket;
-import me.egg82.echo.messaging.packets.MessageUpdatePacket;
-import me.egg82.echo.messaging.packets.MultiPacket;
-import me.egg82.echo.messaging.packets.Packet;
+import me.egg82.echo.messaging.packets.*;
 import me.egg82.echo.storage.StorageService;
+import me.egg82.echo.storage.models.LearnModel;
 import me.egg82.echo.storage.models.MessageModel;
 import me.egg82.echo.utils.PacketUtil;
 import org.jetbrains.annotations.NotNull;
@@ -78,6 +76,24 @@ public class GenericMessagingHandler implements MessagingHandler {
         }
     }
 
+    private void handleLearn(@NotNull LearnPacket packet) {
+        if (ConfigUtil.getDebugOrFalse()) {
+            logger.info("Handling learn packet: " + packet.getUser());
+        }
+
+        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+        if (cachedConfig == null) {
+            logger.error("Could not get cached config.");
+            return;
+        }
+
+        for (StorageService service : cachedConfig.getStorage()) {
+            LearnModel model = service.getOrCreateLearnModel(packet.getUser(), packet.isLearning());
+            model.setLearning(packet.isLearning());
+            service.storeModel(model);
+        }
+    }
+
     private void handleMulti(@NotNull MultiPacket packet) {
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Handling multi-packet.");
@@ -93,6 +109,8 @@ public class GenericMessagingHandler implements MessagingHandler {
             handleMessage((MessagePacket) packet);
         } else if (packet instanceof MessageUpdatePacket) {
             handleMessageUpdate((MessageUpdatePacket) packet);
+        } else if (packet instanceof LearnPacket) {
+            handleLearn((LearnPacket) packet);
         } else if (packet instanceof MultiPacket) {
             handleMulti((MultiPacket) packet);
         }
