@@ -29,6 +29,7 @@ google: "Get Google results."
 lmgtfy: "Googles things for you."
 inspire: "Get some inspiration."
 wolfram: "Do some math."
+eight-ball: "Ask the all-knowing ball."
 
 import:
   messages: "<c2>Importing messages..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
