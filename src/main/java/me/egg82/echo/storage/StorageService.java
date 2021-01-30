@@ -24,7 +24,7 @@ public interface StorageService {
     @NotNull MessageModel getOrCreateMessageModel(@NotNull String message);
     @Nullable MessageModel getMessageModel(@NotNull String message);
     @Nullable MessageModel getMessageModel(long messageId);
-    @NotNull Set<MessageModel> getAllMessages(int start, int end);
+    @NotNull Set<MessageModel> getAllMessages(int start, int max);
 
     /*
    Note: Can be an expensive operation

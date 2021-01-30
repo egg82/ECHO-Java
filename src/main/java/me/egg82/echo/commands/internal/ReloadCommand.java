@@ -11,6 +11,7 @@ import me.egg82.echo.lang.Message;
 import me.egg82.echo.messaging.GenericMessagingHandler;
 import me.egg82.echo.messaging.MessagingService;
 import me.egg82.echo.storage.StorageService;
+import me.egg82.echo.utils.ResponseUtil;
 import net.dv8tion.jda.api.JDA;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,6 +44,7 @@ public class ReloadCommand extends AbstractCommand {
         }
 
         ConfigurationFileUtil.reloadConfig(dataFolder, manager, new GenericMessagingHandler(), new MarkovMegaHal());
+        ResponseUtil.loadMegaHal(manager);
 
         issuer.sendInfo(Message.RELOAD__END);
     }

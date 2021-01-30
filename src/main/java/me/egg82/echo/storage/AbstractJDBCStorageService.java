@@ -121,11 +121,11 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
-    public @NotNull Set<MessageModel> getAllMessages(int start, int end) {
+    public @NotNull Set<MessageModel> getAllMessages(int start, int max) {
         queueLock.readLock().lock();
         try {
             return new QMessageModel(connection)
-                    .id.between(start - 1, end + 1)
+                    .id.between(start, start + max - 1)
                     .findSet();
         } finally {
             queueLock.readLock().unlock();

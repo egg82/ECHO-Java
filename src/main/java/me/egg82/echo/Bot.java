@@ -29,10 +29,7 @@ import me.egg82.echo.reflect.PackageFilter;
 import me.egg82.echo.storage.StorageService;
 import me.egg82.echo.storage.models.MessageModel;
 import me.egg82.echo.tasks.TaskScheduler;
-import me.egg82.echo.utils.BotLogUtil;
-import me.egg82.echo.utils.FileUtil;
-import me.egg82.echo.utils.PacketUtil;
-import me.egg82.echo.utils.TimeUtil;
+import me.egg82.echo.utils.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -77,7 +74,7 @@ public class Bot {
 
         loadServices();
         loadLanguages();
-        loadMegaHal();
+        ResponseUtil.loadMegaHal(commandManager);
         loadCommands();
         loadEvents();
         loadTasks();
@@ -154,40 +151,6 @@ public class Bot {
 
     private void loadServices() {
         ConfigurationFileUtil.reloadConfig(FileUtil.getCwd(), commandManager, new GenericMessagingHandler(), new MarkovMegaHal());
-    }
-
-    private void loadMegaHal() {
-        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig == null) {
-            logger.error("Could not get cached config.");
-            return;
-        }
-
-        MarkovMegaHal megaHal = cachedConfig.getMegaHal();
-        StorageService master = cachedConfig.getStorage().get(0);
-
-        if (cachedConfig.getDebug()) {
-            BotLogUtil.sendInfo(logger, commandManager, Message.IMPORT__BEGIN);
-            BotLogUtil.sendInfo(logger, commandManager, Message.IMPORT__MESSAGES, "{id}", "0");
-        }
-
-        int start = 1;
-        int max = 50;
-        Set<MessageModel> models;
-        do {
-            models = master.getAllMessages(start, max);
-            for (MessageModel model : models) {
-                megaHal.add(model.getMessage());
-            }
-            if (cachedConfig.getDebug()) {
-                BotLogUtil.sendInfo(logger, commandManager, Message.IMPORT__MESSAGES, "{id}", String.valueOf(start + models.size()));
-            }
-            start += max;
-        } while (models.size() == max);
-
-        if (cachedConfig.getDebug()) {
-            BotLogUtil.sendInfo(logger, commandManager, Message.IMPORT__END);
-        }
     }
 
     private void loadCommands() {
