@@ -142,7 +142,7 @@ public class GithubCommand extends BaseCommand {
                 embed.addField("Wiki", String.format(WIKI_URL, first.getFullName()), false);
             }
             if (license != null) {
-                embed.addField("License", license.getHtmlUrl(), false);
+                embed.addField("License", "[" + license.getName() + "](" + license.getHtmlUrl() + ")", false);
                 embed.addField("License Description", "```" + license.getDescription() + "```", false);
             }
             embed.setFooter("For " + (event.getMember() != null ? event.getMember().getEffectiveName() : event.getAuthor().getAsTag()));
