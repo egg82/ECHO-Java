@@ -48,10 +48,15 @@ public class GithubCommand extends BaseCommand {
     private static final String README_URL = "https://github.com/%s/blob/master/README.md";
     private static final String RAW_README_URL = "https://raw.githubusercontent.com/%s/master/README.md";
 
-    private static final Pattern RE_LINKS_GROUP = Pattern.compile("\\[\\!\\[(.+)\\]\\s*\\((https?:\\/\\/.*)\\)\\]\\s*\\((https?:\\/\\/.*)\\)");
-    private static final Pattern RE_LINKS_GROUP_2 = Pattern.compile("\\[+(.+)\\]+\\s*\\(+(https?:\\/\\/.*)\\)+");
-    private static final Pattern RE_IMAGES = Pattern.compile("\\!\\[+(.*)\\]+\\s*\\(+(https?:\\/\\/.*)\\)+");
-    private static final Pattern RE_LINKS = Pattern.compile("(https?:\\/\\/.*)");
+    private static final Pattern RE_IMAGES = Pattern.compile("\\[\\!\\[([^\\[\\]\\(\\)]+)\\]\\s*\\((https?:\\/\\/[^\\[\\]\\(\\)]*)\\)\\]\\s*\\(([^\\[\\]\\(\\)]+)\\)");
+    private static final Pattern RE_IMAGES_2 = Pattern.compile("\\[\\!\\[([^\\[\\]\\(\\)]+)\\]\\s*\\((https?:\\/\\/[^\\[\\]\\(\\)]*)\\)\\]\\s*\\[([^\\[\\]\\(\\)]+)\\]");
+    private static final Pattern RE_IMAGES_3 = Pattern.compile("\\!\\[(.*)\\]\\s*\\((https?:\\/\\/[^\\[\\]\\(\\)]*)\\)");
+    private static final Pattern RE_LINKS_GROUP = Pattern.compile("\\[\\[([^\\[\\]\\(\\)]+)\\]\\s*\\((https?:\\/\\/[^\\[\\]\\(\\)]*)\\)\\]\\s*\\((https?:\\/\\/[^\\[\\]\\(\\)]*)\\)");
+    private static final Pattern RE_LINKS_GROUP_2 = Pattern.compile("\\[([^\\[\\]\\(\\)]+)\\]\\s*\\((https?:\\/\\/[^\\[\\]\\(\\)]*)\\)");
+    private static final Pattern RE_LINKS_REPLACE_GROUP = Pattern.compile("\\[(.*)\\]:\\s*(https?:\\/\\/[^\\[\\]\\(\\)]*)");
+    private static final Pattern RE_LINKS = Pattern.compile("(https?:\\/\\/.*)[\\!\\.\\?]");
+    private static final Pattern RE_LINKS_2 = Pattern.compile("(https?:\\/\\/.*)");
+    private static final Pattern RE_LINKS_REPLACE_GROUP_MATCH = Pattern.compile("\\[([^\\[\\]\\(\\)]*)\\]");
     private static final Pattern RE_URL_LINE = Pattern.compile("^<(?:url|img)>$", Pattern.MULTILINE);
     private static final Pattern RE_MULTIPLE_LINES = Pattern.compile("\n{3,}");
 
@@ -191,24 +196,39 @@ public class GithubCommand extends BaseCommand {
             }
             if (readme != null) {
                 Map<String, String> links = new HashMap<>();
+
+                readme = RE_IMAGES.matcher(readme).replaceAll("<img>");
+                readme = RE_IMAGES_2.matcher(readme).replaceAll("<img>");
+                readme = RE_IMAGES_3.matcher(readme).replaceAll("<img>");
+
                 Matcher matcher = RE_LINKS_GROUP.matcher(readme);
                 while (matcher.find()) {
-                    links.put(matcher.group(1).replace("`", ""), matcher.group(3));
+                    links.put(matcher.group(1).replace("`", ""), matcher.group(3).replace("`", ""));
                 }
                 readme = RE_LINKS_GROUP.matcher(readme).replaceAll("<url>");
                 matcher = RE_LINKS_GROUP_2.matcher(readme);
                 while (matcher.find()) {
-                    links.put(matcher.group(1).replace("`", ""), matcher.group(2));
+                    links.put(matcher.group(1).replace("`", ""), matcher.group(2).replace("`", ""));
                 }
                 readme = RE_LINKS_GROUP_2.matcher(readme).replaceAll("<url>");
-                readme = RE_IMAGES.matcher(readme).replaceAll("<img>");
+                matcher = RE_LINKS_REPLACE_GROUP.matcher(readme);
+                while (matcher.find()) {
+                    links.put(matcher.group(1).replace("`", ""), matcher.group(2).replace("`", ""));
+                }
+                readme = RE_LINKS_REPLACE_GROUP.matcher(readme).replaceAll("<url>");
                 matcher = RE_LINKS.matcher(readme);
                 while (matcher.find()) {
-                    links.put(matcher.group(1), matcher.group(1));
+                    links.put(matcher.group(1).replace("`", ""), matcher.group(1).replace("`", ""));
                 }
                 readme = RE_LINKS.matcher(readme).replaceAll("<url>");
-                if (readme.length() > 500) {
-                    readme = readme.substring(0, 500) + "...";
+                matcher = RE_LINKS_2.matcher(readme);
+                while (matcher.find()) {
+                    links.put(matcher.group(1).replace("`", ""), matcher.group(1).replace("`", ""));
+                }
+                readme = RE_LINKS_2.matcher(readme).replaceAll("<url>");
+                readme = RE_LINKS_REPLACE_GROUP_MATCH.matcher(readme).replaceAll("<url>");
+                if (readme.length() > 250) {
+                    readme = readme.substring(0, 250) + "...";
                 }
 
                 readme = RE_URL_LINE.matcher(readme).replaceAll("");
