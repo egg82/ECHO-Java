@@ -41,6 +41,7 @@ public class GithubCommand extends BaseCommand {
     private static final String REPO_URL = "https://github.com/%s";
     private static final String WIKI_URL = "https://github.com/%s/wiki";
     private static final String ISSUES_URL = "https://github.com/%s/issues";
+    private static final String CUSTOM_LICENSE_URL = "https://github.com/%s/blob/master/LICENSE.md";
 
     public GithubCommand() { }
 
@@ -146,20 +147,18 @@ public class GithubCommand extends BaseCommand {
                 }
                 if (first.isIssues()) {
                     if (first.isWiki()) {
-                        builder.append(' ');
+                        builder.append(" \u2014 ");
                     }
                     builder.append("[Issues](" + String.format(ISSUES_URL, first.getFullName()) + ")");
                 }
-                if (license != null) {
-                    if (first.isIssues()) {
-                        builder.append(' ');
+                if (first.getLicense() != null) {
+                    if (first.isIssues() || first.isWiki()) {
+                        builder.append(" \u2014 ");
                     }
-                    builder.append("[" + license.getName() + "](" + license.getHtmlUrl() + ")");
+                    String licenseName = license == null ? first.getLicense().getName() + " License" : license.getName();
+                    builder.append("[" + licenseName + "](" + (license != null ? license.getHtmlUrl() : String.format(CUSTOM_LICENSE_URL, first.getFullName()) ) + ")");
                 }
                 embed.addField("Links", builder.toString(), false);
-            }
-            if (license != null) {
-                embed.addField("License", "```" + license.getName() + "\n\n" + license.getDescription() + "```", false);
             }
             embed.setFooter("For " + (event.getMember() != null ? event.getMember().getEffectiveName() : event.getAuthor().getAsTag()));
 
