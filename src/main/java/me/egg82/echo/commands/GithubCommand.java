@@ -12,7 +12,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
@@ -189,21 +191,21 @@ public class GithubCommand extends BaseCommand {
                 embed.addField("Links", builder.toString(), false);
             }
             if (readme != null) {
-                List<String> links = new ArrayList<>();
+                Map<String, String> links = new HashMap<>();
                 Matcher matcher = RE_LINKS_GROUP.matcher(readme);
                 while (matcher.find()) {
-                    links.add(matcher.group(3));
+                    links.put(matcher.group(1).replace("`", ""), matcher.group(3));
                 }
                 readme = RE_LINKS_GROUP.matcher(readme).replaceAll("<url>");
                 matcher = RE_LINKS_GROUP_2.matcher(readme);
                 while (matcher.find()) {
-                    links.add(matcher.group(2));
+                    links.put(matcher.group(1).replace("`", ""), matcher.group(2));
                 }
                 readme = RE_LINKS_GROUP_2.matcher(readme).replaceAll("<url>");
                 readme = RE_IMAGES.matcher(readme).replaceAll("<img>");
                 matcher = RE_LINKS.matcher(readme);
                 while (matcher.find()) {
-                    links.add(matcher.group(1));
+                    links.put(matcher.group(1), matcher.group(1));
                 }
                 readme = RE_LINKS.matcher(readme).replaceAll("<url>");
                 if (readme.length() > 500) {
@@ -216,7 +218,17 @@ public class GithubCommand extends BaseCommand {
                 embed.addField("Readme", "```" + readme + "```", false);
 
                 if (!links.isEmpty()) {
-                    embed.addField("Readme Links", String.join("\n", links), false);
+                    StringBuilder builder = new StringBuilder();
+                    for (Map.Entry<String, String> kvp : links.entrySet()) {
+                        if (kvp.getKey().equals(kvp.getValue())) {
+                            builder.append(kvp.getValue());
+                        } else {
+                            builder.append("[" + kvp.getKey() + "](" + kvp.getValue() + ")");
+                        }
+                        builder.append(" \u2014 ");
+                    }
+                    builder.delete(builder.length() - 3, builder.length());
+                    embed.addField("Readme Links", builder.toString(), false);
                 }
             }
             embed.setFooter("For " + (event.getMember() != null ? event.getMember().getEffectiveName() : event.getAuthor().getAsTag()));
