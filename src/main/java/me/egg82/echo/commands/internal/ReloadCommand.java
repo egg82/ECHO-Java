@@ -5,7 +5,6 @@ import co.aikar.commands.JDACommandManager;
 import io.paradaux.ai.MarkovMegaHal;
 import java.io.File;
 import me.egg82.echo.config.CachedConfig;
-import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.config.ConfigurationFileUtil;
 import me.egg82.echo.lang.Message;
 import me.egg82.echo.messaging.GenericMessagingHandler;
@@ -13,29 +12,28 @@ import me.egg82.echo.messaging.MessagingService;
 import me.egg82.echo.storage.StorageService;
 import me.egg82.echo.utils.ResponseUtil;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class ReloadCommand extends AbstractCommand {
+public class ReloadCommand extends AbstractInternalCommand {
     private final File dataFolder;
     private final JDACommandManager manager;
     private final JDA jda;
 
-    public ReloadCommand(@NotNull CommandIssuer issuer, @NotNull File dataFolder, @NotNull JDACommandManager manager, @NotNull JDA jda) {
-        super(issuer);
+    public ReloadCommand(@NotNull CommandIssuer issuer, @NotNull MessageReceivedEvent event, @NotNull File dataFolder, @NotNull JDACommandManager manager, @NotNull JDA jda) {
+        super(issuer, event);
         this.dataFolder = dataFolder;
         this.manager = manager;
         this.jda = jda;
     }
 
     public void run() {
-        issuer.sendInfo(Message.RELOAD__BEGIN);
-
-        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig == null) {
-            logger.error("Could not get cached config.");
-            issuer.sendError(Message.ERROR__INTERNAL);
+        CachedConfig cachedConfig = getCachedConfig(issuer);
+        if (cachedConfig == null || !canRun(event, cachedConfig, true)) {
             return;
         }
+
+        issuer.sendInfo(Message.RELOAD__BEGIN);
 
         for (MessagingService service : cachedConfig.getMessaging()) {
             service.close();

@@ -2,12 +2,19 @@ package me.egg82.echo.commands;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandIssuer;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.core.Pair;
 import me.egg82.echo.lang.Message;
+import me.egg82.echo.services.lookup.PlayerInfo;
+import me.egg82.echo.services.lookup.PlayerLookup;
 import me.egg82.echo.utils.JDAUtil;
 import net.dv8tion.jda.api.entities.Emote;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,12 +33,14 @@ public abstract class AbstractCommand extends BaseCommand {
         return cachedConfig;
     }
 
-    protected final boolean canRun(@NotNull MessageReceivedEvent event, @NotNull CachedConfig cachedConfig) {
+    protected final boolean canRun(@NotNull MessageReceivedEvent event, @NotNull CachedConfig cachedConfig) { return canRun(event, cachedConfig, false); }
+
+    protected final boolean canRun(@NotNull MessageReceivedEvent event, @NotNull CachedConfig cachedConfig, boolean requireAdmin) {
         if (event.getAuthor().isBot() || cachedConfig.getDisabledCommands().contains(getName())) {
             return false;
         }
 
-        if (event.getMember() != null && !JDAUtil.isAllowed(event.getMember())) {
+        if (event.getMember() != null && !JDAUtil.isAllowed(event.getMember()) || (requireAdmin && !JDAUtil.isAdmin(event.getMember()))) {
             Emote emote = JDAUtil.getEmote(cachedConfig.getDisallowedEmote(), event.getJDA(), event.getGuild());
             if (emote == null) {
                 logger.warn("Could not find disallowed emote \"" + cachedConfig.getDisallowedEmote() + "\" for guild \"" + event.getGuild().getName() + "\".");
@@ -74,5 +83,24 @@ public abstract class AbstractCommand extends BaseCommand {
             return true;
         }
         return false;
+    }
+
+    protected final @NotNull CompletableFuture<UUID> fetchUuid(@NotNull String name) { return PlayerLookup.get(name).thenApply(PlayerInfo::getUUID); }
+
+    protected final @NotNull CompletableFuture<Member> getMember(@NotNull String user, @NotNull Guild guild) {
+        return CompletableFuture.supplyAsync(() -> {
+            List<Member> members = guild.findMembers(m -> m.getId().equals(user)).get();
+            Member retVal = !members.isEmpty() ? members.get(0) : null;
+            if (retVal == null) {
+                members = guild.findMembers(m -> m.getUser().getAsTag().equalsIgnoreCase(user)).get();
+                retVal = !members.isEmpty() ? members.get(0) : null;
+                if (retVal == null) {
+                    members = guild.findMembers(m -> m.getEffectiveName().equalsIgnoreCase(user)).get();
+                    retVal = !members.isEmpty() ? members.get(0) : null;
+                }
+            }
+
+            return retVal;
+        });
     }
 }
