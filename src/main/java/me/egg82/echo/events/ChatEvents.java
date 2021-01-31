@@ -150,9 +150,9 @@ public class ChatEvents extends EventHolder {
 
         String message;
         if (reversed) {
-            message = reverse(generateSentence(cachedConfig.getMegaHal(), reverse(event.getMessage().getContentStripped()), reverse(seed)));
+            message = reverse(generateSentence(cachedConfig.getMegaHal(), cachedConfig.getGoogleKey(), reverse(event.getMessage().getContentStripped()), reverse(seed)));
         } else {
-            message = generateSentence(cachedConfig.getMegaHal(), event.getMessage().getContentStripped(), seed);
+            message = generateSentence(cachedConfig.getMegaHal(), cachedConfig.getGoogleKey(), event.getMessage().getContentStripped(), seed);
         }
 
         if (!message.isEmpty()) {
@@ -201,33 +201,37 @@ public class ChatEvents extends EventHolder {
         return words.isEmpty() ? null : words.get(rand.nextInt(words.size()));
     }
 
-    private @NotNull String generateSentence(@NotNull MarkovMegaHal megaHal, @NotNull String sentence, @NotNull String seed) {
+    private @NotNull String generateSentence(@NotNull MarkovMegaHal megaHal, @NotNull String googleKey, @NotNull String sentence, @NotNull String seed) {
         Set<String> previousUrls = new HashSet<>();
 
         String retVal = megaHal.getSentence(seed);
-        return RE_URL.matcher(retVal).replaceAll(v -> {
-            String s = rand.nextDouble() >= 0.5 ? getSeed(sentence) : getSeed(retVal);
-            if (s == null) {
-                s = seed;
-            }
-            try {
-                List<GoogleSearchModel.GoogleSearchItemModel> items = GoogleSearchCommand.getModel(s).get().getItems();
-                for (GoogleSearchModel.GoogleSearchItemModel item : items) {
-                    if (previousUrls.add(item.getLink())) {
-                        return item.getLink();
+        if (googleKey.isEmpty()) {
+            return RE_URL.matcher(retVal).replaceAll("");
+        } else {
+            return RE_URL.matcher(retVal).replaceAll(v -> {
+                String s = rand.nextDouble() >= 0.5 ? getSeed(sentence) : getSeed(retVal);
+                if (s == null) {
+                    s = seed;
+                }
+                try {
+                    List<GoogleSearchModel.GoogleSearchItemModel> items = GoogleSearchCommand.getModel(googleKey, s).get().getItems();
+                    for (GoogleSearchModel.GoogleSearchItemModel item : items) {
+                        if (previousUrls.add(item.getLink())) {
+                            return item.getLink();
+                        }
                     }
+                } catch (ExecutionException ex) {
+                    if (ConfigUtil.getDebugOrFalse()) {
+                        logger.error(ex.getMessage(), ex);
+                    } else {
+                        logger.error(ex.getMessage());
+                    }
+                } catch (InterruptedException ignored) {
+                    Thread.currentThread().interrupt();
                 }
-            } catch (ExecutionException ex) {
-                if (ConfigUtil.getDebugOrFalse()) {
-                    logger.error(ex.getMessage(), ex);
-                } else {
-                    logger.error(ex.getMessage());
-                }
-            } catch (InterruptedException ignored) {
-                Thread.currentThread().interrupt();
-            }
-            return "";
-        });
+                return "";
+            });
+        }
     }
 
     private boolean containsWord(@NotNull String content, @NotNull String word) {
