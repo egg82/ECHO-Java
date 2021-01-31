@@ -57,7 +57,7 @@ public class GithubCommand extends BaseCommand {
     private static final Pattern RE_LINKS = Pattern.compile("(https?:\\/\\/.*)[\\!\\.\\?]");
     private static final Pattern RE_LINKS_2 = Pattern.compile("(https?:\\/\\/.*)");
     private static final Pattern RE_LINKS_REPLACE_GROUP_MATCH = Pattern.compile("\\[([^\\[\\]\\(\\)]*)\\]");
-    private static final Pattern RE_URL_LINE = Pattern.compile("^<(?:url|img)>$", Pattern.MULTILINE);
+    private static final Pattern RE_URL_LINE = Pattern.compile("^#*?\\s*<(?:url|img)>\\s*$", Pattern.MULTILINE);
     private static final Pattern RE_MULTIPLE_LINES = Pattern.compile("\n{3,}");
 
     public GithubCommand() { }
@@ -240,8 +240,14 @@ public class GithubCommand extends BaseCommand {
                     StringBuilder builder = new StringBuilder();
                     for (Map.Entry<String, String> kvp : links.entrySet()) {
                         if (kvp.getKey().equals(kvp.getValue())) {
+                            if (builder.length() + kvp.getValue().length() > 1024) {
+                                continue;
+                            }
                             builder.append(kvp.getValue());
                         } else {
+                            if (builder.length() + ("[" + kvp.getKey() + "](" + kvp.getValue() + ")").length() > 1024) {
+                                continue;
+                            }
                             builder.append("[" + kvp.getKey() + "](" + kvp.getValue() + ")");
                         }
                         builder.append(" \u2014 ");
