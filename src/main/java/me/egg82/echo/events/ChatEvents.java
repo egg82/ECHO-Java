@@ -15,6 +15,7 @@ import me.egg82.echo.messaging.packets.MessagePacket;
 import me.egg82.echo.messaging.packets.MessageUpdatePacket;
 import me.egg82.echo.storage.StorageService;
 import me.egg82.echo.storage.models.MessageModel;
+import me.egg82.echo.utils.JDAUtil;
 import me.egg82.echo.utils.PacketUtil;
 import me.egg82.echo.utils.ResponseUtil;
 import me.egg82.echo.web.models.GoogleSearchModel;
@@ -45,7 +46,7 @@ public class ChatEvents extends EventHolder {
         events.add(JDAEvents.subscribe(jda, GuildMessageReceivedEvent.class)
                 .filter(e -> !e.getAuthor().isBot())
                 .filter(e -> !e.isWebhookMessage())
-                .filter(e -> !ResponseUtil.isCommand(e.getMessage().getContentRaw()))
+                .filter(e -> !JDAUtil.isCommand(e.getMessage().getContentRaw()))
                 .filter(e -> {
                     boolean retVal = ResponseUtil.canLearn(e.getAuthor());
                     if (!retVal && ConfigUtil.getDebugOrFalse()) {
@@ -58,12 +59,12 @@ public class ChatEvents extends EventHolder {
         events.add(JDAEvents.subscribe(jda, MessageReceivedEvent.class)
                 .filter(e -> !e.getAuthor().isBot())
                 .filter(e -> !e.isWebhookMessage())
-                .filter(e -> !ResponseUtil.isCommand(e.getMessage().getContentRaw()))
+                .filter(e -> !JDAUtil.isCommand(e.getMessage().getContentRaw()))
                 .handler(this::speak));
 
         events.add(JDAEvents.subscribe(jda, GuildMessageUpdateEvent.class)
                 .filter(e -> !e.getAuthor().isBot())
-                .filter(e -> !ResponseUtil.isCommand(e.getMessage().getContentRaw()))
+                .filter(e -> !JDAUtil.isCommand(e.getMessage().getContentRaw()))
                 .filter(e -> {
                     boolean retVal = ResponseUtil.canLearn(e.getAuthor());
                     if (!retVal && ConfigUtil.getDebugOrFalse()) {

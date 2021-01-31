@@ -4,7 +4,7 @@ import co.aikar.commands.JDACommandManager;
 import java.util.regex.Pattern;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
-import me.egg82.echo.utils.EmoteUtil;
+import me.egg82.echo.utils.JDAUtil;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -34,7 +34,7 @@ public class ReactEvents extends EventHolder {
             return;
         }
 
-        Emote emote = EmoteUtil.getEmote(cachedConfig.getAlotEmote(), event.getGuild());
+        Emote emote = JDAUtil.getEmote(cachedConfig.getAlotEmote(), event.getJDA(), event.getGuild());
         if (emote == null) {
             logger.warn("Could not find alot emote \"" + cachedConfig.getAlotEmote() + "\" for guild \"" + event.getGuild().getName() + "\".");
             return;

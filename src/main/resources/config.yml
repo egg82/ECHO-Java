@@ -144,7 +144,7 @@ chat:
   # The chance to reply to any message regardless of content
   # For example, if set to "0.6" then there will be a 15% chance to respond
   # The value can range from 0 to 1, and will be clipped at those values
-  random: 0.15
+  random: 0.04
   # The phrases to respond to (case-insensitive)
   respond:
     - 'echo'

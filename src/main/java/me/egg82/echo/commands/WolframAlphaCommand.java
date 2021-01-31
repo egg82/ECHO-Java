@@ -1,6 +1,5 @@
 package me.egg82.echo.commands;
 
-import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandIssuer;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Default;
@@ -16,26 +15,18 @@ import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import me.egg82.echo.config.CachedConfig;
-import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.core.Pair;
 import me.egg82.echo.lang.Message;
-import me.egg82.echo.utils.EmoteUtil;
-import me.egg82.echo.utils.RoleUtil;
 import me.egg82.echo.utils.WebUtil;
 import me.egg82.echo.web.models.ImgurUploadModel;
 import me.egg82.echo.web.transformers.InstantTransformer;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @CommandAlias("wolfram|wa")
-public class WolframAlphaCommand extends BaseCommand {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
+public class WolframAlphaCommand extends AbstractCommand {
     private static final String RESULT_URL = "https://api.wolframalpha.com/v1/result?appid=%s&i=%s";
     private static final String IMAGE_URL = "https://api.wolframalpha.com/v1/simple?appid=%s&i=%s";
     private static final String QUERY_LINK = "https://www.wolframalpha.com/input/?i=%s";
@@ -46,28 +37,8 @@ public class WolframAlphaCommand extends BaseCommand {
     @Description("{@@description.wolfram}")
     @Syntax("<query>")
     public void submit(@NotNull CommandIssuer issuer, @NotNull MessageReceivedEvent event, @NotNull String query) {
-        if (event.getAuthor().isBot()) {
-            return;
-        }
-
-        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig == null) {
-            logger.error("Could not get cached config.");
-            issuer.sendError(Message.ERROR__INTERNAL);
-            return;
-        }
-
-        if (cachedConfig.getDisabledCommands().contains(getName())) {
-            return;
-        }
-
-        if (event.getMember() != null && !RoleUtil.isAllowed(event.getMember())) {
-            Emote emote = EmoteUtil.getEmote(cachedConfig.getDisallowedEmote(), event.getGuild());
-            if (emote == null) {
-                logger.warn("Could not find disallowed emote \"" + cachedConfig.getAlotEmote() + "\" for guild \"" + event.getGuild().getName() + "\".");
-                return;
-            }
-            event.getMessage().addReaction(emote).queue();
+        CachedConfig cachedConfig = getCachedConfig(issuer);
+        if (cachedConfig == null || !canRun(event, cachedConfig) || queryMentionsUsers(issuer, query)) {
             return;
         }
 
@@ -83,11 +54,6 @@ public class WolframAlphaCommand extends BaseCommand {
             return;
         }
 
-        if (query.contains("@")) { // TODO: find a better way to do this
-            issuer.sendError(Message.ERROR__INTERNAL);
-            return;
-        }
-
         getResult(cachedConfig.getWolframKey(), query)
                 .thenCombineAsync(getImage(cachedConfig.getWolframKey(), query), Pair::new)
                 .thenApplyAsync(v -> {
@@ -98,18 +64,7 @@ public class WolframAlphaCommand extends BaseCommand {
                     return new Pair<>(v.getT1(), model.getData().getLink());
                 })
                 .whenCompleteAsync((val, ex) -> {
-                    if (ex != null) {
-                        if (ConfigUtil.getDebugOrFalse()) {
-                            logger.error(ex.getMessage(), ex);
-                        } else {
-                            logger.error(ex.getMessage());
-                        }
-                        issuer.sendError(Message.ERROR__INTERNAL);
-                        return;
-                    }
-
-                    if (val == null || val.getT1() == null) {
-                        issuer.sendError(Message.ERROR__INTERNAL);
+                    if (!canCompleteContinue(issuer, val, ex)) {
                         return;
                     }
 
@@ -118,7 +73,9 @@ public class WolframAlphaCommand extends BaseCommand {
                     embed.setColor(Color.GREEN);
                     embed.appendDescription("Answer");
                     embed.appendDescription(String.format("```%s```", val.getT1()));
-                    embed.setImage(val.getT2());
+                    if (!val.getT2().isEmpty()) {
+                        embed.setImage(val.getT2());
+                    }
                     embed.setFooter("For " + (event.getMember() != null ? event.getMember().getEffectiveName() : event.getAuthor().getAsTag()));
 
                     event.getChannel().sendMessage(embed.build()).queue();
@@ -127,48 +84,11 @@ public class WolframAlphaCommand extends BaseCommand {
 
     private static final Cache<String, String> resultCache = Caffeine.newBuilder().build();
 
-    public static @NotNull CompletableFuture<String> getResult(@NotNull String key, @NotNull String query) {
-        return CompletableFuture.supplyAsync(() -> resultCache.get(query, q -> {
-            try {
-                Request request = WebUtil.getDefaultRequestBuilder(new URL(String.format(RESULT_URL, key, WebUtil.urlEncode(q))))
-                        .build();
-
-                try (Response response = WebUtil.getResponse(request)) {
-                    if (!response.isSuccessful()) {
-                        if (response.code() == 501) {
-                            return "No short answer available";
-                        }
-                        throw new IOException("Could not get connection (HTTP status " + response.code() + ")");
-                    }
-
-                    return response.body().string();
-                }
-            } catch (IOException ex) {
-                throw new CompletionException(ex);
-            }
-        }));
-    }
+    public static @NotNull CompletableFuture<String> getResult(@NotNull String key, @NotNull String query) { return CompletableFuture.supplyAsync(() -> resultCache.get(query, q -> WebUtil.getString(String.format(RESULT_URL, key, WebUtil.urlEncode(q))).join())); }
 
     private static final Cache<String, byte[]> imageCache = Caffeine.newBuilder().build();
 
-    public static @NotNull CompletableFuture<byte[]> getImage(@NotNull String key, @NotNull String query) {
-        return CompletableFuture.supplyAsync(() -> imageCache.get(query, q -> {
-            try {
-                Request request = WebUtil.getDefaultRequestBuilder(new URL(String.format(IMAGE_URL, key, WebUtil.urlEncode(q))))
-                        .build();
-
-                try (Response response = WebUtil.getResponse(request)) {
-                    if (!response.isSuccessful()) {
-                        throw new IOException("Could not get connection (HTTP status " + response.code() + ")");
-                    }
-
-                    return response.body().bytes();
-                }
-            } catch (IOException ex) {
-                throw new CompletionException(ex);
-            }
-        }));
-    }
+    public static @NotNull CompletableFuture<byte[]> getImage(@NotNull String key, @NotNull String query) { return CompletableFuture.supplyAsync(() -> imageCache.get(query, q -> WebUtil.getBytes(String.format(IMAGE_URL, key, WebUtil.urlEncode(q))).join())); }
 
     private static final Cache<byte[], ImgurUploadModel> imgurCache = Caffeine.newBuilder().build();
 

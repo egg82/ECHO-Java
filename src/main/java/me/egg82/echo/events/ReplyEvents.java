@@ -2,7 +2,7 @@ package me.egg82.echo.events;
 
 import co.aikar.commands.JDACommandManager;
 import java.util.regex.Pattern;
-import me.egg82.echo.utils.ResponseUtil;
+import me.egg82.echo.utils.JDAUtil;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import ninja.egg82.events.JDAEvents;
@@ -20,7 +20,7 @@ public class ReplyEvents extends EventHolder {
         this.manager = manager;
 
         events.add(JDAEvents.subscribe(jda, MessageReceivedEvent.class)
-                .filter(e -> !ResponseUtil.isCommand(e.getMessage().getContentRaw()))
+                .filter(e -> !JDAUtil.isCommand(e.getMessage().getContentRaw()))
                 .handler(this::replyBold));
     }
 
