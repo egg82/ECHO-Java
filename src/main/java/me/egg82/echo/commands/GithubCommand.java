@@ -40,6 +40,7 @@ public class GithubCommand extends BaseCommand {
     private static final String SEARCH_URL = "https://api.github.com/search/repositories?q=%s";
     private static final String REPO_URL = "https://github.com/%s";
     private static final String WIKI_URL = "https://github.com/%s/wiki";
+    private static final String ISSUES_URL = "https://github.com/%s/issues";
 
     public GithubCommand() { }
 
@@ -109,7 +110,7 @@ public class GithubCommand extends BaseCommand {
 
             GithubLicenseModel license;
             try {
-                license = first.getLicense() == null ? null : getLicense(first.getLicense().getUrl()).get();
+                license = first.getLicense() == null || first.getLicense().getUrl() == null ? null : getLicense(first.getLicense().getUrl()).get();
             } catch (InterruptedException ignored) {
                 Thread.currentThread().interrupt();
                 license = null;
@@ -138,12 +139,27 @@ public class GithubCommand extends BaseCommand {
             if (first.getLanguage() != null) {
                 embed.addField("Language", first.getLanguage(), true);
             }
-            if (first.isWiki()) {
-                embed.addField("Wiki", String.format(WIKI_URL, first.getFullName()), false);
+            if (first.isWiki() || first.isIssues() || first.getLicense() != null) {
+                StringBuilder builder = new StringBuilder();
+                if (first.isWiki()) {
+                    builder.append("[Wiki](" + String.format(WIKI_URL, first.getFullName()) + ")");
+                }
+                if (first.isIssues()) {
+                    if (first.isWiki()) {
+                        builder.append(' ');
+                    }
+                    builder.append("[Issues](" + String.format(ISSUES_URL, first.getFullName()) + ")");
+                }
+                if (license != null) {
+                    if (first.isIssues()) {
+                        builder.append(' ');
+                    }
+                    builder.append("[" + license.getName() + "](" + license.getHtmlUrl() + ")");
+                }
+                embed.addField("Links", builder.toString(), false);
             }
             if (license != null) {
-                embed.addField("License", "[" + license.getName() + "](" + license.getHtmlUrl() + ")", false);
-                embed.addField("License Description", "```" + license.getDescription() + "```", false);
+                embed.addField("License", "```" + license.getName() + "\n\n" + license.getDescription() + "```", false);
             }
             embed.setFooter("For " + (event.getMember() != null ? event.getMember().getEffectiveName() : event.getAuthor().getAsTag()));
 

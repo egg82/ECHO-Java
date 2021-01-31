@@ -68,7 +68,7 @@ public class ResponseUtil {
         }
 
         for (String prefix : cachedConfig.getCommandPrefixes()) {
-            if (content.length() >= prefix.length() && prefix.equals(content.substring(0, prefix.length() + 1))) {
+            if (content.length() >= prefix.length() && prefix.equals(content.substring(0, prefix.length()))) {
                 return true;
             }
         }
