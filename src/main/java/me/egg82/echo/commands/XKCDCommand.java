@@ -109,7 +109,7 @@ public class XKCDCommand extends BaseCommand {
                     }
 
                     JSONDeserializer<XKCDInfoModel> modelDeserializer = new JSONDeserializer<>();
-                    XKCDInfoModel retVal = modelDeserializer.deserialize(response.body().string(), XKCDInfoModel.class);
+                    XKCDInfoModel retVal = modelDeserializer.deserialize(response.body().charStream(), XKCDInfoModel.class);
                     return retVal == null || retVal.getNum() == -1 ? null : retVal;
                 }
             } catch (IOException ex) {

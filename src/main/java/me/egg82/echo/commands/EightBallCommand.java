@@ -102,7 +102,7 @@ public class EightBallCommand extends BaseCommand {
                     }
 
                     JSONDeserializer<EightBallModel> modelDeserializer = new JSONDeserializer<>();
-                    return modelDeserializer.deserialize(response.body().string(), EightBallModel.class);
+                    return modelDeserializer.deserialize(response.body().charStream(), EightBallModel.class);
                 }
             } catch (IOException ex) {
                 throw new CompletionException(ex);

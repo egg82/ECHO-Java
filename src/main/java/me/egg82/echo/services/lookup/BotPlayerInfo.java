@@ -121,7 +121,7 @@ public class BotPlayerInfo implements PlayerInfo {
             } else if (response.code() == 200) {
                 JSONDeserializer<List<PlayerNameModel>> modelDeserializer = new JSONDeserializer<>();
                 modelDeserializer.use("values", PlayerNameModel.class);
-                List<PlayerNameModel> model = modelDeserializer.deserialize(response.body().string());
+                List<PlayerNameModel> model = modelDeserializer.deserialize(response.body().charStream());
 
                 String name = model.get(model.size() - 1).getName();
                 synchronized (nameCacheLock) {
@@ -150,7 +150,7 @@ public class BotPlayerInfo implements PlayerInfo {
                 return null;
             } else if (response.code() == 200) {
                 JSONDeserializer<PlayerUUIDModel> modelDeserializer = new JSONDeserializer<>();
-                PlayerUUIDModel model = modelDeserializer.deserialize(response.body().string(), PlayerUUIDModel.class);
+                PlayerUUIDModel model = modelDeserializer.deserialize(response.body().charStream(), PlayerUUIDModel.class);
 
                 UUID uuid = UUID.fromString(model.getId().replaceFirst("(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"));
                 synchronized (uuidCacheLock) {
@@ -179,7 +179,7 @@ public class BotPlayerInfo implements PlayerInfo {
                 return null;
             } else if (response.code() == 200) {
                 JSONDeserializer<ProfileModel> modelDeserializer = new JSONDeserializer<>();
-                return modelDeserializer.deserialize(response.body().string(), ProfileModel.class).getProperties();
+                return modelDeserializer.deserialize(response.body().charStream(), ProfileModel.class).getProperties();
             }
 
             throw new IOException("Mojang API response code: " + response.code());

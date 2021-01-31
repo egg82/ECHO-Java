@@ -77,7 +77,7 @@ public class GoogleSearchCommand extends BaseCommand {
             return;
         }
 
-        getModel(query).whenCompleteAsync((val, ex) -> {
+        getModel(cachedConfig.getGoogleKey(), query).whenCompleteAsync((val, ex) -> {
             if (ex != null) {
                 if (ConfigUtil.getDebugOrFalse()) {
                     logger.error(ex.getMessage(), ex);
@@ -112,18 +112,10 @@ public class GoogleSearchCommand extends BaseCommand {
         });
     }
 
-    public static @NotNull CompletableFuture<GoogleSearchModel> getModel(@NotNull String query) {
+    public static @NotNull CompletableFuture<GoogleSearchModel> getModel(@NotNull String key, @NotNull String query) {
         return CompletableFuture.supplyAsync(() -> {
-            CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-            if (cachedConfig == null) {
-                throw new CompletionException(new IllegalStateException("Could not get cached config."));
-            }
-            if (cachedConfig.getGoogleKey().isEmpty()) {
-                throw new CompletionException(new IllegalStateException("Google API key is empty."));
-            }
-
             try {
-                Request request = WebUtil.getDefaultRequestBuilder(new URL(String.format(SEARCH_URL, cachedConfig.getGoogleKey(), WebUtil.urlEncode(query.replace("\\s+", "+")))))
+                Request request = WebUtil.getDefaultRequestBuilder(new URL(String.format(SEARCH_URL, key, WebUtil.urlEncode(query.replace("\\s+", "+")))))
                         .header("Accept", "application/json")
                         .build();
 
@@ -133,7 +125,7 @@ public class GoogleSearchCommand extends BaseCommand {
                     }
 
                     JSONDeserializer<GoogleSearchModel> modelDeserializer = new JSONDeserializer<>();
-                    GoogleSearchModel retVal = modelDeserializer.deserialize(response.body().string(), GoogleSearchModel.class);
+                    GoogleSearchModel retVal = modelDeserializer.deserialize(response.body().charStream(), GoogleSearchModel.class);
                     return retVal == null || retVal.getItems().isEmpty() ? null : retVal;
                 }
             } catch (IOException ex) {

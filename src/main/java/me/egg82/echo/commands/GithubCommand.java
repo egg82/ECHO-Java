@@ -250,7 +250,7 @@ public class GithubCommand extends BaseCommand {
 
                     JSONDeserializer<GithubSearchModel> modelDeserializer = new JSONDeserializer<>();
                     modelDeserializer.use(Instant.class, new InstantTransformer());
-                    GithubSearchModel retVal = modelDeserializer.deserialize(response.body().string(), GithubSearchModel.class);
+                    GithubSearchModel retVal = modelDeserializer.deserialize(response.body().charStream(), GithubSearchModel.class);
                     return retVal == null || retVal.getItems().isEmpty() ? null : retVal;
                 }
             } catch (IOException ex) {
@@ -272,7 +272,7 @@ public class GithubCommand extends BaseCommand {
                     }
 
                     JSONDeserializer<GithubLicenseModel> modelDeserializer = new JSONDeserializer<>();
-                    return modelDeserializer.deserialize(response.body().string(), GithubLicenseModel.class);
+                    return modelDeserializer.deserialize(response.body().charStream(), GithubLicenseModel.class);
                 }
             } catch (IOException ex) {
                 throw new CompletionException(ex);

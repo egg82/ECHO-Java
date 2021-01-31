@@ -102,7 +102,7 @@ public class RoryCommand extends BaseCommand {
                     }
 
                     JSONDeserializer<RoryModel> modelDeserializer = new JSONDeserializer<>();
-                    RoryModel retVal = modelDeserializer.deserialize(response.body().string(), RoryModel.class);
+                    RoryModel retVal = modelDeserializer.deserialize(response.body().charStream(), RoryModel.class);
                     return retVal == null || retVal.getId() == -1 ? null : retVal;
                 }
             } catch (IOException ex) {

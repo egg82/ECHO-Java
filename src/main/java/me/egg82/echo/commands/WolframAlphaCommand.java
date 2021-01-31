@@ -91,6 +91,9 @@ public class WolframAlphaCommand extends BaseCommand {
         getResult(cachedConfig.getWolframKey(), query)
                 .thenCombineAsync(getImage(cachedConfig.getWolframKey(), query), Pair::new)
                 .thenApplyAsync(v -> {
+                    if (v.getT2() == null) {
+                        return new Pair<>(v.getT1(), "");
+                    }
                     ImgurUploadModel model = uploadImage(cachedConfig.getImgurKey(), v.getT2()).join();
                     return new Pair<>(v.getT1(), model.getData().getLink());
                 })
@@ -105,13 +108,13 @@ public class WolframAlphaCommand extends BaseCommand {
                         return;
                     }
 
-                    if (val == null || val.getT1() == null || val.getT2() == null) {
+                    if (val == null || val.getT1() == null) {
                         issuer.sendError(Message.ERROR__INTERNAL);
                         return;
                     }
 
                     EmbedBuilder embed = new EmbedBuilder();
-                    embed.setTitle("Wolfram Alpha query: " + query, String.format(QUERY_LINK, WebUtil.urlEncode(query.replace("\\s+", "+"))));
+                    embed.setTitle("Wolfram Alpha query: " + query, String.format(QUERY_LINK, WebUtil.urlEncode(query)));
                     embed.setColor(Color.GREEN);
                     embed.appendDescription("Answer");
                     embed.appendDescription(String.format("```%s```", val.getT1()));
@@ -127,7 +130,7 @@ public class WolframAlphaCommand extends BaseCommand {
     public static @NotNull CompletableFuture<String> getResult(@NotNull String key, @NotNull String query) {
         return CompletableFuture.supplyAsync(() -> resultCache.get(query, q -> {
             try {
-                Request request = WebUtil.getDefaultRequestBuilder(new URL(String.format(RESULT_URL, key, WebUtil.urlEncode(q.replace("\\s+", "+")))))
+                Request request = WebUtil.getDefaultRequestBuilder(new URL(String.format(RESULT_URL, key, WebUtil.urlEncode(q))))
                         .build();
 
                 try (Response response = WebUtil.getResponse(request)) {
@@ -151,7 +154,7 @@ public class WolframAlphaCommand extends BaseCommand {
     public static @NotNull CompletableFuture<byte[]> getImage(@NotNull String key, @NotNull String query) {
         return CompletableFuture.supplyAsync(() -> imageCache.get(query, q -> {
             try {
-                Request request = WebUtil.getDefaultRequestBuilder(new URL(String.format(IMAGE_URL, key, WebUtil.urlEncode(q.replace("\\s+", "+")))))
+                Request request = WebUtil.getDefaultRequestBuilder(new URL(String.format(IMAGE_URL, key, WebUtil.urlEncode(q))))
                         .build();
 
                 try (Response response = WebUtil.getResponse(request)) {
@@ -191,7 +194,7 @@ public class WolframAlphaCommand extends BaseCommand {
 
                     JSONDeserializer<ImgurUploadModel> modelDeserializer = new JSONDeserializer<>();
                     modelDeserializer.use(Instant.class, new InstantTransformer());
-                    ImgurUploadModel retVal = modelDeserializer.deserialize(response.body().string(), ImgurUploadModel.class);
+                    ImgurUploadModel retVal = modelDeserializer.deserialize(response.body().charStream(), ImgurUploadModel.class);
                     return retVal == null || !retVal.isSuccess() ? null : retVal;
                 }
             } catch (IOException ex) {
