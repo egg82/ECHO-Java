@@ -63,10 +63,12 @@ public class GoogleSearchCommand extends AbstractCommand {
     }
 
     public static @NotNull CompletableFuture<GoogleSearchModel> getModel(@NotNull String key, @NotNull String query) {
-        return WebUtil.getReader(String.format(SEARCH_URL, key, WebUtil.urlEncode(query.replace("\\s+", "+")))).thenApplyAsync(stream -> {
-            JSONDeserializer<GoogleSearchModel> modelDeserializer = new JSONDeserializer<>();
-            GoogleSearchModel retVal = modelDeserializer.deserialize(stream, GoogleSearchModel.class);
-            return retVal == null || retVal.getItems().isEmpty() ? null : retVal;
+        return WebUtil.getUnclosedResponse(String.format(SEARCH_URL, key, WebUtil.urlEncode(query.replace("\\s+", "+")))).thenApplyAsync(response -> {
+            try (response) {
+                JSONDeserializer<GoogleSearchModel> modelDeserializer = new JSONDeserializer<>();
+                GoogleSearchModel retVal = modelDeserializer.deserialize(response.body().charStream(), GoogleSearchModel.class);
+                return retVal == null || retVal.getItems().isEmpty() ? null : retVal;
+            }
         });
     }
 }

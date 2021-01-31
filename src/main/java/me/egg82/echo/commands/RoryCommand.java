@@ -44,10 +44,12 @@ public class RoryCommand extends AbstractCommand {
     }
 
     public static @NotNull CompletableFuture<RoryModel> get(int id) {
-        return WebUtil.getReader(id == -1 ? CAT_URL : String.format(CAT_URL_ID, id)).thenApplyAsync(stream -> {
-            JSONDeserializer<RoryModel> modelDeserializer = new JSONDeserializer<>();
-            RoryModel retVal = modelDeserializer.deserialize(stream, RoryModel.class);
-            return retVal == null || retVal.getId() == -1 ? null : retVal;
+        return WebUtil.getUnclosedResponse(id == -1 ? CAT_URL : String.format(CAT_URL_ID, id)).thenApplyAsync(response -> {
+            try (response) {
+                JSONDeserializer<RoryModel> modelDeserializer = new JSONDeserializer<>();
+                RoryModel retVal = modelDeserializer.deserialize(response.body().charStream(), RoryModel.class);
+                return retVal == null || retVal.getId() == -1 ? null : retVal;
+            }
         });
     }
 }

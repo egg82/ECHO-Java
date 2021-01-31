@@ -1,7 +1,6 @@
 package me.egg82.echo.utils;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -35,12 +34,12 @@ public class WebUtil {
 
     public static @NotNull Response getResponse(@NotNull Request request) throws IOException { return client.newCall(request).execute(); }
 
-    public static @NotNull CompletableFuture<Reader> getReader(@NotNull String url) { return getResponse(url, "application/json").thenApplyAsync(response -> response.body().charStream()); }
-
     public static @NotNull CompletableFuture<String> getString(@NotNull String url) {
-        return getResponse(url, "text/plain").thenApplyAsync(response -> {
+        return getUnclosedResponse(url, "text/plain").thenApplyAsync(response -> {
             try {
-                return response.body().string();
+                try (response) {
+                    return response.body().string();
+                }
             } catch (IOException ex) {
                 throw new CompletionException(ex);
             }
@@ -48,20 +47,28 @@ public class WebUtil {
     }
 
     public static @NotNull CompletableFuture<byte[]> getBytes(@NotNull String url) {
-        return getResponse(url).thenApplyAsync(response -> {
+        return getUnclosedResponse(url).thenApplyAsync(response -> {
             try {
-                return response.body().bytes();
+                try (response) {
+                    return response.body().bytes();
+                }
             } catch (IOException ex) {
                 throw new CompletionException(ex);
             }
         });
     }
 
-    public static @NotNull CompletableFuture<HttpUrl> getRedirectedUrl(@NotNull String url) { return getResponse(url).thenApplyAsync(response -> response.request().url()); }
+    public static @NotNull CompletableFuture<HttpUrl> getRedirectedUrl(@NotNull String url) {
+        return getUnclosedResponse(url).thenApplyAsync(response -> {
+            try (response) {
+                return response.request().url();
+            }
+        });
+    }
 
-    private static @NotNull CompletableFuture<Response> getResponse(@NotNull String url) { return getResponse(url, null); }
+    public static @NotNull CompletableFuture<Response> getUnclosedResponse(@NotNull String url) { return getUnclosedResponse(url, null); }
 
-    private static @NotNull CompletableFuture<Response> getResponse(@NotNull String url, String accept) {
+    public static @NotNull CompletableFuture<Response> getUnclosedResponse(@NotNull String url, String accept) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 Request.Builder builder = getDefaultRequestBuilder(new URL(url));
@@ -70,12 +77,11 @@ public class WebUtil {
                 }
                 Request request = builder.build();
 
-                try (Response response = getResponse(request)) {
-                    if (!response.isSuccessful()) {
-                        throw new IOException("Could not get connection (HTTP status " + response.code() + ")");
-                    }
-                    return response;
+                Response response = getResponse(request);
+                if (!response.isSuccessful()) {
+                    throw new IOException("Could not get connection (HTTP status " + response.code() + ")");
                 }
+                return response;
             } catch (IOException ex) {
                 throw new CompletionException(ex);
             }

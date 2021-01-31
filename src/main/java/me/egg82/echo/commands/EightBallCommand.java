@@ -44,9 +44,11 @@ public class EightBallCommand extends AbstractCommand {
     }
 
     public static @NotNull CompletableFuture<EightBallModel> getModel(@NotNull String phrase) {
-        return WebUtil.getReader(String.format(API_URL, phrase)).thenApplyAsync(stream -> {
-            JSONDeserializer<EightBallModel> modelDeserializer = new JSONDeserializer<>();
-            return modelDeserializer.deserialize(stream, EightBallModel.class);
+        return WebUtil.getUnclosedResponse(String.format(API_URL, phrase)).thenApplyAsync(response -> {
+            try (response) {
+                JSONDeserializer<EightBallModel> modelDeserializer = new JSONDeserializer<>();
+                return modelDeserializer.deserialize(response.body().charStream(), EightBallModel.class);
+            }
         });
     }
 }

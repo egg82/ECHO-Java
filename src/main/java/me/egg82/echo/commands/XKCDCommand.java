@@ -47,10 +47,12 @@ public class XKCDCommand extends AbstractCommand {
     }
 
     public static @NotNull CompletableFuture<XKCDInfoModel> getModel(@NotNull String query) {
-        return search(query).thenComposeAsync(v -> WebUtil.getReader(String.format(INFO_URL, v.getComics().get(v.getSelection()).leftInt())).thenApplyAsync(val -> {
-            JSONDeserializer<XKCDInfoModel> modelDeserializer = new JSONDeserializer<>();
-            XKCDInfoModel retVal = modelDeserializer.deserialize(val, XKCDInfoModel.class);
-            return retVal == null || retVal.getNum() == -1 ? null : retVal;
+        return search(query).thenComposeAsync(v -> WebUtil.getUnclosedResponse(String.format(INFO_URL, v.getComics().get(v.getSelection()).leftInt())).thenApplyAsync(response -> {
+            try (response) {
+                JSONDeserializer<XKCDInfoModel> modelDeserializer = new JSONDeserializer<>();
+                XKCDInfoModel retVal = modelDeserializer.deserialize(response.body().charStream(), XKCDInfoModel.class);
+                return retVal == null || retVal.getNum() == -1 ? null : retVal;
+            }
         }));
     }
 

@@ -217,18 +217,22 @@ public class GithubCommand extends AbstractCommand {
     }
 
     public static @NotNull CompletableFuture<GithubSearchModel> getModel(@NotNull String query) {
-        return WebUtil.getReader(String.format(SEARCH_URL, WebUtil.urlEncode(query))).thenApplyAsync(stream -> {
-            JSONDeserializer<GithubSearchModel> modelDeserializer = new JSONDeserializer<>();
-            modelDeserializer.use(Instant.class, new InstantTransformer());
-            GithubSearchModel retVal = modelDeserializer.deserialize(stream, GithubSearchModel.class);
-            return retVal == null || retVal.getItems().isEmpty() ? null : retVal;
+        return WebUtil.getUnclosedResponse(String.format(SEARCH_URL, WebUtil.urlEncode(query))).thenApplyAsync(response -> {
+            try (response) {
+                JSONDeserializer<GithubSearchModel> modelDeserializer = new JSONDeserializer<>();
+                modelDeserializer.use(Instant.class, new InstantTransformer());
+                GithubSearchModel retVal = modelDeserializer.deserialize(response.body().charStream(), GithubSearchModel.class);
+                return retVal == null || retVal.getItems().isEmpty() ? null : retVal;
+            }
         });
     }
 
     public static @NotNull CompletableFuture<GithubLicenseModel> getLicense(@NotNull String url) {
-        return WebUtil.getReader(url).thenApplyAsync(stream -> {
-            JSONDeserializer<GithubLicenseModel> modelDeserializer = new JSONDeserializer<>();
-            return modelDeserializer.deserialize(stream, GithubLicenseModel.class);
+        return WebUtil.getUnclosedResponse(url).thenApplyAsync(response -> {
+            try (response) {
+                JSONDeserializer<GithubLicenseModel> modelDeserializer = new JSONDeserializer<>();
+                return modelDeserializer.deserialize(response.body().charStream(), GithubLicenseModel.class);
+            }
         });
     }
 
