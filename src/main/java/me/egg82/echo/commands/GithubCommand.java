@@ -11,12 +11,15 @@ import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
-import me.egg82.echo.core.Pair;
 import me.egg82.echo.lang.Message;
 import me.egg82.echo.utils.EmoteUtil;
 import me.egg82.echo.utils.RoleUtil;
@@ -42,6 +45,15 @@ public class GithubCommand extends BaseCommand {
     private static final String WIKI_URL = "https://github.com/%s/wiki";
     private static final String ISSUES_URL = "https://github.com/%s/issues";
     private static final String CUSTOM_LICENSE_URL = "https://github.com/%s/blob/master/LICENSE.md";
+    private static final String README_URL = "https://github.com/%s/blob/master/README.md";
+    private static final String RAW_README_URL = "https://raw.githubusercontent.com/%s/master/README.md";
+
+    private static final Pattern RE_LINKS_GROUP = Pattern.compile("\\[\\!\\[(.+)\\]\\s*\\((https?:\\/\\/.*)\\)\\]\\s*\\((https?:\\/\\/.*)\\)");
+    private static final Pattern RE_LINKS_GROUP_2 = Pattern.compile("\\[+(.+)\\]+\\s*\\(+(https?:\\/\\/.*)\\)+");
+    private static final Pattern RE_IMAGES = Pattern.compile("\\!\\[+(.*)\\]+\\s*\\(+(https?:\\/\\/.*)\\)+");
+    private static final Pattern RE_LINKS = Pattern.compile("(https?:\\/\\/.*)");
+    private static final Pattern RE_URL_LINE = Pattern.compile("^<(?:url|img)>$", Pattern.MULTILINE);
+    private static final Pattern RE_MULTIPLE_LINES = Pattern.compile("\n{3,}");
 
     public GithubCommand() { }
 
@@ -124,6 +136,16 @@ public class GithubCommand extends BaseCommand {
                 license = null;
             }
 
+            String readme;
+            try {
+                readme = getReadme(first.getFullName()).get().replace("\r", "").replace("```", "");
+            } catch (InterruptedException ignored) {
+                Thread.currentThread().interrupt();
+                readme = null;
+            } catch (ExecutionException ignored) {
+                readme = null;
+            }
+
             EmbedBuilder embed = new EmbedBuilder();
             embed.setTitle(first.getFullName() + (first.isFork() ? " (\u2442)" : ""), String.format(REPO_URL, first.getFullName()));
             embed.setColor(Color.YELLOW);
@@ -158,7 +180,44 @@ public class GithubCommand extends BaseCommand {
                     String licenseName = license == null ? first.getLicense().getName() + " License" : license.getName();
                     builder.append("[" + licenseName + "](" + (license != null ? license.getHtmlUrl() : String.format(CUSTOM_LICENSE_URL, first.getFullName()) ) + ")");
                 }
+                if (readme != null) {
+                    if (first.isIssues() || first.isWiki() || first.getLicense() != null) {
+                        builder.append(" \u2014 ");
+                    }
+                    builder.append("[Readme](" + String.format(README_URL, first.getFullName()) + ")");
+                }
                 embed.addField("Links", builder.toString(), false);
+            }
+            if (readme != null) {
+                List<String> links = new ArrayList<>();
+                Matcher matcher = RE_LINKS_GROUP.matcher(readme);
+                while (matcher.find()) {
+                    links.add(matcher.group(3));
+                }
+                readme = RE_LINKS_GROUP.matcher(readme).replaceAll("<url>");
+                matcher = RE_LINKS_GROUP_2.matcher(readme);
+                while (matcher.find()) {
+                    links.add(matcher.group(2));
+                }
+                readme = RE_LINKS_GROUP_2.matcher(readme).replaceAll("<url>");
+                readme = RE_IMAGES.matcher(readme).replaceAll("<img>");
+                matcher = RE_LINKS.matcher(readme);
+                while (matcher.find()) {
+                    links.add(matcher.group(1));
+                }
+                readme = RE_LINKS.matcher(readme).replaceAll("<url>");
+                if (readme.length() > 500) {
+                    readme = readme.substring(0, 500) + "...";
+                }
+
+                readme = RE_URL_LINE.matcher(readme).replaceAll("");
+                readme = RE_MULTIPLE_LINES.matcher(readme).replaceAll("\n\n").trim();
+
+                embed.addField("Readme", "```" + readme + "```", false);
+
+                if (!links.isEmpty()) {
+                    embed.addField("Readme Links", String.join("\n", links), false);
+                }
             }
             embed.setFooter("For " + (event.getMember() != null ? event.getMember().getEffectiveName() : event.getAuthor().getAsTag()));
 
@@ -203,6 +262,26 @@ public class GithubCommand extends BaseCommand {
 
                     JSONDeserializer<GithubLicenseModel> modelDeserializer = new JSONDeserializer<>();
                     return modelDeserializer.deserialize(response.body().string(), GithubLicenseModel.class);
+                }
+            } catch (IOException ex) {
+                throw new CompletionException(ex);
+            }
+        });
+    }
+
+    public static @NotNull CompletableFuture<String> getReadme(@NotNull String repo) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                Request request = WebUtil.getDefaultRequestBuilder(new URL(String.format(RAW_README_URL, repo)))
+                        .header("Accept", "text/plain")
+                        .build();
+
+                try (Response response = WebUtil.getResponse(request)) {
+                    if (!response.isSuccessful()) {
+                        throw new IOException("Could not get connection (HTTP status " + response.code() + ")");
+                    }
+
+                    return response.body().string();
                 }
             } catch (IOException ex) {
                 throw new CompletionException(ex);
