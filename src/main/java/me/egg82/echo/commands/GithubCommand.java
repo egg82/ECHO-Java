@@ -125,25 +125,25 @@ public class GithubCommand extends BaseCommand {
             EmbedBuilder embed = new EmbedBuilder();
             embed.setTitle(first.getFullName() + (first.isFork() ? " (\u2442)" : ""), String.format(REPO_URL, first.getFullName()));
             embed.setColor(Color.YELLOW);
-            embed.addField("Description", first.getDescription(), false);
+            embed.addField("Description", "```" + first.getDescription() + "```", false);
             if (first.isArchived()) {
-                embed.addField("\u2757 Status", "ARCHIVED", false);
+                embed.addField("\u2757 Status", "ARCHIVED", true);
             } else if (first.isDisabled()) {
-                embed.addField("\u2757 Status", "DISABLED", false);
+                embed.addField("\u2757 Status", "DISABLED", true);
             }
-            embed.addField("\u1F31F Stars", String.valueOf(first.getStargazers()), false);
-            embed.addField("\u1F441 Watchers", String.valueOf(first.getWatchers()), false);
-            embed.addField("\u2442 Forks", String.valueOf(first.getForks()), false);
-            embed.addField("! Issues", String.valueOf(first.getOpenIssues()), false);
+            embed.addField("\u2605 Stars", String.valueOf(first.getStargazers()), true);
+            embed.addField("\uD83D\uDC41 Watchers", String.valueOf(first.getWatchers()), true);
+            embed.addField("\u2442 Forks", String.valueOf(first.getForks()), true);
+            embed.addField("\u2757 Issues", String.valueOf(first.getOpenIssues()), true);
             if (first.getLanguage() != null) {
-                embed.addField("Language", first.getLanguage(), false);
+                embed.addField("Language", first.getLanguage(), true);
             }
             if (first.isWiki()) {
                 embed.addField("Wiki", String.format(WIKI_URL, first.getFullName()), false);
             }
             if (license != null) {
                 embed.addField("License", license.getHtmlUrl(), false);
-                embed.addField("License Description", "```" + license.getHtmlUrl() + "```", false);
+                embed.addField("License Description", "```" + license.getDescription() + "```", false);
             }
             embed.setFooter("For " + (event.getMember() != null ? event.getMember().getEffectiveName() : event.getAuthor().getAsTag()));
 

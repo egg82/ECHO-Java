@@ -94,7 +94,7 @@ public class GithubSearchModel implements Serializable {
         private GithubRepositoryLicenseModel license = null;
         @JSON(name = "default_branch")
         private String defaultBranch = "";
-        private long score = -1L;
+        private double score = -1.0d;
 
         public GithubRepositoryModel() { }
 
@@ -238,9 +238,9 @@ public class GithubSearchModel implements Serializable {
         @JSON(name = "default_branch")
         public void setDefaultBranch(@NotNull String defaultBranch) { this.defaultBranch = defaultBranch; }
 
-        public long getScore() { return score; }
+        public double getScore() { return score; }
 
-        public void setScore(long score) { this.score = score; }
+        public void setScore(double score) { this.score = score; }
 
         public boolean equals(Object o) {
             if (this == o) return true;

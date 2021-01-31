@@ -20,7 +20,7 @@ public class ReplyEvents extends EventHolder {
         this.manager = manager;
 
         events.add(JDAEvents.subscribe(jda, MessageReceivedEvent.class)
-                .filter(e -> !ResponseUtil.isCommand(e.getMessage().getContentStripped()))
+                .filter(e -> !ResponseUtil.isCommand(e.getMessage().getContentRaw()))
                 .handler(this::replyBold));
     }
 
