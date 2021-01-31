@@ -58,6 +58,7 @@ public class GithubSearchModel implements Serializable {
         private String fullName = "";
         @JSON(name = "private")
         private boolean privateRepo = false;
+        private GithubRepositoryOwnerModel owner = new GithubRepositoryOwnerModel();
         private String description = "";
         private boolean fork = false;
         @JSON(name = "created_at")
@@ -123,6 +124,10 @@ public class GithubSearchModel implements Serializable {
 
         @JSON(name = "private")
         public void setPrivateRepo(boolean privateRepo) { this.privateRepo = privateRepo; }
+
+        public @NotNull GithubRepositoryOwnerModel getOwner() { return owner; }
+
+        public void setOwner(@NotNull GithubRepositoryOwnerModel owner) { this.owner = owner; }
 
         public @NotNull String getDescription() { return description; }
 
@@ -246,10 +251,10 @@ public class GithubSearchModel implements Serializable {
             if (this == o) return true;
             if (!(o instanceof GithubRepositoryModel)) return false;
             GithubRepositoryModel that = (GithubRepositoryModel) o;
-            return id == that.id && privateRepo == that.privateRepo && fork == that.fork && size == that.size && stargazers == that.stargazers && watchers == that.watchers && forks == that.forks && issues == that.issues && projects == that.projects && downloads == that.downloads && wiki == that.wiki && pages == that.pages && archived == that.archived && disabled == that.disabled && openIssues == that.openIssues && score == that.score && nodeId.equals(that.nodeId) && name.equals(that.name) && fullName.equals(that.fullName) && description.equals(that.description) && createdAt.equals(that.createdAt) && updatedAt.equals(that.updatedAt) && pushedAt.equals(that.pushedAt) && Objects.equals(homepage, that.homepage) && language.equals(that.language) && Objects.equals(license, that.license) && defaultBranch.equals(that.defaultBranch);
+            return id == that.id && privateRepo == that.privateRepo && fork == that.fork && size == that.size && stargazers == that.stargazers && watchers == that.watchers && forks == that.forks && issues == that.issues && projects == that.projects && downloads == that.downloads && wiki == that.wiki && pages == that.pages && archived == that.archived && disabled == that.disabled && openIssues == that.openIssues && Double.compare(that.score, score) == 0 && nodeId.equals(that.nodeId) && name.equals(that.name) && fullName.equals(that.fullName) && owner.equals(that.owner) && description.equals(that.description) && createdAt.equals(that.createdAt) && updatedAt.equals(that.updatedAt) && pushedAt.equals(that.pushedAt) && Objects.equals(homepage, that.homepage) && Objects.equals(language, that.language) && Objects.equals(license, that.license) && defaultBranch.equals(that.defaultBranch);
         }
 
-        public int hashCode() { return Objects.hash(id, nodeId, name, fullName, privateRepo, description, fork, createdAt, updatedAt, pushedAt, homepage, size, stargazers, watchers, forks, language, issues, projects, downloads, wiki, pages, archived, disabled, openIssues, license, defaultBranch, score); }
+        public int hashCode() { return Objects.hash(id, nodeId, name, fullName, privateRepo, owner, description, fork, createdAt, updatedAt, pushedAt, homepage, size, stargazers, watchers, forks, language, issues, projects, downloads, wiki, pages, archived, disabled, openIssues, license, defaultBranch, score); }
 
         public String toString() {
             return "GithubRepositoryModel{" +
@@ -258,6 +263,7 @@ public class GithubSearchModel implements Serializable {
                     ", name='" + name + '\'' +
                     ", fullName='" + fullName + '\'' +
                     ", privateRepo=" + privateRepo +
+                    ", owner=" + owner +
                     ", description='" + description + '\'' +
                     ", fork=" + fork +
                     ", createdAt=" + createdAt +
@@ -281,6 +287,71 @@ public class GithubSearchModel implements Serializable {
                     ", defaultBranch='" + defaultBranch + '\'' +
                     ", score=" + score +
                     '}';
+        }
+
+        public static final class GithubRepositoryOwnerModel implements Serializable {
+            private String login = "";
+            private long id = -1L;
+            @JSON(name = "node_id")
+            private String nodeId = "";
+            @JSON(name = "avatar_url")
+            private String avatarUrl = "";
+            @JSON(name = "gravatar_id")
+            private String gravatarId = "";
+            private String type = "";
+            @JSON(name = "site_admin")
+            private boolean siteAdmin = false;
+
+            public GithubRepositoryOwnerModel() { }
+
+            public @NotNull String getLogin() { return login; }
+
+            public void setLogin(@NotNull String login) { this.login = login; }
+
+            public long getId() { return id; }
+
+            public void setId(long id) { this.id = id; }
+
+            public @NotNull String getNodeId() { return nodeId; }
+
+            public void setNodeId(@NotNull String nodeId) { this.nodeId = nodeId; }
+
+            public @NotNull String getAvatarUrl() { return avatarUrl; }
+
+            public void setAvatarUrl(@NotNull String avatarUrl) { this.avatarUrl = avatarUrl; }
+
+            public @NotNull String getGravatarId() { return gravatarId; }
+
+            public void setGravatarId(@NotNull String gravatarId) { this.gravatarId = gravatarId; }
+
+            public @NotNull String getType() { return type; }
+
+            public void setType(@NotNull String type) { this.type = type; }
+
+            public boolean isSiteAdmin() { return siteAdmin; }
+
+            public void setSiteAdmin(boolean siteAdmin) { this.siteAdmin = siteAdmin; }
+
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                if (!(o instanceof GithubRepositoryOwnerModel)) return false;
+                GithubRepositoryOwnerModel that = (GithubRepositoryOwnerModel) o;
+                return id == that.id && siteAdmin == that.siteAdmin && login.equals(that.login) && nodeId.equals(that.nodeId) && avatarUrl.equals(that.avatarUrl) && gravatarId.equals(that.gravatarId) && type.equals(that.type);
+            }
+
+            public int hashCode() { return Objects.hash(login, id, nodeId, avatarUrl, gravatarId, type, siteAdmin); }
+
+            public String toString() {
+                return "GithubRepositoryOwnerModel{" +
+                        "login='" + login + '\'' +
+                        ", id=" + id +
+                        ", nodeId='" + nodeId + '\'' +
+                        ", avatarUrl='" + avatarUrl + '\'' +
+                        ", gravatarId='" + gravatarId + '\'' +
+                        ", type='" + type + '\'' +
+                        ", siteAdmin=" + siteAdmin +
+                        '}';
+            }
         }
 
         public static final class GithubRepositoryLicenseModel implements Serializable {

@@ -147,6 +147,7 @@ public class GithubCommand extends BaseCommand {
             }
 
             EmbedBuilder embed = new EmbedBuilder();
+            embed.setAuthor(first.getOwner().getLogin(), String.format(REPO_URL, first.getOwner().getLogin()), first.getOwner().getAvatarUrl());
             embed.setTitle(first.getFullName() + (first.isFork() ? " (\u2442)" : ""), String.format(REPO_URL, first.getFullName()));
             embed.setColor(Color.YELLOW);
             embed.addField("Description", "```" + first.getDescription() + "```", false);
