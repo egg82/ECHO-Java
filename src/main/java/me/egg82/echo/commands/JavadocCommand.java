@@ -92,10 +92,10 @@ public class JavadocCommand extends AbstractCommand {
             case "CLASS":
                 addClassData(model, embed);
                 break;
-            /*case "INTERFACE":
+            case "INTERFACE":
                 addInterfaceData(model, embed);
                 break;
-            case "FIELD":
+            /*case "FIELD":
                 addFieldData(model, embed);
                 break;
             case "ANNOTATION":
@@ -263,6 +263,91 @@ public class JavadocCommand extends AbstractCommand {
             }
             subclasses.delete(subclasses.length() - 3, subclasses.length());
             embed.addField("Subclasses", subclasses.toString(), false);
+        }
+
+        if (!model.getObject().getMetadata().getMethods().isEmpty()) {
+            StringBuilder methods = new StringBuilder();
+            for (String method : model.getObject().getMetadata().getMethods()) {
+                methods.append("*" + method.substring(method.lastIndexOf('#') + 1) + "*");
+                methods.append(" \u2014 ");
+            }
+            methods.delete(methods.length() - 3, methods.length());
+            embed.addField("Methods", methods.toString(), false);
+        }
+
+        if (!model.getObject().getMetadata().getFields().isEmpty()) {
+            StringBuilder fields = new StringBuilder();
+            for (String field : model.getObject().getMetadata().getFields()) {
+                fields.append("[" + field.substring(field.lastIndexOf('%') + 1) + "](" + link + "#" + field.substring(field.lastIndexOf('%') + 1) + ")");
+                fields.append(" \u2014 ");
+            }
+            fields.delete(fields.length() - 3, fields.length());
+            embed.addField("Fields", fields.toString(), false);
+        }
+    }
+
+    private void addInterfaceData(@NotNull JavadocModel model, @NotNull EmbedBuilder embed) {
+        String link = model.getObject().getLink();
+
+        StringBuilder title = new StringBuilder();
+        for (String annotation : model.getObject().getAnnotations()) {
+            title.append('@');
+            title.append(annotation);
+            title.append(' ');
+        }
+        for (String modifier : model.getObject().getModifiers()) {
+            title.append(modifier);
+            title.append(' ');
+        }
+        if (model.getObject().isDeprecated()) {
+            title.append("~~");
+        }
+        title.append(model.getObject().getPackageName());
+        title.append('.');
+        title.append(model.getObject().getName());
+        if (!model.getObject().getMetadata().getSuperInterfaces().isEmpty()) {
+            title.append(" extends");
+        }
+        for (String extension : model.getObject().getMetadata().getSuperInterfaces()) {
+            title.append(' ');
+            title.append(extension.substring(extension.lastIndexOf('.') + 1));
+            title.append(", ");
+        }
+        if (!model.getObject().getMetadata().getExtensions().isEmpty()) {
+            title.delete(title.length() - 2, title.length());
+        }
+        if (model.getObject().isDeprecated()) {
+            title.append("~~");
+        }
+
+        embed.setTitle(title.toString(), model.getObject().getLink());
+        if (model.getObject().isDeprecated()) {
+            embed.addField("\u2757 DEPRECATED", "`" + model.getObject().getDeprecationMessage() + "`", false);
+        }
+        String description = model.getObject().getStrippedDescription();
+        if (description.length() > 250) {
+            description = description.substring(0, 250) + "...";
+        }
+        embed.addField("Description", "`" + description + "`", false);
+
+        if (!model.getObject().getMetadata().getSubInterfaces().isEmpty()) {
+            StringBuilder subinterfaces = new StringBuilder();
+            for (String subinterface : model.getObject().getMetadata().getSubInterfaces()) {
+                subinterfaces.append("**" + subinterface.substring(subinterface.lastIndexOf('.') + 1) + "**");
+                subinterfaces.append(" \u2014 ");
+            }
+            subinterfaces.delete(subinterfaces.length() - 3, subinterfaces.length());
+            embed.addField("All Subinterfaces", subinterfaces.toString(), false);
+        }
+
+        if (!model.getObject().getMetadata().getImplementingClasses().isEmpty()) {
+            StringBuilder implementations = new StringBuilder();
+            for (String implementation : model.getObject().getMetadata().getImplementingClasses()) {
+                implementations.append("**" + implementation.substring(implementation.lastIndexOf('.') + 1) + "**");
+                implementations.append(" \u2014 ");
+            }
+            implementations.delete(implementations.length() - 3, implementations.length());
+            embed.addField("All Implementing Classes", implementations.toString(), false);
         }
 
         if (!model.getObject().getMetadata().getMethods().isEmpty()) {
