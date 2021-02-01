@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import me.egg82.echo.config.CachedConfig;
+import me.egg82.echo.lang.Message;
 import me.egg82.echo.utils.WebUtil;
 import me.egg82.echo.web.models.JavadocModel;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -64,7 +65,11 @@ public class JavadocCommand extends AbstractCommand {
 
             embed.setFooter("For " + (event.getMember() != null ? event.getMember().getEffectiveName() : event.getAuthor().getAsTag()));
 
-            event.getChannel().sendMessage(embed.build()).queue();
+            if (embed.getFields().isEmpty()) {
+                issuer.sendError(Message.ERROR__INTERNAL);
+            } else {
+                event.getChannel().sendMessage(embed.build()).queue();
+            }
         });
     }
 
@@ -186,6 +191,8 @@ public class JavadocCommand extends AbstractCommand {
     }
 
     private void addClassData(@NotNull JavadocModel model, @NotNull EmbedBuilder embed) {
+        String link = model.getObject().getLink();
+
         StringBuilder title = new StringBuilder();
         for (String annotation : model.getObject().getAnnotations()) {
             title.append('@');
@@ -207,7 +214,7 @@ public class JavadocCommand extends AbstractCommand {
         }
         for (String extension : model.getObject().getMetadata().getExtensions()) {
             title.append(' ');
-            title.append(extension.substring(extension.lastIndexOf('.')));
+            title.append(extension.substring(extension.lastIndexOf('.') + 1));
             title.append(", ");
         }
         if (!model.getObject().getMetadata().getExtensions().isEmpty()) {
@@ -218,7 +225,7 @@ public class JavadocCommand extends AbstractCommand {
         }
         for (String implementation : model.getObject().getMetadata().getImplementations()) {
             title.append(' ');
-            title.append(implementation.substring(implementation.lastIndexOf('.')));
+            title.append(implementation.substring(implementation.lastIndexOf('.') + 1));
             title.append(", ");
         }
         if (!model.getObject().getMetadata().getImplementations().isEmpty()) {
@@ -241,7 +248,7 @@ public class JavadocCommand extends AbstractCommand {
         if (!model.getObject().getMetadata().getAllImplementations().isEmpty()) {
             StringBuilder implementations = new StringBuilder();
             for (String implementation : model.getObject().getMetadata().getAllImplementations()) {
-                implementations.append(implementation.substring(implementation.lastIndexOf('.')));
+                implementations.append("**" + implementation.substring(implementation.lastIndexOf('.') + 1) + "**");
                 implementations.append(" \u2014 ");
             }
             implementations.delete(implementations.length() - 3, implementations.length());
@@ -251,7 +258,7 @@ public class JavadocCommand extends AbstractCommand {
         if (!model.getObject().getMetadata().getSubClasses().isEmpty()) {
             StringBuilder subclasses = new StringBuilder();
             for (String subclass : model.getObject().getMetadata().getSubClasses()) {
-                subclasses.append(subclass.substring(subclass.lastIndexOf('.')));
+                subclasses.append("**" + subclass.substring(subclass.lastIndexOf('.') + 1) + "**");
                 subclasses.append(" \u2014 ");
             }
             subclasses.delete(subclasses.length() - 3, subclasses.length());
@@ -261,7 +268,7 @@ public class JavadocCommand extends AbstractCommand {
         if (!model.getObject().getMetadata().getMethods().isEmpty()) {
             StringBuilder methods = new StringBuilder();
             for (String method : model.getObject().getMetadata().getMethods()) {
-                methods.append(method.substring(method.lastIndexOf('#')));
+                methods.append("*" + method.substring(method.lastIndexOf('#') + 1) + "*");
                 methods.append(" \u2014 ");
             }
             methods.delete(methods.length() - 3, methods.length());
@@ -271,7 +278,7 @@ public class JavadocCommand extends AbstractCommand {
         if (!model.getObject().getMetadata().getFields().isEmpty()) {
             StringBuilder fields = new StringBuilder();
             for (String field : model.getObject().getMetadata().getFields()) {
-                fields.append(field.substring(field.lastIndexOf('%')));
+                fields.append("[" + field.substring(field.lastIndexOf('%') + 1) + "](" + link + "#" + field.substring(field.lastIndexOf('%') + 1) + ")");
                 fields.append(" \u2014 ");
             }
             fields.delete(fields.length() - 3, fields.length());
