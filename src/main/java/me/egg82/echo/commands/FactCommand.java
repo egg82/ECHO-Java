@@ -15,7 +15,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.core.Pair;
-import me.egg82.echo.lang.Message;
 import me.egg82.echo.utils.WebUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
@@ -49,12 +48,6 @@ public class FactCommand extends AbstractCommand {
     public void submit(@NotNull CommandIssuer issuer, @NotNull MessageReceivedEvent event) {
         CachedConfig cachedConfig = getCachedConfig(issuer);
         if (cachedConfig == null || !canRun(event, cachedConfig)) {
-            return;
-        }
-
-        if (cachedConfig.getGoogleKey().isEmpty()) {
-            logger.error("Google key was not defined.");
-            issuer.sendError(Message.ERROR__INTERNAL);
             return;
         }
 
