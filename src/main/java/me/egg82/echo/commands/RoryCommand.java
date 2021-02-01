@@ -20,6 +20,10 @@ public class RoryCommand extends AbstractCommand {
     private static final String CAT_URL = "https://rory.cat/purr/";
     private static final String CAT_URL_ID = "https://rory.cat/purr/%d";
 
+    public RoryCommand() { }
+
+    public boolean requiresAdmin() { return false; }
+
     @Default
     @Description("{@@description.rory}")
     @Syntax("[id]")

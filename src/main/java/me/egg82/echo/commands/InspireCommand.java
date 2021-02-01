@@ -18,6 +18,8 @@ public class InspireCommand extends AbstractCommand {
 
     public InspireCommand() { }
 
+    public boolean requiresAdmin() { return false; }
+
     @Default
     @Description("{@@description.inspire}")
     public void submit(@NotNull CommandIssuer issuer, @NotNull MessageReceivedEvent event) {

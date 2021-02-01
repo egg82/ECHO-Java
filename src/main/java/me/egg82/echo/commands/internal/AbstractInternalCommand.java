@@ -13,4 +13,6 @@ public abstract class AbstractInternalCommand extends AbstractCommand implements
         this.issuer = issuer;
         this.event = event;
     }
+
+    public boolean requiresAdmin() { return true; }
 }

@@ -20,6 +20,8 @@ public class EightBallCommand extends AbstractCommand {
 
     public EightBallCommand() { }
 
+    public boolean requiresAdmin() { return false; }
+
     @Default
     @Description("{@@description.eight-ball}")
     @Syntax("<phrase>")

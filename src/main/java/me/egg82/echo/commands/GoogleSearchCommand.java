@@ -18,17 +18,20 @@ import org.jetbrains.annotations.NotNull;
 
 @CommandAlias("google")
 public class GoogleSearchCommand extends AbstractCommand {
-    private static final String SEARCH_URL = "https://www.googleapis.com/customsearch/v1?key=%s&q=%s&safe=ACTIVE";
+    private static final String SEARCH_URL = "https://www.google.com/search?q=%s&safe=ACTIVE";
+    private static final String API_URL = "https://www.googleapis.com/customsearch/v1?key=%s&q=%s&safe=ACTIVE";
     private static final int ITEM_LIMIT = 4;
 
     public GoogleSearchCommand() { }
+
+    public boolean requiresAdmin() { return false; }
 
     @Default
     @Description("{@@description.google}")
     @Syntax("<search>")
     public void submit(@NotNull CommandIssuer issuer, @NotNull MessageReceivedEvent event, @NotNull String query) {
         CachedConfig cachedConfig = getCachedConfig(issuer);
-        if (cachedConfig == null || !canRun(event, cachedConfig) || queryMentionsUsers(issuer, query)) {
+        if (cachedConfig == null || !canRun(event, cachedConfig)) {
             return;
         }
 
@@ -44,7 +47,7 @@ public class GoogleSearchCommand extends AbstractCommand {
             }
 
             EmbedBuilder embed = new EmbedBuilder();
-            embed.setTitle("Google search: " + query);
+            embed.setTitle("Search Results", String.format(SEARCH_URL, WebUtil.urlEncode(query).replace("%20", "+")));
             embed.setColor(new Color(0x0CD7DE));
 
             int items = 0;
@@ -63,7 +66,7 @@ public class GoogleSearchCommand extends AbstractCommand {
     }
 
     public static @NotNull CompletableFuture<GoogleSearchModel> getModel(@NotNull String key, @NotNull String query) {
-        return WebUtil.getUnclosedResponse(String.format(SEARCH_URL, key, WebUtil.urlEncode(query.replace("\\s+", "+")))).thenApplyAsync(response -> {
+        return WebUtil.getUnclosedResponse(String.format(API_URL, key, WebUtil.urlEncode(query).replace("%20", "+"))).thenApplyAsync(response -> {
             try (response) {
                 JSONDeserializer<GoogleSearchModel> modelDeserializer = new JSONDeserializer<>();
                 GoogleSearchModel retVal = modelDeserializer.deserialize(response.body().charStream(), GoogleSearchModel.class);

@@ -34,7 +34,7 @@ public class ReactEvents extends EventHolder {
             return;
         }
 
-        Emote emote = JDAUtil.getEmote(cachedConfig.getAlotEmote(), event.getJDA(), event.getGuild());
+        Emote emote = JDAUtil.getEmote(cachedConfig.getAlotEmote(), event.getGuild());
         if (emote == null) {
             logger.warn("Could not find alot emote \"" + cachedConfig.getAlotEmote() + "\" for guild \"" + event.getGuild().getName() + "\".");
             return;

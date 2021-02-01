@@ -29,7 +29,7 @@ public class ReloadCommand extends AbstractInternalCommand {
 
     public void run() {
         CachedConfig cachedConfig = getCachedConfig(issuer);
-        if (cachedConfig == null || !canRun(event, cachedConfig, true)) {
+        if (cachedConfig == null || !canRun(event, cachedConfig)) {
             return;
         }
 

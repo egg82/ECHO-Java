@@ -2,6 +2,8 @@ package me.egg82.echo.events;
 
 import co.aikar.commands.JDACommandManager;
 import java.util.regex.Pattern;
+import me.egg82.echo.config.CachedConfig;
+import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.utils.JDAUtil;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -20,7 +22,14 @@ public class ReplyEvents extends EventHolder {
         this.manager = manager;
 
         events.add(JDAEvents.subscribe(jda, MessageReceivedEvent.class)
-                .filter(e -> !JDAUtil.isCommand(e.getMessage().getContentRaw()))
+                .filter(e -> {
+                    CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+                    if (cachedConfig == null) {
+                        logger.error("Could not get cached config.");
+                        return false;
+                    }
+                    return !JDAUtil.isCommand(cachedConfig, e.getMessage().getContentRaw());
+                })
                 .handler(this::replyBold));
     }
 

@@ -47,6 +47,8 @@ public class GithubCommand extends AbstractCommand {
 
     public GithubCommand() { }
 
+    public boolean requiresAdmin() { return false; }
+
     @Default
     @Description("{@@description.github}")
     @Syntax("<search>")

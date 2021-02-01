@@ -27,7 +27,7 @@ import me.egg82.echo.lang.Message;
 import me.egg82.echo.logging.AnsiColor;
 import me.egg82.echo.messaging.GenericMessagingHandler;
 import me.egg82.echo.messaging.MessagingService;
-import me.egg82.echo.reflect.PackageFilter;
+import me.egg82.echo.services.CollectionProvider;
 import me.egg82.echo.storage.StorageService;
 import me.egg82.echo.tasks.TaskScheduler;
 import me.egg82.echo.utils.*;
@@ -157,7 +157,7 @@ public class Bot {
     }
 
     private void loadCommands() {
-        List<Class<BaseCommand>> commandClasses = PackageFilter.getClasses(BaseCommand.class, "me.egg82.echo.commands", false, false, false);
+        List<Class<BaseCommand>> commandClasses = CollectionProvider.getCommandClasses();
         for (Class<BaseCommand> command : commandClasses) {
             if (!ECHOCommand.class.equals(command)) {
                 try {

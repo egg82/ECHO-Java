@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableList;
 import flexjson.JSONDeserializer;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 public class BotPlayerInfo implements PlayerInfo {
     private final UUID uuid;
     private final String name;
-    private List<ProfileModel.ProfilePropertyModel> properties;
+    private ImmutableList<ProfileModel.ProfilePropertyModel> properties;
 
     private static final Cache<UUID, String> uuidCache = Caffeine.newBuilder().expireAfterWrite(1L, TimeUnit.HOURS).build();
     private static final Cache<String, UUID> nameCache = Caffeine.newBuilder().expireAfterWrite(1L, TimeUnit.HOURS).build();
@@ -63,7 +64,7 @@ public class BotPlayerInfo implements PlayerInfo {
                     }
                 }
             }
-            this.properties = properties.orElse(null);
+            this.properties = ImmutableList.copyOf(properties.orElse(new ArrayList<>()));
         }
     }
 
@@ -94,7 +95,7 @@ public class BotPlayerInfo implements PlayerInfo {
                     }
                 }
             }
-            this.properties = properties.orElse(null);
+            this.properties = ImmutableList.copyOf(properties.orElse(new ArrayList<>()));
         }
     }
 
@@ -102,7 +103,7 @@ public class BotPlayerInfo implements PlayerInfo {
 
     public @NotNull String getName() { return name; }
 
-    public @NotNull ImmutableList<ProfileModel.ProfilePropertyModel> getProperties() { return ImmutableList.copyOf(properties); }
+    public @NotNull List<ProfileModel.ProfilePropertyModel> getProperties() { return properties; }
 
     private static @Nullable String nameExpensive(@NotNull UUID uuid) throws IOException {
         // Network lookup

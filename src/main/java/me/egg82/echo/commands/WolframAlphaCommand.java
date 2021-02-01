@@ -33,12 +33,16 @@ public class WolframAlphaCommand extends AbstractCommand {
 
     private static final String IMGUR_URL = "https://api.imgur.com/3/image";
 
+    public WolframAlphaCommand() { }
+
+    public boolean requiresAdmin() { return false; }
+
     @Default
     @Description("{@@description.wolfram}")
     @Syntax("<query>")
     public void submit(@NotNull CommandIssuer issuer, @NotNull MessageReceivedEvent event, @NotNull String query) {
         CachedConfig cachedConfig = getCachedConfig(issuer);
-        if (cachedConfig == null || !canRun(event, cachedConfig) || queryMentionsUsers(issuer, query)) {
+        if (cachedConfig == null || !canRun(event, cachedConfig)) {
             return;
         }
 
@@ -69,7 +73,7 @@ public class WolframAlphaCommand extends AbstractCommand {
                     }
 
                     EmbedBuilder embed = new EmbedBuilder();
-                    embed.setTitle("Wolfram Alpha query: " + query, String.format(QUERY_LINK, WebUtil.urlEncode(query)));
+                    embed.setTitle("Wolfram Alpha Results", String.format(QUERY_LINK, WebUtil.urlEncode(query)));
                     embed.setColor(Color.GREEN);
                     embed.appendDescription("Answer");
                     embed.appendDescription(String.format("```%s```", val.getT1()));

@@ -21,6 +21,8 @@ public class ManchasCommand extends AbstractCommand {
 
     public ManchasCommand() { }
 
+    public boolean requiresAdmin() { return false; }
+
     @Default
     @Description("{@@description.manchas}")
     @Syntax("[id]")

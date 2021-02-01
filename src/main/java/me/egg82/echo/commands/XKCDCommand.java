@@ -23,6 +23,8 @@ public class XKCDCommand extends AbstractCommand {
 
     public XKCDCommand() { }
 
+    public boolean requiresAdmin() { return false; }
+
     @Default
     @Description("{@@description.xkcd}")
     @Syntax("<search>")

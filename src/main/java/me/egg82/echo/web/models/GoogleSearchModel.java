@@ -1,6 +1,5 @@
 package me.egg82.echo.web.models;
 
-import com.google.common.collect.ImmutableList;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +12,7 @@ public class GoogleSearchModel implements Serializable {
 
     public GoogleSearchModel() { }
 
-    public @NotNull List<GoogleSearchItemModel> getItems() { return ImmutableList.copyOf(items); }
+    public @NotNull List<GoogleSearchItemModel> getItems() { return items; }
 
     public void setItems(@NotNull List<GoogleSearchItemModel> items) { this.items = items; }
 

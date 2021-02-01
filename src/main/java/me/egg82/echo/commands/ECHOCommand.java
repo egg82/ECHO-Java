@@ -1,20 +1,17 @@
 package me.egg82.echo.commands;
 
-import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandHelp;
 import co.aikar.commands.CommandIssuer;
 import co.aikar.commands.JDACommandManager;
 import co.aikar.commands.annotation.*;
-import me.egg82.echo.commands.internal.DoNotLearnCommand;
-import me.egg82.echo.commands.internal.LearnCommand;
-import me.egg82.echo.commands.internal.ReloadCommand;
+import me.egg82.echo.commands.internal.*;
 import me.egg82.echo.utils.FileUtil;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
 @CommandAlias("echo")
-public class ECHOCommand extends BaseCommand {
+public class ECHOCommand extends AbstractCommand {
     private final JDA jda;
     private final JDACommandManager manager;
 
@@ -22,6 +19,8 @@ public class ECHOCommand extends BaseCommand {
         this.jda = jda;
         this.manager = manager;
     }
+
+    public boolean requiresAdmin() { return true; }
 
     @Subcommand("reload")
     @Description("{@@description.reload}")
@@ -45,12 +44,14 @@ public class ECHOCommand extends BaseCommand {
 
     @CatchUnknown
     @Default
-    @CommandCompletion("@subcommand")
-    public void onDefault(@NotNull CommandIssuer issuer, String[] args) {
-        manager.getRootCommand("echo help").execute(issuer, args[0], args);
+    public void onDefault(@NotNull CommandIssuer issuer, @NotNull MessageReceivedEvent event, String[] args) {
+        new CommandsCommand(issuer, event, manager, args).run();
     }
 
     @HelpCommand
+    @Description("{@@description.no-learn}")
     @Syntax("[command]")
-    public void onHelp(@NotNull CommandIssuer issuer, @NotNull CommandHelp help) { help.showHelp(); }
+    public void onHelp(@NotNull CommandIssuer issuer, @NotNull MessageReceivedEvent event, @NotNull CommandHelp help) {
+        new UsageCommand(issuer, event, help).run();
+    }
 }

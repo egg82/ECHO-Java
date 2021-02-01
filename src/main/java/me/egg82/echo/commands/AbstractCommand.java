@@ -24,6 +24,10 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractCommand extends BaseCommand {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
+    public abstract boolean requiresAdmin();
+
+    public boolean isDisabled(@NotNull CachedConfig cachedConfig) { return cachedConfig.getDisabledCommands().contains(getName()); }
+
     protected final @Nullable CachedConfig getCachedConfig(@NotNull CommandIssuer issuer) {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
         if (cachedConfig == null) {
@@ -33,15 +37,13 @@ public abstract class AbstractCommand extends BaseCommand {
         return cachedConfig;
     }
 
-    protected final boolean canRun(@NotNull MessageReceivedEvent event, @NotNull CachedConfig cachedConfig) { return canRun(event, cachedConfig, false); }
-
-    protected final boolean canRun(@NotNull MessageReceivedEvent event, @NotNull CachedConfig cachedConfig, boolean requireAdmin) {
-        if (event.getAuthor().isBot() || cachedConfig.getDisabledCommands().contains(getName())) {
+    protected final boolean canRun(@NotNull MessageReceivedEvent event, @NotNull CachedConfig cachedConfig) {
+        if (event.getAuthor().isBot() || isDisabled(cachedConfig)) {
             return false;
         }
 
-        if (event.getMember() != null && !JDAUtil.isAllowed(event.getMember()) || (requireAdmin && !JDAUtil.isAdmin(event.getMember()))) {
-            Emote emote = JDAUtil.getEmote(cachedConfig.getDisallowedEmote(), event.getJDA(), event.getGuild());
+        if (event.getMember() != null && !JDAUtil.isAllowed(cachedConfig, event.getMember()) || (requiresAdmin() && !JDAUtil.isAdmin(cachedConfig, event.getMember()))) {
+            Emote emote = JDAUtil.getEmote(cachedConfig.getDisallowedEmote(), event.getGuild());
             if (emote == null) {
                 logger.warn("Could not find disallowed emote \"" + cachedConfig.getDisallowedEmote() + "\" for guild \"" + event.getGuild().getName() + "\".");
                 return false;
@@ -77,9 +79,14 @@ public abstract class AbstractCommand extends BaseCommand {
         return true;
     }
 
-    protected final boolean queryMentionsUsers(@NotNull CommandIssuer issuer, @NotNull String query) {
+    protected final boolean queryMentionsUsers(@NotNull MessageReceivedEvent event, @NotNull CachedConfig cachedConfig, @NotNull String query) {
         if (query.contains("@")) { // TODO: find a better way to do this
-            issuer.sendError(Message.ERROR__INTERNAL);
+            Emote emote = JDAUtil.getEmote(cachedConfig.getDisallowedEmote(), event.getGuild());
+            if (emote == null) {
+                logger.warn("Could not find disallowed emote \"" + cachedConfig.getDisallowedEmote() + "\" for guild \"" + event.getGuild().getName() + "\".");
+                return true;
+            }
+            event.getMessage().addReaction(emote).queue();
             return true;
         }
         return false;

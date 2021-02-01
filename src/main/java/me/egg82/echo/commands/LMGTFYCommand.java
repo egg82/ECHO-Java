@@ -18,6 +18,8 @@ public class LMGTFYCommand extends AbstractCommand {
 
     public LMGTFYCommand() { }
 
+    public boolean requiresAdmin() { return false; }
+
     @Default
     @Description("{@@description.lmgtfy}")
     @Syntax("<search>")
@@ -28,7 +30,7 @@ public class LMGTFYCommand extends AbstractCommand {
         }
 
         EmbedBuilder embed = new EmbedBuilder();
-        embed.setTitle("Click for answer!", String.format(SEARCH_URL, WebUtil.urlEncode(query.replace("\\s+", "+"))));
+        embed.setTitle("Click for answer!", String.format(SEARCH_URL, WebUtil.urlEncode(query).replace("%20", "+")));
         embed.setColor(new Color(0x17E77E));
         embed.setFooter("For " + (event.getMember() != null ? event.getMember().getEffectiveName() : event.getAuthor().getAsTag()));
 

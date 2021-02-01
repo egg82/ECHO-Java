@@ -46,7 +46,14 @@ public class ChatEvents extends EventHolder {
         events.add(JDAEvents.subscribe(jda, GuildMessageReceivedEvent.class)
                 .filter(e -> !e.getAuthor().isBot())
                 .filter(e -> !e.isWebhookMessage())
-                .filter(e -> !JDAUtil.isCommand(e.getMessage().getContentRaw()))
+                .filter(e -> {
+                    CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+                    if (cachedConfig == null) {
+                        logger.error("Could not get cached config.");
+                        return false;
+                    }
+                    return !JDAUtil.isCommand(cachedConfig, e.getMessage().getContentRaw());
+                })
                 .filter(e -> {
                     boolean retVal = ResponseUtil.canLearn(e.getAuthor());
                     if (!retVal && ConfigUtil.getDebugOrFalse()) {
@@ -59,12 +66,26 @@ public class ChatEvents extends EventHolder {
         events.add(JDAEvents.subscribe(jda, MessageReceivedEvent.class)
                 .filter(e -> !e.getAuthor().isBot())
                 .filter(e -> !e.isWebhookMessage())
-                .filter(e -> !JDAUtil.isCommand(e.getMessage().getContentRaw()))
+                .filter(e -> {
+                    CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+                    if (cachedConfig == null) {
+                        logger.error("Could not get cached config.");
+                        return false;
+                    }
+                    return !JDAUtil.isCommand(cachedConfig, e.getMessage().getContentRaw());
+                })
                 .handler(this::speak));
 
         events.add(JDAEvents.subscribe(jda, GuildMessageUpdateEvent.class)
                 .filter(e -> !e.getAuthor().isBot())
-                .filter(e -> !JDAUtil.isCommand(e.getMessage().getContentRaw()))
+                .filter(e -> {
+                    CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+                    if (cachedConfig == null) {
+                        logger.error("Could not get cached config.");
+                        return false;
+                    }
+                    return !JDAUtil.isCommand(cachedConfig, e.getMessage().getContentRaw());
+                })
                 .filter(e -> {
                     boolean retVal = ResponseUtil.canLearn(e.getAuthor());
                     if (!retVal && ConfigUtil.getDebugOrFalse()) {
