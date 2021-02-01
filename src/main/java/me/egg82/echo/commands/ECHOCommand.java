@@ -49,7 +49,7 @@ public class ECHOCommand extends AbstractCommand {
     }
 
     @HelpCommand
-    @Description("{@@description.no-learn}")
+    @Description("{@@description.help}")
     @Syntax("[command]")
     public void onHelp(@NotNull CommandIssuer issuer, @NotNull MessageReceivedEvent event, @NotNull CommandHelp help) {
         new UsageCommand(issuer, event, help).run();

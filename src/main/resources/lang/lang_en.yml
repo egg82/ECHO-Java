@@ -6,6 +6,7 @@ description:
   reload: "Reloads the bot."
   learn: "Learn from an online text file."
   no-learn: "Prevent language learning from a user."
+  help: "Shows help for various commands."
 
 general:
   header: "<c2>[</c2><c3>ECHO</c3><c2>]</c2> "

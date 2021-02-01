@@ -2,17 +2,19 @@ package me.egg82.echo.commands.internal;
 
 import co.aikar.commands.*;
 import co.aikar.locales.MessageKey;
-import co.aikar.locales.MessageKeyProvider;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import me.egg82.echo.config.CachedConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class UsageCommand extends AbstractInternalCommand {
     private final CommandHelp help;
@@ -38,7 +40,8 @@ public class UsageCommand extends AbstractInternalCommand {
             results = help.getSelectedEntry().iterator();
             while (results.hasNext()) {
                 HelpEntry entry = results.next();
-                embed.addField(entry.getCommand() + " " + entry.getParameterSyntax(issuer), "```" + entry.getDescription() + "```", false);
+                String description = getDescription(help.getManager(), entry.getDescription());
+                embed.addField(entry.getCommand() + " " + entry.getParameterSyntax(issuer), "```" + (description == null ? "No description available" : description) + "```", false);
             }
         } else {
             if (help.getSearch() == null) {
@@ -78,12 +81,23 @@ public class UsageCommand extends AbstractInternalCommand {
                 results = entries.iterator();
                 while (results.hasNext()) {
                     HelpEntry entry = results.next();
-                    embed.addField(entry.getCommand() + " " + entry.getParameterSyntax(issuer), entry.getDescription(), false);
+                    String description = getDescription(help.getManager(), entry.getDescription());
+                    embed.addField(entry.getCommand() + " " + entry.getParameterSyntax(issuer), "```" + (description == null ? "No description available" : description) + "```", false);
                 }
             }
         }
         embed.setFooter("For " + (event.getMember() != null ? event.getMember().getEffectiveName() : event.getAuthor().getAsTag()));
 
         event.getChannel().sendMessage(embed.build()).queue();
+    }
+
+    private static final Pattern RE_DESC = Pattern.compile("^\\{@@(.+)\\}$");
+
+    private @Nullable String getDescription(@NotNull CommandManager manager, @NotNull String description) {
+        Matcher matcher = RE_DESC.matcher(description);
+        if (matcher.find()) {
+            return manager.getLocales().getOptionalMessage(issuer, MessageKey.of(matcher.group(1)));
+        }
+        return description;
     }
 }
