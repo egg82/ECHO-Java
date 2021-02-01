@@ -420,6 +420,7 @@ public class JavadocCommand extends AbstractCommand {
             title.append(modifier);
             title.append(' ');
         }
+        title.append("enum ");
         if (model.getObject().isDeprecated()) {
             title.append("~~");
         }
@@ -428,17 +429,6 @@ public class JavadocCommand extends AbstractCommand {
         title.append(model.getObject().getName());
         if (model.getObject().isDeprecated()) {
             title.append("~~");
-        }
-        if (!model.getObject().getMetadata().getExtensions().isEmpty()) {
-            title.append(" extends");
-        }
-        for (String extension : model.getObject().getMetadata().getExtensions()) {
-            title.append(' ');
-            title.append(extension.substring(extension.lastIndexOf('.') + 1));
-            title.append(", ");
-        }
-        if (!model.getObject().getMetadata().getExtensions().isEmpty()) {
-            title.delete(title.length() - 2, title.length());
         }
         if (!model.getObject().getMetadata().getImplementations().isEmpty()) {
             title.append(" implements");
