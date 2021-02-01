@@ -14,7 +14,6 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import javax.security.auth.login.LoginException;
 import joptsimple.OptionSet;
-import me.egg82.echo.commands.ECHOCommand;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.config.ConfigurationFileUtil;
@@ -157,19 +156,7 @@ public class Bot {
     }
 
     private void loadCommands() {
-        List<Class<BaseCommand>> commandClasses = CollectionProvider.getCommandClasses();
-        for (Class<BaseCommand> command : commandClasses) {
-            if (!ECHOCommand.class.equals(command)) {
-                try {
-                    commands.add(command.newInstance());
-                } catch (InstantiationException | IllegalAccessException ex) {
-                    logger.warn(ex.getMessage(), ex);
-                }
-            }
-        }
-
-        commands.add(new ECHOCommand(jda, commandManager));
-
+        commands.addAll(CollectionProvider.getCommands(jda, commandManager));
         for (BaseCommand command : commands) {
             commandManager.registerCommand(command);
         }

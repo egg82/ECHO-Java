@@ -36,7 +36,7 @@ public class ECHOCommand extends AbstractCommand {
     }
 
     @Subcommand("donotlearn|dnl")
-    @Description("{@@description.no-learn}")
+    @Description("{@@description.no_learn}")
     @Syntax("<user> [learn]")
     public void onDnl(@NotNull CommandIssuer issuer, @NotNull MessageReceivedEvent event, @NotNull String user, @Default("false") boolean learning) {
         new DoNotLearnCommand(issuer, event, user, event.getGuild(), learning).run();

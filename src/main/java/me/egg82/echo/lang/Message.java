@@ -11,7 +11,8 @@ public enum Message implements MessageKeyProvider {
     GENERAL__LOAD,
 
     ERROR__INTERNAL,
-    ERROR__NOT_EXIST,
+    ERROR__USER_NOT_EXIST,
+    ERROR__COMMAND_NOT_EXIST,
 
     IMPORT__BEGIN,
     IMPORT__MESSAGES,

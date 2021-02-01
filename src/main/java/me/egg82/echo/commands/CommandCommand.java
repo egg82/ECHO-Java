@@ -1,6 +1,10 @@
-package me.egg82.echo.commands.internal;
+package me.egg82.echo.commands;
 
 import co.aikar.commands.*;
+import co.aikar.commands.annotation.CommandAlias;
+import co.aikar.commands.annotation.Default;
+import co.aikar.commands.annotation.Description;
+import co.aikar.commands.annotation.Syntax;
 import co.aikar.locales.MessageKey;
 import java.awt.*;
 import java.util.ArrayList;
@@ -10,7 +14,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import me.egg82.echo.commands.AbstractCommand;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.lang.Message;
 import me.egg82.echo.services.CollectionProvider;
@@ -20,17 +23,16 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class CommandsCommand extends AbstractInternalCommand {
-    private final JDACommandManager manager;
-    private final String[] args;
+@CommandAlias("command|commands")
+public class CommandCommand extends AbstractCommand {
+    public CommandCommand() { }
 
-    public CommandsCommand(@NotNull CommandIssuer issuer, @NotNull MessageReceivedEvent event, @NotNull JDACommandManager manager, String @NotNull [] args) {
-        super(issuer, event);
-        this.manager = manager;
-        this.args = args;
-    }
+    public boolean requiresAdmin() { return false; }
 
-    public void run() {
+    @Default
+    @Description("{@@description.command}")
+    @Syntax("[search]")
+    public void submit(@NotNull CommandIssuer issuer, @NotNull MessageReceivedEvent event, String[] args) {
         CachedConfig cachedConfig = getCachedConfig(issuer);
         if (cachedConfig == null || !canRun(event, cachedConfig)) {
             return;
@@ -47,12 +49,12 @@ public class CommandsCommand extends AbstractInternalCommand {
             }
             embed.setTitle("Command Search: " + query);
 
-            if (manager.getRootCommand(query) == null) {
+            if (issuer.getManager().getRootCommand(query) == null) {
                 issuer.sendError(Message.ERROR__COMMAND_NOT_EXIST);
                 return;
             }
 
-            CommandHelp help = manager.generateCommandHelp(issuer, query);
+            CommandHelp help = issuer.getManager().generateCommandHelp(issuer, query);
             List<HelpEntry> entries = help.getHelpEntries().stream().filter(HelpEntry::shouldShow).collect(Collectors.toList());
             Iterator<HelpEntry> results = entries.stream().sorted(Comparator.comparingInt(e -> e.getSearchScore() * -1)).iterator();
             if (!results.hasNext()) {
@@ -80,19 +82,19 @@ public class CommandsCommand extends AbstractInternalCommand {
                 results = entries.iterator();
                 while (results.hasNext()) {
                     HelpEntry entry = results.next();
-                    String description = getDescription(help.getManager(), entry.getDescription());
+                    String description = getDescription(issuer, help.getManager(), entry.getDescription());
                     embed.addField(entry.getCommand() + " " + entry.getParameterSyntax(issuer), "```" + (description == null ? "No description available" : description) + "```", false);
                 }
             }
         } else {
             embed.setTitle("Commands");
-            for (AbstractCommand command : CollectionProvider.getCommands(manager.getJDA(), manager)) {
+            for (AbstractCommand command : CollectionProvider.getCommands(((JDACommandManager) issuer.getManager()).getJDA(), (JDACommandManager) issuer.getManager())) {
                 if ((!command.requiresAdmin() || isAdmin) && !command.isDisabled(cachedConfig)) {
-                    CommandHelp help = manager.generateCommandHelp(issuer, command.getName());
+                    CommandHelp help = issuer.getManager().generateCommandHelp(issuer, command.getName());
 
                     if (!help.getHelpEntries().isEmpty()) {
                         for (HelpEntry entry : help.getHelpEntries()) {
-                            String description = getDescription(help.getManager(), entry.getDescription());
+                            String description = getDescription(issuer, help.getManager(), entry.getDescription());
                             embed.addField(entry.getCommand() + " " + entry.getParameterSyntax(issuer), "```" + (description == null ? "No description available" : description) + "```", false);
                         }
                     }
@@ -106,7 +108,7 @@ public class CommandsCommand extends AbstractInternalCommand {
 
     private static final Pattern RE_DESC = Pattern.compile("^\\{@@(.+)\\}$");
 
-    private @Nullable String getDescription(@NotNull CommandManager manager, @NotNull String description) {
+    private @Nullable String getDescription(@NotNull CommandIssuer issuer, @NotNull CommandManager manager, @NotNull String description) {
         Matcher matcher = RE_DESC.matcher(description);
         if (matcher.find()) {
             return manager.getLocales().getOptionalMessage(issuer, MessageKey.of(matcher.group(1)));

@@ -23,7 +23,7 @@ public class EightBallCommand extends AbstractCommand {
     public boolean requiresAdmin() { return false; }
 
     @Default
-    @Description("{@@description.eight-ball}")
+    @Description("{@@description.eight_ball}")
     @Syntax("<phrase>")
     public void submit(@NotNull CommandIssuer issuer, @NotNull MessageReceivedEvent event, @NotNull String phrase) {
         CachedConfig cachedConfig = getCachedConfig(issuer);

@@ -5,8 +5,20 @@ acf-minecraft:
 description:
   reload: "Reloads the bot."
   learn: "Learn from an online text file."
-  no-learn: "Prevent language learning from a user."
+  no_learn: "Prevent language learning from a user."
   help: "Shows help for various commands."
+
+  xkcd: "Find an XKCD."
+  manchas: "Gives a Manchas kitty image."
+  rory: "Gives a Rory kitty image."
+  google: "Get Google results."
+  lmgtfy: "Googles things for you."
+  inspire: "Get some inspiration."
+  wolfram: "Do some math."
+  eight_ball: "Ask the all-knowing ball."
+  github: "Get some information about various repos."
+  issues: "Get information about issues on a repo."
+  command: "Search for or list commands."
 
 general:
   header: "<c2>[</c2><c3>ECHO</c3><c2>]</c2> "
@@ -16,7 +28,8 @@ general:
 
 error:
   internal: "An error occurred, sorry :("
-  not_exist: "Sorry, that user doesn't seem to exist."
+  user_not_exist: "Sorry, that user doesn't seem to exist."
+  command_not_exist: "Sorry, that command doesn't seem to exist."
 
 reload:
   begin: "<c2>Reloading, please wait..</c2>"
@@ -30,17 +43,6 @@ no_learn:
   begin: "<c2>Adding user to DNL database, please wait..</c2>"
   learning: "<c4>Now learning from {user}!</c4>"
   not_learning: "<c4>No longer learning from {user}!</c4>"
-
-xkcd: "Find an XKCD."
-manchas: "Gives a Manchas kitty image."
-rory: "Gives a Rory kitty image."
-google: "Get Google results."
-lmgtfy: "Googles things for you."
-inspire: "Get some inspiration."
-wolfram: "Do some math."
-eight-ball: "Ask the all-knowing ball."
-github: "Get some information about various repos."
-issues: "Get information about issues on a repo."
 
 import:
   messages: "<c2>Importing messages..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"

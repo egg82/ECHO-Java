@@ -11,6 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import me.egg82.echo.config.CachedConfig;
+import me.egg82.echo.lang.Message;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
@@ -88,7 +89,11 @@ public class UsageCommand extends AbstractInternalCommand {
         }
         embed.setFooter("For " + (event.getMember() != null ? event.getMember().getEffectiveName() : event.getAuthor().getAsTag()));
 
-        event.getChannel().sendMessage(embed.build()).queue();
+        if (embed.getFields().isEmpty()) {
+            issuer.sendError(Message.ERROR__COMMAND_NOT_EXIST);
+        } else {
+            event.getChannel().sendMessage(embed.build()).queue();
+        }
     }
 
     private static final Pattern RE_DESC = Pattern.compile("^\\{@@(.+)\\}$");
