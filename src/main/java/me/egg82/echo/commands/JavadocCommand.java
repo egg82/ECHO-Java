@@ -84,10 +84,10 @@ public class JavadocCommand extends AbstractCommand {
             case "METHOD":
                 addMethodData(model, embed);
                 break;
-            /*case "CLASS":
+            case "CLASS":
                 addClassData(model, embed);
                 break;
-            case "INTERFACE":
+            /*case "INTERFACE":
                 addInterfaceData(model, embed);
                 break;
             case "FIELD":
@@ -134,7 +134,9 @@ public class JavadocCommand extends AbstractCommand {
             title.append(param);
             title.append(", ");
         }
-        title.delete(title.length() - 2, title.length());
+        if (!model.getObject().getMetadata().getParameters().isEmpty()) {
+            title.delete(title.length() - 2, title.length());
+        }
         title.append(')');
         if (model.getObject().isDeprecated()) {
             title.append("~~");
@@ -142,9 +144,13 @@ public class JavadocCommand extends AbstractCommand {
 
         embed.setTitle(title.toString(), model.getObject().getLink());
         if (model.getObject().isDeprecated()) {
-            embed.addField("\u2757 DEPRECATED", "```" + model.getObject().getDeprecationMessage() + "```", false);
+            embed.addField("\u2757 DEPRECATED", "`" + model.getObject().getDeprecationMessage() + "`", false);
         }
-        embed.addField("Description", "`" + model.getObject().getStrippedDescription() + "`", false);
+        String description = model.getObject().getStrippedDescription();
+        if (description.length() > 250) {
+            description = description.substring(0, 250) + "...";
+        }
+        embed.addField("Description", "`" + description + "`", false);
 
         StringBuilder params = new StringBuilder();
         for (Map.Entry<String, Object> kvp : model.getObject().getMetadata().getParameterDescriptions().entrySet()) {
@@ -176,6 +182,100 @@ public class JavadocCommand extends AbstractCommand {
         }
         if (javadocThrows.length() > 0) {
             embed.addField("Throws", javadocThrows.toString(), false);
+        }
+    }
+
+    private void addClassData(@NotNull JavadocModel model, @NotNull EmbedBuilder embed) {
+        StringBuilder title = new StringBuilder();
+        for (String annotation : model.getObject().getAnnotations()) {
+            title.append('@');
+            title.append(annotation);
+            title.append(' ');
+        }
+        for (String modifier : model.getObject().getModifiers()) {
+            title.append(modifier);
+            title.append(' ');
+        }
+        if (model.getObject().isDeprecated()) {
+            title.append("~~");
+        }
+        title.append(model.getObject().getPackageName());
+        title.append('.');
+        title.append(model.getObject().getName());
+        if (!model.getObject().getMetadata().getExtensions().isEmpty()) {
+            title.append(" extends");
+        }
+        for (String extension : model.getObject().getMetadata().getExtensions()) {
+            title.append(' ');
+            title.append(extension.substring(extension.lastIndexOf('.')));
+            title.append(", ");
+        }
+        if (!model.getObject().getMetadata().getExtensions().isEmpty()) {
+            title.delete(title.length() - 2, title.length());
+        }
+        if (!model.getObject().getMetadata().getImplementations().isEmpty()) {
+            title.append(" implements");
+        }
+        for (String implementation : model.getObject().getMetadata().getImplementations()) {
+            title.append(' ');
+            title.append(implementation.substring(implementation.lastIndexOf('.')));
+            title.append(", ");
+        }
+        if (!model.getObject().getMetadata().getImplementations().isEmpty()) {
+            title.delete(title.length() - 2, title.length());
+        }
+        if (model.getObject().isDeprecated()) {
+            title.append("~~");
+        }
+
+        embed.setTitle(title.toString(), model.getObject().getLink());
+        if (model.getObject().isDeprecated()) {
+            embed.addField("\u2757 DEPRECATED", "`" + model.getObject().getDeprecationMessage() + "`", false);
+        }
+        String description = model.getObject().getStrippedDescription();
+        if (description.length() > 250) {
+            description = description.substring(0, 250) + "...";
+        }
+        embed.addField("Description", "`" + description + "`", false);
+
+        if (!model.getObject().getMetadata().getAllImplementations().isEmpty()) {
+            StringBuilder implementations = new StringBuilder();
+            for (String implementation : model.getObject().getMetadata().getAllImplementations()) {
+                implementations.append(implementation.substring(implementation.lastIndexOf('.')));
+                implementations.append(" \u2014 ");
+            }
+            implementations.delete(implementations.length() - 3, implementations.length());
+            embed.addField("All Implemented Interfaces", implementations.toString(), false);
+        }
+
+        if (!model.getObject().getMetadata().getSubClasses().isEmpty()) {
+            StringBuilder subclasses = new StringBuilder();
+            for (String subclass : model.getObject().getMetadata().getSubClasses()) {
+                subclasses.append(subclass.substring(subclass.lastIndexOf('.')));
+                subclasses.append(" \u2014 ");
+            }
+            subclasses.delete(subclasses.length() - 3, subclasses.length());
+            embed.addField("Subclasses", subclasses.toString(), false);
+        }
+
+        if (!model.getObject().getMetadata().getMethods().isEmpty()) {
+            StringBuilder methods = new StringBuilder();
+            for (String method : model.getObject().getMetadata().getMethods()) {
+                methods.append(method.substring(method.lastIndexOf('#')));
+                methods.append(" \u2014 ");
+            }
+            methods.delete(methods.length() - 3, methods.length());
+            embed.addField("Methods", methods.toString(), false);
+        }
+
+        if (!model.getObject().getMetadata().getFields().isEmpty()) {
+            StringBuilder fields = new StringBuilder();
+            for (String field : model.getObject().getMetadata().getFields()) {
+                fields.append(field.substring(field.lastIndexOf('%')));
+                fields.append(" \u2014 ");
+            }
+            fields.delete(fields.length() - 3, fields.length());
+            embed.addField("Fields", fields.toString(), false);
         }
     }
 }

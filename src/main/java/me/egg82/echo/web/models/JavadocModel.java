@@ -4,6 +4,7 @@ import flexjson.JSON;
 import java.io.Serializable;
 import java.util.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class JavadocModel implements Serializable {
     private String name = "";
@@ -123,97 +124,97 @@ public class JavadocModel implements Serializable {
         }
 
         public static final class JavadocMetadataModel implements Serializable {
-            private String owner = "";
-            private List<String> parameters = new ArrayList<>();
+            private String owner = null;
+            private List<String> parameters = null;
             @JSON(name = "parameter_descriptions")
-            private Map<String, Object> parameterDescriptions = new HashMap<>();
-            private String returns = "";
+            private Map<String, Object> parameterDescriptions = null;
+            private String returns = null;
             @JSON(name = "returns_description")
-            private String returnsDescription = "";
+            private String returnsDescription = null;
             @JSON(name = "throws")
-            private List<JavadocThrowsModel> javadocThrows = new ArrayList<>();
-            private List<String> extensions = new ArrayList<>();
-            private List<String> implementations = new ArrayList<>();
+            private List<JavadocThrowsModel> javadocThrows = null;
+            private List<String> extensions = null;
+            private List<String> implementations = null;
             @JSON(name = "all_implementations")
-            private List<String> allImplementations = new ArrayList<>();
+            private List<String> allImplementations = null;
             @JSON(name = "super_interfaces")
-            private List<String> superInterfaces = new ArrayList<>();
+            private List<String> superInterfaces = null;
             @JSON(name = "sub_interfaces")
-            private List<String> subInterfaces = new ArrayList<>();
+            private List<String> subInterfaces = null;
             @JSON(name = "sub_classes")
-            private List<String> subClasses = new ArrayList<>();
+            private List<String> subClasses = null;
             @JSON(name = "implementing_classes")
-            private List<String> implementingClasses = new ArrayList<>();
-            private List<String> methods = new ArrayList<>();
-            private List<String> fields = new ArrayList<>();
+            private List<String> implementingClasses = null;
+            private List<String> methods = null;
+            private List<String> fields = null;
 
             public JavadocMetadataModel() { }
 
-            public @NotNull String getOwner() { return owner; }
+            public @Nullable String getOwner() { return owner; }
 
-            public void setOwner(@NotNull String owner) { this.owner = owner; }
+            public void setOwner(String owner) { this.owner = owner; }
 
-            public @NotNull List<String> getParameters() { return parameters; }
+            public @Nullable List<String> getParameters() { return parameters; }
 
-            public void setParameters(@NotNull List<String> parameters) { this.parameters = parameters; }
+            public void setParameters(List<String> parameters) { this.parameters = parameters; }
 
-            public @NotNull Map<String, Object> getParameterDescriptions() { return parameterDescriptions; }
+            public @Nullable Map<String, Object> getParameterDescriptions() { return parameterDescriptions; }
 
-            public void setParameterDescriptions(@NotNull Map<String, Object> parameterDescriptions) { this.parameterDescriptions = parameterDescriptions; }
+            public void setParameterDescriptions(Map<String, Object> parameterDescriptions) { this.parameterDescriptions = parameterDescriptions; }
 
-            public @NotNull String getReturns() { return returns; }
+            public @Nullable String getReturns() { return returns; }
 
-            public void setReturns(@NotNull String returns) { this.returns = returns; }
+            public void setReturns(String returns) { this.returns = returns; }
 
-            public @NotNull String getReturnsDescription() { return returnsDescription; }
+            public @Nullable String getReturnsDescription() { return returnsDescription; }
 
-            public void setReturnsDescription(@NotNull String returnsDescription) { this.returnsDescription = returnsDescription; }
+            public void setReturnsDescription(String returnsDescription) { this.returnsDescription = returnsDescription; }
 
-            public @NotNull List<JavadocThrowsModel> getJavadocThrows() { return javadocThrows; }
+            public @Nullable List<JavadocThrowsModel> getJavadocThrows() { return javadocThrows; }
 
-            public void setJavadocThrows(@NotNull List<JavadocThrowsModel> javadocThrows) { this.javadocThrows = javadocThrows; }
+            public void setJavadocThrows(List<JavadocThrowsModel> javadocThrows) { this.javadocThrows = javadocThrows; }
 
-            public @NotNull List<String> getExtensions() { return extensions; }
+            public @Nullable List<String> getExtensions() { return extensions; }
 
-            public void setExtensions(@NotNull List<String> extensions) { this.extensions = extensions; }
+            public void setExtensions(List<String> extensions) { this.extensions = extensions; }
 
-            public @NotNull List<String> getImplementations() { return implementations; }
+            public @Nullable List<String> getImplementations() { return implementations; }
 
-            public void setImplementations(@NotNull List<String> implementations) { this.implementations = implementations; }
+            public void setImplementations(List<String> implementations) { this.implementations = implementations; }
 
-            public @NotNull List<String> getAllImplementations() { return allImplementations; }
+            public @Nullable List<String> getAllImplementations() { return allImplementations; }
 
-            public void setAllImplementations(@NotNull List<String> allImplementations) { this.allImplementations = allImplementations; }
+            public void setAllImplementations(List<String> allImplementations) { this.allImplementations = allImplementations; }
 
-            public @NotNull List<String> getSuperInterfaces() { return superInterfaces; }
+            public @Nullable List<String> getSuperInterfaces() { return superInterfaces; }
 
-            public void setSuperInterfaces(@NotNull List<String> superInterfaces) { this.superInterfaces = superInterfaces; }
+            public void setSuperInterfaces(List<String> superInterfaces) { this.superInterfaces = superInterfaces; }
 
-            public @NotNull List<String> getSubInterfaces() { return subInterfaces; }
+            public @Nullable List<String> getSubInterfaces() { return subInterfaces; }
 
-            public void setSubInterfaces(@NotNull List<String> subInterfaces) { this.subInterfaces = subInterfaces; }
+            public void setSubInterfaces(List<String> subInterfaces) { this.subInterfaces = subInterfaces; }
 
-            public @NotNull List<String> getSubClasses() { return subClasses; }
+            public @Nullable List<String> getSubClasses() { return subClasses; }
 
-            public void setSubClasses(@NotNull List<String> subClasses) { this.subClasses = subClasses; }
+            public void setSubClasses(List<String> subClasses) { this.subClasses = subClasses; }
 
-            public @NotNull List<String> getImplementingClasses() { return implementingClasses; }
+            public @Nullable List<String> getImplementingClasses() { return implementingClasses; }
 
-            public void setImplementingClasses(@NotNull List<String> implementingClasses) { this.implementingClasses = implementingClasses; }
+            public void setImplementingClasses(List<String> implementingClasses) { this.implementingClasses = implementingClasses; }
 
-            public @NotNull List<String> getMethods() { return methods; }
+            public @Nullable List<String> getMethods() { return methods; }
 
-            public void setMethods(@NotNull List<String> methods) { this.methods = methods; }
+            public void setMethods(List<String> methods) { this.methods = methods; }
 
-            public @NotNull List<String> getFields() { return fields; }
+            public @Nullable List<String> getFields() { return fields; }
 
-            public void setFields(@NotNull List<String> fields) { this.fields = fields; }
+            public void setFields(List<String> fields) { this.fields = fields; }
 
             public boolean equals(Object o) {
                 if (this == o) return true;
                 if (!(o instanceof JavadocMetadataModel)) return false;
                 JavadocMetadataModel that = (JavadocMetadataModel) o;
-                return owner.equals(that.owner) && parameters.equals(that.parameters) && parameterDescriptions.equals(that.parameterDescriptions) && returns.equals(that.returns) && returnsDescription.equals(that.returnsDescription) && javadocThrows.equals(that.javadocThrows) && extensions.equals(that.extensions) && implementations.equals(that.implementations) && allImplementations.equals(that.allImplementations) && superInterfaces.equals(that.superInterfaces) && subInterfaces.equals(that.subInterfaces) && subClasses.equals(that.subClasses) && implementingClasses.equals(that.implementingClasses) && methods.equals(that.methods) && fields.equals(that.fields);
+                return Objects.equals(owner, that.owner) && Objects.equals(parameters, that.parameters) && Objects.equals(parameterDescriptions, that.parameterDescriptions) && Objects.equals(returns, that.returns) && Objects.equals(returnsDescription, that.returnsDescription) && Objects.equals(javadocThrows, that.javadocThrows) && Objects.equals(extensions, that.extensions) && Objects.equals(implementations, that.implementations) && Objects.equals(allImplementations, that.allImplementations) && Objects.equals(superInterfaces, that.superInterfaces) && Objects.equals(subInterfaces, that.subInterfaces) && Objects.equals(subClasses, that.subClasses) && Objects.equals(implementingClasses, that.implementingClasses) && Objects.equals(methods, that.methods) && Objects.equals(fields, that.fields);
             }
 
             public int hashCode() { return Objects.hash(owner, parameters, parameterDescriptions, returns, returnsDescription, javadocThrows, extensions, implementations, allImplementations, superInterfaces, subInterfaces, subClasses, implementingClasses, methods, fields); }
