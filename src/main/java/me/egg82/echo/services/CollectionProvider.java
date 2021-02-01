@@ -14,8 +14,8 @@ import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.reflect.PackageFilter;
 import me.egg82.echo.storage.StorageService;
 import me.egg82.echo.storage.models.LearnModel;
-import net.dv8tion.jda.api.JDA;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +44,7 @@ public class CollectionProvider {
 
     private static ImmutableList<AbstractCommand> commands = null;
     private static final Object commandsLock = new Object();
-    public static @NotNull List<AbstractCommand> getCommands(@NotNull JDA jda, @NotNull JDACommandManager commandManager) {
+    public static @NotNull List<AbstractCommand> getCommands(@NotNull JDACommandManager commandManager) {
         ImmutableList<AbstractCommand> retVal = commands;
         if (retVal == null) {
             synchronized (commandsLock) {
@@ -61,12 +61,24 @@ public class CollectionProvider {
                             }
                         }
                     }
-                    internalCommands.add(new ECHOCommand(jda, commandManager));
+                    internalCommands.add(new ECHOCommand(commandManager.getJDA(), commandManager));
                     commands = retVal = ImmutableList.copyOf(internalCommands);
                 }
             }
         }
         return retVal;
+    }
+
+    public static @Nullable AbstractCommand getCommand(@NotNull JDACommandManager commandManager, @NotNull String name, boolean caseSensitive) {
+        for (AbstractCommand command : getCommands(commandManager)) {
+            if (
+                    (!caseSensitive && command.getName().equalsIgnoreCase(name))
+                    || (caseSensitive && command.getName().equals(name))
+            ) {
+                return command;
+            }
+        }
+        return null;
     }
 
     private static boolean canLearnExpensive(long id) {

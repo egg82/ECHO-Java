@@ -23,7 +23,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-@CommandAlias("command|commands")
+@CommandAlias("command|commands|help")
 public class CommandCommand extends AbstractCommand {
     public CommandCommand() { }
 
@@ -82,13 +82,17 @@ public class CommandCommand extends AbstractCommand {
                 results = entries.iterator();
                 while (results.hasNext()) {
                     HelpEntry entry = results.next();
+                    AbstractCommand command = CollectionProvider.getCommand((JDACommandManager) help.getManager(), entry.getCommand(), false);
+                    if (command == null || (!isAdmin && command.requiresAdmin()) || command.isDisabled(cachedConfig)) {
+                        continue;
+                    }
                     String description = getDescription(issuer, help.getManager(), entry.getDescription());
                     embed.addField(entry.getCommand() + " " + entry.getParameterSyntax(issuer), "```" + (description == null ? "No description available" : description) + "```", false);
                 }
             }
         } else {
             embed.setTitle("Commands");
-            for (AbstractCommand command : CollectionProvider.getCommands(((JDACommandManager) issuer.getManager()).getJDA(), (JDACommandManager) issuer.getManager())) {
+            for (AbstractCommand command : CollectionProvider.getCommands((JDACommandManager) issuer.getManager())) {
                 if ((!command.requiresAdmin() || isAdmin) && !command.isDisabled(cachedConfig)) {
                     CommandHelp help = issuer.getManager().generateCommandHelp(issuer, command.getName());
 

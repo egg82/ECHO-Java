@@ -80,13 +80,17 @@ public class CommandsCommand extends AbstractInternalCommand {
                 results = entries.iterator();
                 while (results.hasNext()) {
                     HelpEntry entry = results.next();
+                    AbstractCommand command = CollectionProvider.getCommand(manager, entry.getCommand(), false);
+                    if (command == null || (!isAdmin && command.requiresAdmin()) || command.isDisabled(cachedConfig)) {
+                        continue;
+                    }
                     String description = getDescription(help.getManager(), entry.getDescription());
                     embed.addField(entry.getCommand() + " " + entry.getParameterSyntax(issuer), "```" + (description == null ? "No description available" : description) + "```", false);
                 }
             }
         } else {
             embed.setTitle("Commands");
-            for (AbstractCommand command : CollectionProvider.getCommands(manager.getJDA(), manager)) {
+            for (AbstractCommand command : CollectionProvider.getCommands(manager)) {
                 if ((!command.requiresAdmin() || isAdmin) && !command.isDisabled(cachedConfig)) {
                     CommandHelp help = manager.generateCommandHelp(issuer, command.getName());
 

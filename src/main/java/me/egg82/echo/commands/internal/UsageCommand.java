@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.lang.Message;
+import me.egg82.echo.utils.JDAUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
@@ -31,6 +32,7 @@ public class UsageCommand extends AbstractInternalCommand {
             return;
         }
 
+        boolean isAdmin = event.getMember() != null && JDAUtil.isAdmin(cachedConfig, event.getMember());
         EmbedBuilder embed = new EmbedBuilder();
         embed.setColor(new Color(0x0CD7DE));
 
@@ -41,6 +43,9 @@ public class UsageCommand extends AbstractInternalCommand {
             results = help.getSelectedEntry().iterator();
             while (results.hasNext()) {
                 HelpEntry entry = results.next();
+                if (!isAdmin) {
+                    continue;
+                }
                 String description = getDescription(help.getManager(), entry.getDescription());
                 embed.addField(entry.getCommand() + " " + entry.getParameterSyntax(issuer), "```" + (description == null ? "No description available" : description) + "```", false);
             }
@@ -82,6 +87,9 @@ public class UsageCommand extends AbstractInternalCommand {
                 results = entries.iterator();
                 while (results.hasNext()) {
                     HelpEntry entry = results.next();
+                    if (!isAdmin) {
+                        continue;
+                    }
                     String description = getDescription(help.getManager(), entry.getDescription());
                     embed.addField(entry.getCommand() + " " + entry.getParameterSyntax(issuer), "```" + (description == null ? "No description available" : description) + "```", false);
                 }

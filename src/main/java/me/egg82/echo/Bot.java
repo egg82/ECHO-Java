@@ -156,7 +156,7 @@ public class Bot {
     }
 
     private void loadCommands() {
-        commands.addAll(CollectionProvider.getCommands(jda, commandManager));
+        commands.addAll(CollectionProvider.getCommands(commandManager));
         for (BaseCommand command : commands) {
             commandManager.registerCommand(command);
         }
