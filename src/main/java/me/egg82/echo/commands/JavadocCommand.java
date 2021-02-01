@@ -95,10 +95,10 @@ public class JavadocCommand extends AbstractCommand {
             case "INTERFACE":
                 addInterfaceData(model, embed);
                 break;
-            /*case "FIELD":
+            case "FIELD":
                 addFieldData(model, embed);
                 break;
-            case "ANNOTATION":
+            /*case "ANNOTATION":
                 addAnnotationData(model, embed);
                 break;
             case "ENUM":
@@ -369,5 +369,41 @@ public class JavadocCommand extends AbstractCommand {
             fields.delete(fields.length() - 3, fields.length());
             embed.addField("Fields", fields.toString(), false);
         }
+    }
+
+    private void addFieldData(@NotNull JavadocModel model, @NotNull EmbedBuilder embed) {
+        StringBuilder title = new StringBuilder();
+        for (String annotation : model.getObject().getAnnotations()) {
+            title.append('@');
+            title.append(annotation);
+            title.append(' ');
+        }
+        for (String modifier : model.getObject().getModifiers()) {
+            title.append(modifier);
+            title.append(' ');
+        }
+        title.append(model.getObject().getMetadata().getReturns());
+        title.append(' ');
+        if (model.getObject().isDeprecated()) {
+            title.append("~~");
+        }
+        title.append(model.getObject().getPackageName());
+        title.append('.');
+        title.append(model.getObject().getMetadata().getOwner());
+        title.append('#');
+        title.append(model.getObject().getName());
+        if (model.getObject().isDeprecated()) {
+            title.append("~~");
+        }
+
+        embed.setTitle(title.toString(), model.getObject().getLink());
+        if (model.getObject().isDeprecated()) {
+            embed.addField("\u2757 DEPRECATED", "`" + model.getObject().getDeprecationMessage() + "`", false);
+        }
+        String description = model.getObject().getStrippedDescription();
+        if (description.length() > 250) {
+            description = description.substring(0, 250) + "...";
+        }
+        embed.addField("Description", "`" + description + "`", false);
     }
 }
