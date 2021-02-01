@@ -123,17 +123,19 @@ public class ChatEvents extends EventHolder {
             return;
         }
 
-        boolean contains = false;
-        for (String phrase : cachedConfig.getReplyPhrases()) {
-            if (RE_SPACE.matcher(phrase).find()) {
-                if (event.getMessage().getContentStripped().toLowerCase().contains(phrase)) {
-                    contains = true;
-                    break;
-                }
-            } else {
-                if (containsWord(event.getMessage().getContentStripped(), phrase)) {
-                    contains = true;
-                    break;
+        boolean contains = event.getMessage().isMentioned(jda.getSelfUser());
+        if (!contains) {
+            for (String phrase : cachedConfig.getReplyPhrases()) {
+                if (RE_SPACE.matcher(phrase).find()) {
+                    if (event.getMessage().getContentStripped().toLowerCase().contains(phrase)) {
+                        contains = true;
+                        break;
+                    }
+                } else {
+                    if (containsWord(event.getMessage().getContentStripped(), phrase)) {
+                        contains = true;
+                        break;
+                    }
                 }
             }
         }
