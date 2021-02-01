@@ -21,10 +21,10 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class UsageCommand extends AbstractInternalCommand {
+public class InternalUsageCommand extends AbstractInternalCommand {
     private final CommandHelp help;
 
-    public UsageCommand(@NotNull CommandIssuer issuer, @NotNull MessageReceivedEvent event, @NotNull CommandHelp help) {
+    public InternalUsageCommand(@NotNull CommandIssuer issuer, @NotNull MessageReceivedEvent event, @NotNull CommandHelp help) {
         super(issuer, event);
         this.help = help;
     }
