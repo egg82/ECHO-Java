@@ -15,6 +15,7 @@ import me.egg82.echo.web.models.GoogleSearchModel;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @CommandAlias("google")
 public class GoogleSearchCommand extends AbstractCommand {
@@ -25,6 +26,8 @@ public class GoogleSearchCommand extends AbstractCommand {
     public GoogleSearchCommand() { }
 
     public boolean requiresAdmin() { return false; }
+
+    public @Nullable EmbedBuilder getDescription() { return null; }
 
     @Default
     @Description("{@@description.google}")

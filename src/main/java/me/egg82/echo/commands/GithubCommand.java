@@ -22,6 +22,7 @@ import me.egg82.echo.web.transformers.InstantTransformer;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @CommandAlias("github|gh")
 public class GithubCommand extends AbstractCommand {
@@ -48,6 +49,8 @@ public class GithubCommand extends AbstractCommand {
     public GithubCommand() { }
 
     public boolean requiresAdmin() { return false; }
+
+    public @Nullable EmbedBuilder getDescription() { return null; }
 
     @Default
     @Description("{@@description.github}")

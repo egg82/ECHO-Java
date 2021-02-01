@@ -21,14 +21,12 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class CommandsCommand extends AbstractInternalCommand {
-    private final JDACommandManager manager;
-    private final String[] args;
+public class UsageCommand extends AbstractInternalCommand {
+    private final CommandHelp help;
 
-    public CommandsCommand(@NotNull CommandIssuer issuer, @NotNull MessageReceivedEvent event, @NotNull JDACommandManager manager, String @NotNull [] args) {
+    public UsageCommand(@NotNull CommandIssuer issuer, @NotNull MessageReceivedEvent event, @NotNull CommandHelp help) {
         super(issuer, event);
-        this.manager = manager;
-        this.args = args;
+        this.help = help;
     }
 
     public void run() {
@@ -41,21 +39,41 @@ public class CommandsCommand extends AbstractInternalCommand {
         EmbedBuilder embed = new EmbedBuilder();
         embed.setColor(new Color(0x0CD7DE));
 
-        if (args != null && args.length > 0) {
-            String query = ACFUtil.join(args, " ");
-            if (queryMentionsUsers(event, cachedConfig, query)) {
-                return;
+        Iterator<HelpEntry> results;
+        if (!help.getSelectedEntry().isEmpty()) {
+            HelpEntry first = ACFUtil.getFirstElement(help.getSelectedEntry());
+            embed.setTitle(first.getCommandPrefix() + first.getCommand());
+            results = help.getSelectedEntry().iterator();
+            while (results.hasNext()) {
+                HelpEntry entry = results.next();
+                AbstractCommand command = CollectionProvider.getCommand((JDACommandManager) help.getManager(), entry.getCommand(), false);
+                if ((command == null && !isAdmin) || (command != null && (!isAdmin && command.requiresAdmin() || command.isDisabled(cachedConfig)))) {
+                    continue;
+                }
+                String description = getDescription(help.getManager(), entry.getDescription());
+                embed.addField(entry.getCommand() + " " + entry.getParameterSyntax(issuer), "```" + (description == null ? "No description available" : description) + "```", false);
+                if (command != null) {
+                    EmbedBuilder descriptionBuilder = command.getDescription();
+                    if (descriptionBuilder != null) {
+                        for (MessageEmbed.Field field : descriptionBuilder.getFields()) {
+                            embed.addField(field);
+                        }
+                    }
+                }
             }
-            embed.setTitle("Command Search: " + query);
-
-            if (manager.getRootCommand(query) == null) {
-                issuer.sendError(Message.ERROR__COMMAND_NOT_EXIST);
-                return;
+        } else {
+            if (help.getSearch() == null) {
+                embed.setTitle("Commands");
+            } else {
+                String query = ACFUtil.join(help.getSearch(), " ");
+                if (queryMentionsUsers(event, cachedConfig, query)) {
+                    return;
+                }
+                embed.setTitle("Command Search: " + query);
             }
 
-            CommandHelp help = manager.generateCommandHelp(issuer, query);
             List<HelpEntry> entries = help.getHelpEntries().stream().filter(HelpEntry::shouldShow).collect(Collectors.toList());
-            Iterator<HelpEntry> results = entries.stream().sorted(Comparator.comparingInt(e -> e.getSearchScore() * -1)).iterator();
+            results = entries.stream().sorted(Comparator.comparingInt(e -> e.getSearchScore() * -1)).iterator();
             if (!results.hasNext()) {
                 entries = help.getHelpEntries();
                 results = entries.iterator();
@@ -82,38 +100,22 @@ public class CommandsCommand extends AbstractInternalCommand {
                 results = entries.iterator();
                 while (results.hasNext()) {
                     HelpEntry entry = results.next();
-                    AbstractCommand command = CollectionProvider.getCommand(manager, entry.getCommand(), false);
-                    if (command == null || (!isAdmin && command.requiresAdmin()) || command.isDisabled(cachedConfig)) {
+                    AbstractCommand command = CollectionProvider.getCommand((JDACommandManager) help.getManager(), entry.getCommand(), false);
+                    if ((command == null && !isAdmin) || (command != null && (!isAdmin && command.requiresAdmin() || command.isDisabled(cachedConfig)))) {
                         continue;
                     }
                     String description = getDescription(help.getManager(), entry.getDescription());
                     embed.addField(entry.getCommand() + " " + entry.getParameterSyntax(issuer), "```" + (description == null ? "No description available" : description) + "```", false);
-                    EmbedBuilder descriptionBuilder = command.getDescription();
-                    if (descriptionBuilder != null) {
-                        for (MessageEmbed.Field field : descriptionBuilder.getFields()) {
-                            embed.addField(field);
-                        }
-                    }
-                }
-            }
-        } else {
-            embed.setTitle("Commands");
-            for (AbstractCommand command : CollectionProvider.getCommands(manager)) {
-                if ((!command.requiresAdmin() || isAdmin) && !command.isDisabled(cachedConfig)) {
-                    CommandHelp help = manager.generateCommandHelp(issuer, command.getName());
-
-                    if (!help.getHelpEntries().isEmpty()) {
-                        for (HelpEntry entry : help.getHelpEntries()) {
-                            String description = getDescription(help.getManager(), entry.getDescription());
-                            embed.addField(entry.getCommand() + " " + entry.getParameterSyntax(issuer), "```" + (description == null ? "No description available" : description) + "```", false);
-                        }
-                    }
                 }
             }
         }
         embed.setFooter("For " + (event.getMember() != null ? event.getMember().getEffectiveName() : event.getAuthor().getAsTag()));
 
-        event.getChannel().sendMessage(embed.build()).queue();
+        if (embed.getFields().isEmpty()) {
+            issuer.sendError(Message.ERROR__COMMAND_NOT_EXIST);
+        } else {
+            event.getChannel().sendMessage(embed.build()).queue();
+        }
     }
 
     private static final Pattern RE_DESC = Pattern.compile("^\\{@@(.+)\\}$");

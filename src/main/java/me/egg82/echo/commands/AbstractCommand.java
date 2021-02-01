@@ -12,6 +12,7 @@ import me.egg82.echo.lang.Message;
 import me.egg82.echo.services.lookup.PlayerInfo;
 import me.egg82.echo.services.lookup.PlayerLookup;
 import me.egg82.echo.utils.JDAUtil;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -25,6 +26,8 @@ public abstract class AbstractCommand extends BaseCommand {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     public abstract boolean requiresAdmin();
+
+    public abstract @Nullable EmbedBuilder getDescription();
 
     public boolean isDisabled(@NotNull CachedConfig cachedConfig) { return cachedConfig.getDisabledCommands().contains(getName()); }
 

@@ -6,7 +6,7 @@ description:
   reload: "Reloads the bot."
   learn: "Learn from an online text file."
   no_learn: "Prevent language learning from a user."
-  help: "Shows help for various commands."
+  help: "Shows help for the command."
 
   xkcd: "Find an XKCD."
   manchas: "Gives a Manchas kitty image."
@@ -19,6 +19,7 @@ description:
   github: "Get some information about various repos."
   issues: "Get information about issues on a repo."
   command: "Search for or list commands."
+  javadoc: "Get javadocs."
 
 general:
   header: "<c2>[</c2><c3>ECHO</c3><c2>]</c2> "

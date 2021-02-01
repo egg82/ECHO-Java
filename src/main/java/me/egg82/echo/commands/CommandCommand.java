@@ -19,6 +19,7 @@ import me.egg82.echo.lang.Message;
 import me.egg82.echo.services.CollectionProvider;
 import me.egg82.echo.utils.JDAUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,6 +29,8 @@ public class CommandCommand extends AbstractCommand {
     public CommandCommand() { }
 
     public boolean requiresAdmin() { return false; }
+
+    public @Nullable EmbedBuilder getDescription() { return null; }
 
     @Default
     @Description("{@@description.command}")
@@ -67,6 +70,7 @@ public class CommandCommand extends AbstractCommand {
             int i = 0;
             if (min >= entries.size()) {
                 issuer.sendMessage(MessageType.HELP, MessageKeys.HELP_NO_RESULTS);
+                return;
             } else {
                 entries = new ArrayList<>();
                 while (results.hasNext()) {
@@ -88,6 +92,12 @@ public class CommandCommand extends AbstractCommand {
                     }
                     String description = getDescription(issuer, help.getManager(), entry.getDescription());
                     embed.addField(entry.getCommand() + " " + entry.getParameterSyntax(issuer), "```" + (description == null ? "No description available" : description) + "```", false);
+                    EmbedBuilder descriptionBuilder = command.getDescription();
+                    if (descriptionBuilder != null) {
+                        for (MessageEmbed.Field field : descriptionBuilder.getFields()) {
+                            embed.addField(field);
+                        }
+                    }
                 }
             }
         } else {

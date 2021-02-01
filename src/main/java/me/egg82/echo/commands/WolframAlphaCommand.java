@@ -24,6 +24,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @CommandAlias("wolfram|wa")
 public class WolframAlphaCommand extends AbstractCommand {
@@ -36,6 +37,8 @@ public class WolframAlphaCommand extends AbstractCommand {
     public WolframAlphaCommand() { }
 
     public boolean requiresAdmin() { return false; }
+
+    public @Nullable EmbedBuilder getDescription() { return null; }
 
     @Default
     @Description("{@@description.wolfram}")

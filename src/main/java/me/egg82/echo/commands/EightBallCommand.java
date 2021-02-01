@@ -10,9 +10,11 @@ import java.util.concurrent.CompletableFuture;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.utils.WebUtil;
 import me.egg82.echo.web.models.EightBallModel;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @CommandAlias("8ball")
 public class EightBallCommand extends AbstractCommand {
@@ -21,6 +23,8 @@ public class EightBallCommand extends AbstractCommand {
     public EightBallCommand() { }
 
     public boolean requiresAdmin() { return false; }
+
+    public @Nullable EmbedBuilder getDescription() { return null; }
 
     @Default
     @Description("{@@description.eight_ball}")

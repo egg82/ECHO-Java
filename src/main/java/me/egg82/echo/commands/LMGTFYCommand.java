@@ -11,6 +11,7 @@ import me.egg82.echo.utils.WebUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @CommandAlias("lmgtfy")
 public class LMGTFYCommand extends AbstractCommand {
@@ -19,6 +20,8 @@ public class LMGTFYCommand extends AbstractCommand {
     public LMGTFYCommand() { }
 
     public boolean requiresAdmin() { return false; }
+
+    public @Nullable EmbedBuilder getDescription() { return null; }
 
     @Default
     @Description("{@@description.lmgtfy}")

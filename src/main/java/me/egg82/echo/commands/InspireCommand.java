@@ -11,6 +11,7 @@ import me.egg82.echo.utils.WebUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @CommandAlias("inspire|inspireme")
 public class InspireCommand extends AbstractCommand {
@@ -19,6 +20,8 @@ public class InspireCommand extends AbstractCommand {
     public InspireCommand() { }
 
     public boolean requiresAdmin() { return false; }
+
+    public @Nullable EmbedBuilder getDescription() { return null; }
 
     @Default
     @Description("{@@description.inspire}")

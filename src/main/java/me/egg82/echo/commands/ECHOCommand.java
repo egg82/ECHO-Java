@@ -6,9 +6,11 @@ import co.aikar.commands.JDACommandManager;
 import co.aikar.commands.annotation.*;
 import me.egg82.echo.commands.internal.*;
 import me.egg82.echo.utils.FileUtil;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @CommandAlias("echo")
 public class ECHOCommand extends AbstractCommand {
@@ -21,6 +23,8 @@ public class ECHOCommand extends AbstractCommand {
     }
 
     public boolean requiresAdmin() { return true; }
+
+    public @Nullable EmbedBuilder getDescription() { return null; }
 
     @Subcommand("reload")
     @Description("{@@description.reload}")
@@ -52,6 +56,6 @@ public class ECHOCommand extends AbstractCommand {
     @Description("{@@description.help}")
     @Syntax("[command]")
     public void onHelp(@NotNull CommandIssuer issuer, @NotNull MessageReceivedEvent event, @NotNull CommandHelp help) {
-        new UsageCommand(issuer, event, help).run();
+        new InternalUsageCommand(issuer, event, help).run();
     }
 }

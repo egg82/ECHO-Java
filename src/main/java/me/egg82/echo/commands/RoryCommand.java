@@ -14,6 +14,7 @@ import me.egg82.echo.web.models.RoryModel;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @CommandAlias("rory")
 public class RoryCommand extends AbstractCommand {
@@ -23,6 +24,8 @@ public class RoryCommand extends AbstractCommand {
     public RoryCommand() { }
 
     public boolean requiresAdmin() { return false; }
+
+    public @Nullable EmbedBuilder getDescription() { return null; }
 
     @Default
     @Description("{@@description.rory}")
