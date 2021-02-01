@@ -5,6 +5,14 @@ import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Description;
 import co.aikar.commands.annotation.Syntax;
+import flexjson.JSONDeserializer;
+import java.awt.*;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import me.egg82.echo.config.CachedConfig;
+import me.egg82.echo.utils.WebUtil;
+import me.egg82.echo.web.models.JavadocModel;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
@@ -12,6 +20,9 @@ import org.jetbrains.annotations.Nullable;
 
 @CommandAlias("javadoc|jd")
 public class JavadocCommand extends AbstractCommand {
+    private static final String API_URL = "https://docdex.helpch.at/index?javadoc=%s&query=%s&limit=%d";
+    private static final int ITEM_LIMIT = 1;
+
     public JavadocCommand() { }
 
     public boolean requiresAdmin() { return false; }
@@ -34,6 +45,137 @@ public class JavadocCommand extends AbstractCommand {
     @Description("{@@description.javadoc}")
     @Syntax("<repo> [search]")
     public void submit(@NotNull CommandIssuer issuer, @NotNull MessageReceivedEvent event, @NotNull String repo, @NotNull String search) {
+        CachedConfig cachedConfig = getCachedConfig(issuer);
+        if (cachedConfig == null || !canRun(event, cachedConfig)) {
+            return;
+        }
 
+        getModel(repo, search).whenCompleteAsync((val, ex) -> {
+            if (!canCompleteContinue(issuer, val, ex)) {
+                return;
+            }
+
+            JavadocModel first = val.get(0);
+
+            EmbedBuilder embed = new EmbedBuilder();
+            embed.setColor(new Color(0xB11ACB));
+
+            addData(first, embed);
+
+            embed.setFooter("For " + (event.getMember() != null ? event.getMember().getEffectiveName() : event.getAuthor().getAsTag()));
+
+            event.getChannel().sendMessage(embed.build()).queue();
+        });
+    }
+
+    public static @NotNull CompletableFuture<List<JavadocModel>> getModel(@NotNull String repo, @NotNull String query) {
+        return WebUtil.getUnclosedResponse(String.format(API_URL, WebUtil.urlEncode(repo), WebUtil.urlEncode(query.replaceAll("\\s", "").replace("#", "~").replace("%", "-")), ITEM_LIMIT)).thenApplyAsync(response -> {
+            try (response) {
+                JSONDeserializer<List<JavadocModel>> modelDeserializer = new JSONDeserializer<>();
+                modelDeserializer.use("values", JavadocModel.class);
+                List<JavadocModel> retVal = modelDeserializer.deserialize(response.body().charStream());
+                return retVal == null || retVal.isEmpty() ? null : retVal;
+            }
+        });
+    }
+
+    private void addData(@NotNull JavadocModel model, @NotNull EmbedBuilder embed) {
+        switch (model.getObject().getType()) {
+            case "METHOD":
+                addMethodData(model, embed);
+                break;
+            /*case "CLASS":
+                addClassData(model, embed);
+                break;
+            case "INTERFACE":
+                addInterfaceData(model, embed);
+                break;
+            case "FIELD":
+                addFieldData(model, embed);
+                break;
+            case "ANNOTATION":
+                addAnnotationData(model, embed);
+                break;
+            case "ENUM":
+                addEnumData(model, embed);
+                break;
+            case "CONSTRUCTOR":
+                addConstructorData(model, embed);
+                break;*/
+            default:
+                logger.warn("Could not get javadoc type: " + model.getObject().getType());
+                break;
+        }
+    }
+
+    private void addMethodData(@NotNull JavadocModel model, @NotNull EmbedBuilder embed) {
+        StringBuilder title = new StringBuilder();
+        for (String annotation : model.getObject().getAnnotations()) {
+            title.append('@');
+            title.append(annotation);
+            title.append(' ');
+        }
+        for (String modifier : model.getObject().getModifiers()) {
+            title.append(modifier);
+            title.append(' ');
+        }
+        title.append(model.getObject().getMetadata().getReturns());
+        title.append(' ');
+        title.append(model.getObject().getPackageName());
+        title.append('.');
+        title.append(model.getObject().getMetadata().getOwner());
+        title.append('#');
+        if (model.getObject().isDeprecated()) {
+            title.append("~~");
+        }
+        title.append(model.getObject().getName());
+        title.append('(');
+        for (String param : model.getObject().getMetadata().getParameters()) {
+            title.append(param);
+            title.append(", ");
+        }
+        title.delete(title.length() - 2, title.length());
+        title.append(')');
+        if (model.getObject().isDeprecated()) {
+            title.append("~~");
+        }
+
+        embed.setTitle(title.toString(), model.getObject().getLink());
+        if (model.getObject().isDeprecated()) {
+            embed.addField("\u2757 DEPRECATED", "```" + model.getObject().getDeprecationMessage() + "```", false);
+        }
+        embed.addField("Description", "`" + model.getObject().getStrippedDescription() + "`", false);
+
+        StringBuilder params = new StringBuilder();
+        for (Map.Entry<String, Object> kvp : model.getObject().getMetadata().getParameterDescriptions().entrySet()) {
+            params.append("**" + kvp.getKey() + "**");
+            params.append(' ');
+            params.append("*" + kvp.getValue() + "*");
+            params.append('\n');
+        }
+        if (!model.getObject().getMetadata().getParameterDescriptions().isEmpty()) {
+            params.deleteCharAt(params.length() - 1);
+        }
+        if (params.length() > 0) {
+            embed.addField("Parameters", params.toString(), false);
+        }
+
+        if (!model.getObject().getMetadata().getReturns().equals("void")) {
+            embed.addField("Returns ", "**" + model.getObject().getMetadata().getReturns() + "** *" + model.getObject().getMetadata().getReturnsDescription() + "*", false);
+        }
+
+        StringBuilder javadocThrows = new StringBuilder();
+        for (JavadocModel.JavadocObjectModel.JavadocMetadataModel.JavadocThrowsModel throwsModel : model.getObject().getMetadata().getJavadocThrows()) {
+            javadocThrows.append("**" + throwsModel.getKey() + "**");
+            javadocThrows.append(' ');
+            javadocThrows.append("*" + throwsModel.getValue() + "*");
+            javadocThrows.append('\n');
+        }
+        if (!model.getObject().getMetadata().getJavadocThrows().isEmpty()) {
+            javadocThrows.deleteCharAt(params.length() - 1);
+        }
+        if (javadocThrows.length() > 0) {
+            embed.addField("Throws", javadocThrows.toString(), false);
+        }
     }
 }

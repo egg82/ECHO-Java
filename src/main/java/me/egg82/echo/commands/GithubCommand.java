@@ -114,7 +114,7 @@ public class GithubCommand extends AbstractCommand {
             embed.setAuthor(first.getOwner().getLogin(), String.format(REPO_URL, first.getOwner().getLogin()), first.getOwner().getAvatarUrl());
             embed.setTitle(first.getFullName() + (first.isFork() ? " (\u2442)" : ""), String.format(REPO_URL, first.getFullName()));
             embed.setColor(Color.YELLOW);
-            embed.addField("Description", "```" + first.getDescription() + "```", false);
+            embed.addField("Description", "`" + first.getDescription() + "`", false);
             if (first.isArchived()) {
                 embed.addField("\u2757 Status", "ARCHIVED", true);
             } else if (first.isDisabled()) {
