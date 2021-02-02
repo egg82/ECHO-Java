@@ -239,6 +239,11 @@
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
+
+        <repository>
+            <id>central-proxy</id>
+            <url>https://nexus.egg82.me/repository/maven-central/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -319,6 +324,17 @@
             <groupId>io.paradaux.ai</groupId>
             <artifactId>MarkovMegaHal</artifactId>
             <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>edu.stanford.nlp</groupId>
+            <artifactId>stanford-corenlp</artifactId>
+            <version>4.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>edu.stanford.nlp</groupId>
+            <artifactId>stanford-corenlp</artifactId>
+            <version>4.2.0</version>
+            <classifier>models</classifier>
         </dependency>
 
         <dependency>

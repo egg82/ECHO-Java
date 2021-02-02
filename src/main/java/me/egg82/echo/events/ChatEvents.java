@@ -3,6 +3,12 @@ package me.egg82.echo.events;
 import co.aikar.commands.JDACommandManager;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import edu.stanford.nlp.ie.util.RelationTriple;
+import edu.stanford.nlp.ling.CoreAnnotations;
+import edu.stanford.nlp.naturalli.NaturalLogicAnnotations;
+import edu.stanford.nlp.pipeline.Annotation;
+import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+import edu.stanford.nlp.util.CoreMap;
 import io.paradaux.ai.MarkovMegaHal;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -36,6 +42,14 @@ public class ChatEvents extends EventHolder {
     private static final Pattern RE_SPACE = Pattern.compile("[\\s\\t]+");
     private static final Pattern RE_NOT_WORD = Pattern.compile("[^\\w]");
     private static final Pattern RE_URL = Pattern.compile("<url>");
+
+    private static final StanfordCoreNLP tripletNlp;
+
+    static {
+        Properties tripletProps = new Properties();
+        tripletProps.setProperty("annotators", "tokenize,ssplit,pos,lemma,ner,depparse,natlog,openie");
+        tripletNlp = new StanfordCoreNLP(tripletProps);
+    }
 
     private final Cache<Long, String> oldMessages = Caffeine.newBuilder().expireAfterWrite(1L, TimeUnit.HOURS).expireAfterAccess(30L, TimeUnit.MINUTES).build();
 
@@ -163,7 +177,7 @@ public class ChatEvents extends EventHolder {
             return;
         }
 
-        String seed = getSeed(event.getMessage().getContentStripped());
+        String seed = reversed ? getSeed(reverse(event.getMessage().getContentStripped())) : getSeed(event.getMessage().getContentStripped());
         if (seed == null) {
             return;
         }
@@ -216,13 +230,40 @@ public class ChatEvents extends EventHolder {
     }
 
     private @Nullable String getSeed(@NotNull String message) {
+        Annotation doc = new Annotation(message);
+        tripletNlp.annotate(doc);
+
+        List<String> options = new ArrayList<>();
+
+        List<CoreMap> sentences = doc.get(CoreAnnotations.SentencesAnnotation.class);
+        for (CoreMap sentence : sentences) {
+            Collection<RelationTriple> triples = sentence.get(NaturalLogicAnnotations.RelationTriplesAnnotation.class);
+            for (RelationTriple triple : triples) {
+                options.add(swapSubjects(triple.subjectLemmaGloss()));
+                options.add(triple.objectLemmaGloss());
+            }
+        }
+
+        if (!options.isEmpty()) {
+            return options.get(rand.nextInt(options.size()));
+        }
+
+        // Fallback
         List<String> words = new ArrayList<>(Arrays.asList(RE_SPACE.split(message)));
         for (int i = 0; i < words.size(); i++) {
             words.set(i, RE_NOT_WORD.matcher(words.get(i)).replaceAll(""));
         }
         words.removeIf(word -> word.length() < 4);
-
         return words.isEmpty() ? null : words.get(rand.nextInt(words.size()));
+    }
+
+    private @NotNull String swapSubjects(@NotNull String subject) {
+        if (subject.equalsIgnoreCase("you")) {
+            return "I";
+        } else if (subject.equalsIgnoreCase("i") || subject.equalsIgnoreCase("me")) {
+            return "you";
+        }
+        return subject;
     }
 
     private @NotNull String generateSentence(@NotNull MarkovMegaHal megaHal, @NotNull String googleKey, @NotNull String sentence, @NotNull String seed) {
