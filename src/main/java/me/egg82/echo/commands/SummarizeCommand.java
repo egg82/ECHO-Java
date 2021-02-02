@@ -109,10 +109,14 @@ public class SummarizeCommand extends AbstractCommand {
                             MessageBuilder message = new MessageBuilder();
                             message.append(event.getAuthor());
                             message.append(" \u2014 ");
-                            message.append(val.getT1().getTitle());
+                            message.append("*" + val.getT1().getTitle() + "*");
                             message.append('\n');
                             message.append("```");
-                            message.append(val.getT2().getOutput());
+                            if (val.getT2().getOutput().length() > 1500) {
+                                message.append(val.getT2().getOutput().substring(0, 1500) + "...");
+                            } else {
+                                message.append(val.getT2().getOutput());
+                            }
                             message.append("```");
 
                             event.getChannel().sendMessage(message.build()).queue();
@@ -145,7 +149,11 @@ public class SummarizeCommand extends AbstractCommand {
                             message.append(event.getAuthor());
                             message.append('\n');
                             message.append("```");
-                            message.append(val.getOutput());
+                            if (val.getOutput().length() > 1500) {
+                                message.append(val.getOutput().substring(0, 1500) + "...");
+                            } else {
+                                message.append(val.getOutput());
+                            }
                             message.append("```");
 
                             event.getChannel().sendMessage(message.build()).queue();
@@ -204,7 +212,7 @@ public class SummarizeCommand extends AbstractCommand {
         return text;
     }
 
-    private static final Cache<String, ExtractionModel> extractionCache = Caffeine.newBuilder().expireAfterWrite(7L, TimeUnit.DAYS).expireAfterAccess(1L, TimeUnit.DAYS).build();
+    private static final Cache<String, ExtractionModel> extractionCache = Caffeine.newBuilder().expireAfterWrite(1L, TimeUnit.DAYS).expireAfterAccess(12L, TimeUnit.HOURS).build();
 
     public static @NotNull CompletableFuture<ExtractionModel> getExtractionModel(@NotNull String key, @NotNull String url) {
         return CompletableFuture.supplyAsync(() -> extractionCache.get(url, u -> WebUtil.getUnclosedResponse(String.format(EXTRACT_URL, key, u), "application/json").thenApplyAsync(response -> {
