@@ -38,9 +38,10 @@ public class SummarizeCommand extends AbstractCommand {
     private static final String SUMMARIZE_URL = "https://api.deepai.org/api/summarization";
     private static final String BYTEBIN_URL = "https://bytebin.lucko.me/%s";
 
-    private static final Pattern RE_DOT_PATTERN = Pattern.compile("\\.\\s*[^\\)]");
+    private static final Pattern RE_DOT_PATTERN = Pattern.compile("\\.\\s*");
     private static final Pattern RE_URL_PATTERN = Pattern.compile("(https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*))");
     private static final Pattern RE_VERSION_PATTERN = Pattern.compile("\\b(\\d+\\.\\d+(?:[\\.\\d]*))\\b");
+    private static final Pattern RE_DOT_PATTERN_2 = Pattern.compile("\\.+\\s*([^\\)])");
 
     public SummarizeCommand() { }
 
@@ -190,7 +191,13 @@ public class SummarizeCommand extends AbstractCommand {
             current++;
         }
 
-        text = RE_DOT_PATTERN.matcher(text).replaceAll(". ");
+        matcher = RE_DOT_PATTERN_2.matcher(text);
+        while (matcher.find()) {
+            text = matcher.replaceFirst(Matcher.quoteReplacement(". " + matcher.group(1)));
+            matcher = RE_VERSION_PATTERN.matcher(text);
+            current++;
+        }
+
         for (Map.Entry<String, String> kvp : replacements.entrySet()) {
             text = text.replaceAll(Pattern.quote(kvp.getKey()), Matcher.quoteReplacement(kvp.getValue()));
         }
