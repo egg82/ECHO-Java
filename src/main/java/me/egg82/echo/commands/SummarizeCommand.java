@@ -41,7 +41,7 @@ public class SummarizeCommand extends AbstractCommand {
     private static final Pattern RE_DOT_PATTERN = Pattern.compile("\\.\\s*");
     private static final Pattern RE_URL_PATTERN = Pattern.compile("(https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*))");
     private static final Pattern RE_VERSION_PATTERN = Pattern.compile("\\b(\\d+\\.\\d+(?:[\\.\\d]*))\\b");
-    private static final Pattern RE_DOT_PATTERN_2 = Pattern.compile("\\.+\\s*([^\\)])");
+    private static final Pattern RE_DOT_PATTERN_2 = Pattern.compile("([\\.?!])+\\s*([^\\)])");
 
     public SummarizeCommand() { }
 
@@ -171,6 +171,8 @@ public class SummarizeCommand extends AbstractCommand {
     }
 
     private @NotNull String cleanText(@NotNull String text) {
+        System.out.println("Dirty: " + text);
+
         Map<String, String> replacements = new HashMap<>();
         text = RE_DOT_PATTERN.matcher(text).replaceAll(".");
 
@@ -191,16 +193,13 @@ public class SummarizeCommand extends AbstractCommand {
             current++;
         }
 
-        matcher = RE_DOT_PATTERN_2.matcher(text);
-        while (matcher.find()) {
-            text = matcher.replaceFirst(Matcher.quoteReplacement(". " + matcher.group(1)));
-            matcher = RE_VERSION_PATTERN.matcher(text);
-            current++;
-        }
+        text = RE_DOT_PATTERN_2.matcher(text).replaceAll("$1 $2");
 
         for (Map.Entry<String, String> kvp : replacements.entrySet()) {
             text = text.replaceAll(Pattern.quote(kvp.getKey()), Matcher.quoteReplacement(kvp.getValue()));
         }
+
+        System.out.println("Clean: " + text);
 
         return text;
     }
@@ -228,10 +227,16 @@ public class SummarizeCommand extends AbstractCommand {
                         .post(body)
                         .build();
 
+                System.out.println("Bytebin request: " + request.toString());
+
                 try (Response response = WebUtil.getResponse(request)) {
+                    System.out.println("Bytebin response: " + response.code());
+
                     if (!response.isSuccessful()) {
                         throw new IOException("Could not get connection (HTTP status " + response.code() + ")");
                     }
+
+                    System.out.println("Bytebin URL: " + String.format(BYTEBIN_URL, response.header("Location")));
 
                     return String.format(BYTEBIN_URL, response.header("Location"));
                 }
@@ -244,6 +249,8 @@ public class SummarizeCommand extends AbstractCommand {
     private static final Cache<String, SummaryModel> summaryCache = Caffeine.newBuilder().expireAfterWrite(7L, TimeUnit.DAYS).expireAfterAccess(1L, TimeUnit.DAYS).build();
 
     public static @NotNull CompletableFuture<SummaryModel> getSummaryModel(@NotNull String key, @NotNull String url) {
+        System.out.println("Getting summary for " + url);
+
         return CompletableFuture.supplyAsync(() -> summaryCache.get(url, u -> {
             try {
                 RequestBody body = new MultipartBody.Builder()
@@ -257,13 +264,19 @@ public class SummarizeCommand extends AbstractCommand {
                         .post(body)
                         .build();
 
+                System.out.println("Summary request: " + request.toString());
+
                 try (Response response = WebUtil.getResponse(request)) {
+                    System.out.println("Summary response: " + response.code());
+
                     if (!response.isSuccessful()) {
                         throw new IOException("Could not get connection (HTTP status " + response.code() + ")");
                     }
 
                     JSONDeserializer<SummaryModel> modelDeserializer = new JSONDeserializer<>();
-                    return modelDeserializer.deserialize(response.body().charStream(), SummaryModel.class);
+                    SummaryModel retVal = modelDeserializer.deserialize(response.body().charStream(), SummaryModel.class);
+                    System.out.println("Summary JSON: " + retVal);
+                    return retVal;
                 }
             } catch (IOException ex) {
                 throw new CompletionException(ex);
