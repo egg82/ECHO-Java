@@ -104,9 +104,9 @@ public class JavadocCommand extends AbstractCommand {
             case "ENUM":
                 addEnumData(model, embed);
                 break;
-            /*case "CONSTRUCTOR":
+            case "CONSTRUCTOR":
                 addConstructorData(model, embed);
-                break;*/
+                break;
             default:
                 logger.warn("Could not get javadoc type: " + model.getObject().getType());
                 break;
@@ -164,10 +164,8 @@ public class JavadocCommand extends AbstractCommand {
             params.append("*" + kvp.getValue() + "*");
             params.append('\n');
         }
-        if (!model.getObject().getMetadata().getParameterDescriptions().isEmpty()) {
-            params.deleteCharAt(params.length() - 1);
-        }
         if (params.length() > 0) {
+            params.deleteCharAt(params.length() - 1);
             embed.addField("Parameters", params.toString(), false);
         }
 
@@ -182,10 +180,8 @@ public class JavadocCommand extends AbstractCommand {
             javadocThrows.append("*" + throwsModel.getValue() + "*");
             javadocThrows.append('\n');
         }
-        if (!model.getObject().getMetadata().getJavadocThrows().isEmpty()) {
-            javadocThrows.deleteCharAt(params.length() - 1);
-        }
         if (javadocThrows.length() > 0) {
+            javadocThrows.deleteCharAt(javadocThrows.length() - 1);
             embed.addField("Throws", javadocThrows.toString(), false);
         }
     }
@@ -480,6 +476,73 @@ public class JavadocCommand extends AbstractCommand {
             }
             fields.delete(fields.length() - 3, fields.length());
             embed.addField("Fields", fields.toString(), false);
+        }
+    }
+
+    private void addConstructorData(@NotNull JavadocModel model, @NotNull EmbedBuilder embed) {
+        StringBuilder title = new StringBuilder();
+        for (String annotation : model.getObject().getAnnotations()) {
+            title.append('@');
+            title.append(annotation);
+            title.append(' ');
+        }
+        for (String modifier : model.getObject().getModifiers()) {
+            title.append(modifier);
+            title.append(' ');
+        }
+        title.append(model.getObject().getPackageName());
+        title.append('.');
+        title.append(model.getObject().getMetadata().getOwner());
+        title.append('#');
+        if (model.getObject().isDeprecated()) {
+            title.append("~~");
+        }
+        title.append(model.getObject().getName());
+        title.append('(');
+        for (String param : model.getObject().getMetadata().getParameters()) {
+            title.append(param);
+            title.append(", ");
+        }
+        if (!model.getObject().getMetadata().getParameters().isEmpty()) {
+            title.delete(title.length() - 2, title.length());
+        }
+        title.append(')');
+        if (model.getObject().isDeprecated()) {
+            title.append("~~");
+        }
+
+        embed.setTitle(title.toString(), model.getObject().getLink());
+        if (model.getObject().isDeprecated()) {
+            embed.addField("\u2757 DEPRECATED", "`" + model.getObject().getDeprecationMessage() + "`", false);
+        }
+        String description = model.getObject().getStrippedDescription();
+        if (description.length() > 250) {
+            description = description.substring(0, 250) + "...";
+        }
+        embed.addField("Description", "`" + description + "`", false);
+
+        StringBuilder params = new StringBuilder();
+        for (Map.Entry<String, Object> kvp : model.getObject().getMetadata().getParameterDescriptions().entrySet()) {
+            params.append("**" + kvp.getKey() + "**");
+            params.append(' ');
+            params.append("*" + kvp.getValue() + "*");
+            params.append('\n');
+        }
+        if (params.length() > 0) {
+            params.deleteCharAt(params.length() - 1);
+            embed.addField("Parameters", params.toString(), false);
+        }
+
+        StringBuilder javadocThrows = new StringBuilder();
+        for (JavadocModel.JavadocObjectModel.JavadocMetadataModel.JavadocThrowsModel throwsModel : model.getObject().getMetadata().getJavadocThrows()) {
+            javadocThrows.append("**" + throwsModel.getKey() + "**");
+            javadocThrows.append(' ');
+            javadocThrows.append("*" + throwsModel.getValue() + "*");
+            javadocThrows.append('\n');
+        }
+        if (javadocThrows.length() > 0) {
+            javadocThrows.deleteCharAt(javadocThrows.length() - 1);
+            embed.addField("Throws", javadocThrows.toString(), false);
         }
     }
 }
