@@ -63,6 +63,7 @@ public class SummarizeCommand extends AbstractCommand {
         text = text.trim();
         String cleaned = cleanUrl(text);
         boolean doImage = !cleaned.equals(text);
+        text = cleaned;
 
         if (isUrl(text)) {
             if (cachedConfig.getExtractorKey().isEmpty()) {
