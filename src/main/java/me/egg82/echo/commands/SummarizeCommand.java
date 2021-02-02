@@ -9,6 +9,8 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import flexjson.JSONDeserializer;
 import java.awt.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -19,6 +21,8 @@ import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.core.Pair;
 import me.egg82.echo.lang.Message;
@@ -229,9 +233,15 @@ public class SummarizeCommand extends AbstractCommand {
     public static @NotNull CompletableFuture<String> getBytebinUrl(@NotNull String text) {
         return CompletableFuture.supplyAsync(() -> bytebinCache.get(text, t -> {
             try {
-                RequestBody body = RequestBody.create(MediaType.get("text/plain"), text.getBytes(StandardCharsets.UTF_8));
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                try (GZIPOutputStream gzip = new GZIPOutputStream(out)) {
+                    gzip.write(text.getBytes(StandardCharsets.UTF_8));
+                }
+
+                RequestBody body = RequestBody.create(MediaType.get("text/plain"), out.toByteArray());
 
                 Request request = WebUtil.getDefaultRequestBuilder(new URL(String.format(BYTEBIN_URL, "post")))
+                        .header("Content-Encoding", "gzip")
                         .post(body)
                         .build();
 
