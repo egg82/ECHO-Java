@@ -42,7 +42,7 @@ public class EightBallCommand extends AbstractCommand {
 
             MessageBuilder message = new MessageBuilder();
             message.append(event.getAuthor());
-            message.append(" ");
+            message.append(' ');
             message.append(val.getMagic().getAnswer());
 
             event.getChannel().sendMessage(message.build()).queue();

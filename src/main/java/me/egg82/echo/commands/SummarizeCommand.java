@@ -11,6 +11,7 @@ import flexjson.JSONDeserializer;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -25,6 +26,7 @@ import me.egg82.echo.utils.WebUtil;
 import me.egg82.echo.web.models.ExtractionModel;
 import me.egg82.echo.web.models.SummaryModel;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
@@ -34,8 +36,9 @@ import org.jetbrains.annotations.Nullable;
 public class SummarizeCommand extends AbstractCommand {
     private static final String EXTRACT_URL = "https://extractorapi.com/api/v1/extractor/?apikey=%s&url=%s";
     private static final String SUMMARIZE_URL = "https://api.deepai.org/api/summarization";
+    private static final String BYTEBIN_URL = "https://bytebin.lucko.me/%s";
 
-    private static final Pattern RE_DOT_PATTERN = Pattern.compile("\\.\\s*");
+    private static final Pattern RE_DOT_PATTERN = Pattern.compile("\\.\\s*[^\\)]");
     private static final Pattern RE_URL_PATTERN = Pattern.compile("(https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*))");
     private static final Pattern RE_VERSION_PATTERN = Pattern.compile("\\b(\\d+\\.\\d+(?:[\\.\\d]*))\\b");
 
@@ -77,38 +80,76 @@ public class SummarizeCommand extends AbstractCommand {
                         if (v == null) {
                             return null;
                         }
-                        return new Pair<>(v, getSummaryModel(cachedConfig.getDeepAiKey(), cleanText(v.getText())).join());
+                        return new Pair<>(v, getSummaryModel(cachedConfig.getDeepAiKey(), getBytebinUrl(cleanText(v.getText())).join()).join());
                     })
                     .whenCompleteAsync((val, ex) -> {
                         if (!canCompleteContinue(issuer, val, ex)) {
                             return;
                         }
 
-                        EmbedBuilder embed = new EmbedBuilder();
-                        embed.setTitle(val.getT1().getTitle(), val.getT1().getUrl());
-                        embed.setColor(new Color(0x0CD7DE));
-                        embed.addField("Summary", "```" + val.getT2().getOutput() + "```", false);
-                        if (doImage && !val.getT1().getImages().isEmpty()) {
-                            embed.setImage(val.getT1().getImages().get(0));
+                        if (val.getT2().getOutput().isEmpty()) {
+                            logger.warn("Summary gave no output.");
+                            issuer.sendError(Message.ERROR__INTERNAL);
+                            return;
                         }
-                        embed.setFooter("For " + (event.getMember() != null ? event.getMember().getEffectiveName() : event.getAuthor().getAsTag()));
 
-                        event.getChannel().sendMessage(embed.build()).queue();
+                        if (val.getT2().getOutput().length() <= 700) {
+                            EmbedBuilder embed = new EmbedBuilder();
+                            embed.setTitle(val.getT1().getTitle(), val.getT1().getUrl());
+                            embed.setColor(new Color(0x0CD7DE));
+                            embed.appendDescription("```" + val.getT2().getOutput() + "```");
+                            if (doImage && !val.getT1().getImages().isEmpty()) {
+                                embed.setImage(val.getT1().getImages().get(0));
+                            }
+                            embed.setFooter("For " + (event.getMember() != null ? event.getMember().getEffectiveName() : event.getAuthor().getAsTag()));
+
+                            event.getChannel().sendMessage(embed.build()).queue();
+                        } else {
+                            MessageBuilder message = new MessageBuilder();
+                            message.append(event.getAuthor());
+                            message.append(" \u2014 ");
+                            message.append(val.getT1().getTitle());
+                            message.append('\n');
+                            message.append("```");
+                            message.append(val.getT2().getOutput());
+                            message.append("```");
+
+                            event.getChannel().sendMessage(message.build()).queue();
+                        }
                     });
         } else {
-            getSummaryModel(cachedConfig.getDeepAiKey(), text).whenCompleteAsync((val, ex) -> {
-                if (!canCompleteContinue(issuer, val, ex)) {
-                    return;
-                }
+            getBytebinUrl(text)
+                    .thenComposeAsync(v -> getSummaryModel(cachedConfig.getDeepAiKey(), v))
+                    .whenCompleteAsync((val, ex) -> {
+                        if (!canCompleteContinue(issuer, val, ex)) {
+                            return;
+                        }
 
-                EmbedBuilder embed = new EmbedBuilder();
-                embed.setTitle("Text Summary");
-                embed.setColor(new Color(0x0CD7DE));
-                embed.addField("Summary", "```" + val.getOutput() + "```", false);
-                embed.setFooter("For " + (event.getMember() != null ? event.getMember().getEffectiveName() : event.getAuthor().getAsTag()));
+                        if (val.getOutput().isEmpty()) {
+                            logger.warn("Summary gave no output.");
+                            issuer.sendError(Message.ERROR__INTERNAL);
+                            return;
+                        }
 
-                event.getChannel().sendMessage(embed.build()).queue();
-            });
+                        if (val.getOutput().length() <= 700) {
+                            EmbedBuilder embed = new EmbedBuilder();
+                            embed.setTitle("Text Summary");
+                            embed.setColor(new Color(0x0CD7DE));
+                            embed.appendDescription("```" + val.getOutput() + "```");
+                            embed.setFooter("For " + (event.getMember() != null ? event.getMember().getEffectiveName() : event.getAuthor().getAsTag()));
+
+                            event.getChannel().sendMessage(embed.build()).queue();
+                        } else {
+                            MessageBuilder message = new MessageBuilder();
+                            message.append(event.getAuthor());
+                            message.append('\n');
+                            message.append("```");
+                            message.append(val.getOutput());
+                            message.append("```");
+
+                            event.getChannel().sendMessage(message.build()).queue();
+                        }
+                    });
         }
     }
 
@@ -169,14 +210,38 @@ public class SummarizeCommand extends AbstractCommand {
         }).join()));
     }
 
+    private static final Cache<String, String> bytebinCache = Caffeine.newBuilder().expireAfterWrite(7L, TimeUnit.DAYS).expireAfterAccess(1L, TimeUnit.DAYS).build();
+
+    public static @NotNull CompletableFuture<String> getBytebinUrl(@NotNull String text) {
+        return CompletableFuture.supplyAsync(() -> bytebinCache.get(text, t -> {
+            try {
+                RequestBody body = RequestBody.create(MediaType.get("text/plain"), text.getBytes(StandardCharsets.UTF_8));
+
+                Request request = WebUtil.getDefaultRequestBuilder(new URL(String.format(BYTEBIN_URL, "post")))
+                        .post(body)
+                        .build();
+
+                try (Response response = WebUtil.getResponse(request)) {
+                    if (!response.isSuccessful()) {
+                        throw new IOException("Could not get connection (HTTP status " + response.code() + ")");
+                    }
+
+                    return String.format(BYTEBIN_URL, response.header("Location"));
+                }
+            } catch (IOException ex) {
+                throw new CompletionException(ex);
+            }
+        }));
+    }
+
     private static final Cache<String, SummaryModel> summaryCache = Caffeine.newBuilder().expireAfterWrite(7L, TimeUnit.DAYS).expireAfterAccess(1L, TimeUnit.DAYS).build();
 
-    public static @NotNull CompletableFuture<SummaryModel> getSummaryModel(@NotNull String key, @NotNull String text) {
-        return CompletableFuture.supplyAsync(() -> summaryCache.get(text, t -> {
+    public static @NotNull CompletableFuture<SummaryModel> getSummaryModel(@NotNull String key, @NotNull String url) {
+        return CompletableFuture.supplyAsync(() -> summaryCache.get(url, u -> {
             try {
                 RequestBody body = new MultipartBody.Builder()
                         .setType(MultipartBody.FORM)
-                        .addFormDataPart("text", t)
+                        .addFormDataPart("text", u)
                         .build();
 
                 Request request = WebUtil.getDefaultRequestBuilder(new URL(SUMMARIZE_URL))
