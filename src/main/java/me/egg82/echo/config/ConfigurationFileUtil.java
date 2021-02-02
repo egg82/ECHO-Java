@@ -76,6 +76,16 @@ public class ConfigurationFileUtil {
             BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Imgur client ID:</c2> <c1>" + imgurKey + "</c1>");
         }
 
+        String deepAiKey = config.node("keys", "deepai").getString("");
+        if (debug) {
+            BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>DeepAI key:</c2> <c1>" + deepAiKey + "</c1>");
+        }
+
+        String extractorKey = config.node("keys", "extractor").getString("");
+        if (debug) {
+            BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Extractor key:</c2> <c1>" + extractorKey + "</c1>");
+        }
+
         String adminRole = config.node("roles", "admin").getString("owner");
         if (debug) {
             BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Admin role:</c2> <c1>" + adminRole + "</c1>");
@@ -113,6 +123,8 @@ public class ConfigurationFileUtil {
                 .googleKey(googleKey)
                 .wolframKey(wolframKey)
                 .imgurKey(imgurKey)
+                .deepAiKey(deepAiKey)
+                .extractorKey(extractorKey)
                 .adminRole(adminRole)
                 .disallowedRole(disallowedRole)
                 .alotEmote(alotEmote)

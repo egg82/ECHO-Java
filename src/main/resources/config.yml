@@ -118,6 +118,10 @@ keys:
   wolfram: ''
   # Imgur client ID
   imgur: ''
+  # DeepAI key
+  deepai: ''
+  # Extractor API key
+  extractor: ''
 
 # Emotes to use for various functions
 emotes:

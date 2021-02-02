@@ -50,7 +50,7 @@ public class EightBallCommand extends AbstractCommand {
     }
 
     public static @NotNull CompletableFuture<EightBallModel> getModel(@NotNull String phrase) {
-        return WebUtil.getUnclosedResponse(String.format(API_URL, phrase)).thenApplyAsync(response -> {
+        return WebUtil.getUnclosedResponse(String.format(API_URL, phrase), "application/json").thenApplyAsync(response -> {
             try (response) {
                 JSONDeserializer<EightBallModel> modelDeserializer = new JSONDeserializer<>();
                 return modelDeserializer.deserialize(response.body().charStream(), EightBallModel.class);

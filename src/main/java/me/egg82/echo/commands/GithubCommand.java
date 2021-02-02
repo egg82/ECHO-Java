@@ -41,7 +41,7 @@ public class GithubCommand extends AbstractCommand {
     private static final Pattern RE_LINKS_GROUP_2 = Pattern.compile("\\[([^\\[\\]\\(\\)]+)\\]\\s*\\((https?:\\/\\/[^\\[\\]\\(\\)]*)\\)");
     private static final Pattern RE_LINKS_REPLACE_GROUP = Pattern.compile("\\[(.*)\\]:\\s*(https?:\\/\\/[^\\[\\]\\(\\)]*)");
     private static final Pattern RE_LINKS = Pattern.compile("(https?:\\/\\/.*)[\\!\\.\\?]");
-    private static final Pattern RE_LINKS_2 = Pattern.compile("(https?:\\/\\/.*)");
+    private static final Pattern RE_LINKS_2 = Pattern.compile("(https?:\\/\\/.*)[\\!\\.\\?]");
     private static final Pattern RE_LINKS_REPLACE_GROUP_MATCH = Pattern.compile("\\[([^\\[\\]\\(\\)]*)\\]");
     private static final Pattern RE_URL_LINE = Pattern.compile("^#*?\\s*<(?:url|img)>\\s*$", Pattern.MULTILINE);
     private static final Pattern RE_MULTIPLE_LINES = Pattern.compile("\n{3,}");
@@ -222,7 +222,7 @@ public class GithubCommand extends AbstractCommand {
     }
 
     public static @NotNull CompletableFuture<GithubSearchModel> getModel(@NotNull String query) {
-        return WebUtil.getUnclosedResponse(String.format(SEARCH_URL, WebUtil.urlEncode(query))).thenApplyAsync(response -> {
+        return WebUtil.getUnclosedResponse(String.format(SEARCH_URL, WebUtil.urlEncode(query)), "application/json").thenApplyAsync(response -> {
             try (response) {
                 JSONDeserializer<GithubSearchModel> modelDeserializer = new JSONDeserializer<>();
                 modelDeserializer.use(Instant.class, new InstantTransformer());
@@ -233,7 +233,7 @@ public class GithubCommand extends AbstractCommand {
     }
 
     public static @NotNull CompletableFuture<GithubLicenseModel> getLicense(@NotNull String url) {
-        return WebUtil.getUnclosedResponse(url).thenApplyAsync(response -> {
+        return WebUtil.getUnclosedResponse(url, "application/json").thenApplyAsync(response -> {
             try (response) {
                 JSONDeserializer<GithubLicenseModel> modelDeserializer = new JSONDeserializer<>();
                 return modelDeserializer.deserialize(response.body().charStream(), GithubLicenseModel.class);

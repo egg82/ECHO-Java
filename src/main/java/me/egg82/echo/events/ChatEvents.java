@@ -13,6 +13,7 @@ import io.paradaux.ai.MarkovMegaHal;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import me.egg82.echo.commands.GoogleSearchCommand;
 import me.egg82.echo.config.CachedConfig;
@@ -282,7 +283,7 @@ public class ChatEvents extends EventHolder {
                     List<GoogleSearchModel.GoogleSearchItemModel> items = GoogleSearchCommand.getModel(googleKey, s).get().getItems();
                     for (GoogleSearchModel.GoogleSearchItemModel item : items) {
                         if (previousUrls.add(item.getLink())) {
-                            return item.getLink();
+                            return Matcher.quoteReplacement(item.getLink());
                         }
                     }
                 } catch (ExecutionException ex) {

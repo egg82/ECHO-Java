@@ -49,7 +49,7 @@ public class QuoteCommand extends AbstractCommand {
     }
 
     public static @NotNull CompletableFuture<QuoteModel> get() {
-        return WebUtil.getUnclosedResponse(API_URL).thenApplyAsync(response -> {
+        return WebUtil.getUnclosedResponse(API_URL, "application/json").thenApplyAsync(response -> {
             try (response) {
                 JSONDeserializer<QuoteModel> modelDeserializer = new JSONDeserializer<>();
                 return modelDeserializer.deserialize(response.body().charStream(), QuoteModel.class);

@@ -44,6 +44,12 @@ public class CachedConfig {
     private String imgurKey = "";
     public @NotNull String getImgurKey() { return imgurKey; }
 
+    private String deepAiKey = "";
+    public @NotNull String getDeepAiKey() { return deepAiKey; }
+
+    private String extractorKey = "";
+    public @NotNull String getExtractorKey() { return extractorKey; }
+
     private String alotEmote = "alot";
     public @NotNull String getAlotEmote() { return alotEmote; }
 
@@ -123,6 +129,16 @@ public class CachedConfig {
 
         public @NotNull CachedConfig.Builder imgurKey(@NotNull String value) {
             values.imgurKey = value;
+            return this;
+        }
+
+        public @NotNull CachedConfig.Builder deepAiKey(@NotNull String value) {
+            values.deepAiKey = value;
+            return this;
+        }
+
+        public @NotNull CachedConfig.Builder extractorKey(@NotNull String value) {
+            values.extractorKey = value;
             return this;
         }
 

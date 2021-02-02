@@ -23,6 +23,7 @@ description:
   fact: "Get a fun fact."
   advice: "Get some advice."
   quote: "Get a random quote."
+  summarize: "Get a summary of some text or a URL."
 
 general:
   header: "<c2>[</c2><c3>ECHO</c3><c2>]</c2> "

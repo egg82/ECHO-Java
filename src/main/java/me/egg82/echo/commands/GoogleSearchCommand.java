@@ -69,7 +69,7 @@ public class GoogleSearchCommand extends AbstractCommand {
     }
 
     public static @NotNull CompletableFuture<GoogleSearchModel> getModel(@NotNull String key, @NotNull String query) {
-        return WebUtil.getUnclosedResponse(String.format(API_URL, key, WebUtil.urlEncode(query).replace("%20", "+"))).thenApplyAsync(response -> {
+        return WebUtil.getUnclosedResponse(String.format(API_URL, key, WebUtil.urlEncode(query).replace("%20", "+")), "application/json").thenApplyAsync(response -> {
             try (response) {
                 JSONDeserializer<GoogleSearchModel> modelDeserializer = new JSONDeserializer<>();
                 GoogleSearchModel retVal = modelDeserializer.deserialize(response.body().charStream(), GoogleSearchModel.class);

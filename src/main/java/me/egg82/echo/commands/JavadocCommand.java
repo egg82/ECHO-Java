@@ -74,7 +74,7 @@ public class JavadocCommand extends AbstractCommand {
     }
 
     public static @NotNull CompletableFuture<List<JavadocModel>> getModel(@NotNull String repo, @NotNull String query) {
-        return WebUtil.getUnclosedResponse(String.format(API_URL, WebUtil.urlEncode(repo), WebUtil.urlEncode(query.replaceAll("\\s", "").replace("#", "~").replace("%", "-")), ITEM_LIMIT)).thenApplyAsync(response -> {
+        return WebUtil.getUnclosedResponse(String.format(API_URL, WebUtil.urlEncode(repo), WebUtil.urlEncode(query.replaceAll("\\s", "").replace("#", "~").replace("%", "-")), ITEM_LIMIT), "application/json").thenApplyAsync(response -> {
             try (response) {
                 JSONDeserializer<List<JavadocModel>> modelDeserializer = new JSONDeserializer<>();
                 modelDeserializer.use("values", JavadocModel.class);

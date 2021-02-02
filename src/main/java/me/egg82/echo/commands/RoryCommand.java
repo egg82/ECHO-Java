@@ -51,7 +51,7 @@ public class RoryCommand extends AbstractCommand {
     }
 
     public static @NotNull CompletableFuture<RoryModel> get(int id) {
-        return WebUtil.getUnclosedResponse(id == -1 ? CAT_URL : String.format(CAT_URL_ID, id)).thenApplyAsync(response -> {
+        return WebUtil.getUnclosedResponse(id == -1 ? CAT_URL : String.format(CAT_URL_ID, id), "application/json").thenApplyAsync(response -> {
             try (response) {
                 JSONDeserializer<RoryModel> modelDeserializer = new JSONDeserializer<>();
                 RoryModel retVal = modelDeserializer.deserialize(response.body().charStream(), RoryModel.class);

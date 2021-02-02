@@ -72,7 +72,7 @@ public class FactCommand extends AbstractCommand {
             url = String.format(url, random.nextInt(100));
         }
 
-        return WebUtil.getUnclosedResponse(url).thenApplyAsync(response -> {
+        return WebUtil.getUnclosedResponse(url, "application/json").thenApplyAsync(response -> {
             try (response) {
                 if (data.getT2() == null) {
                     return response.body().string();
