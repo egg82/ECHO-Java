@@ -40,7 +40,7 @@ public class GithubCommand extends AbstractCommand {
     private static final Pattern RE_LINKS_GROUP = Pattern.compile("\\[\\[([^\\[\\]\\(\\)]+)\\]\\s*\\((https?:\\/\\/[^\\[\\]\\(\\)]*)\\)\\]\\s*\\((https?:\\/\\/[^\\[\\]\\(\\)]*)\\)");
     private static final Pattern RE_LINKS_GROUP_2 = Pattern.compile("\\[([^\\[\\]\\(\\)]+)\\]\\s*\\((https?:\\/\\/[^\\[\\]\\(\\)]*)\\)");
     private static final Pattern RE_LINKS_REPLACE_GROUP = Pattern.compile("\\[(.*)\\]:\\s*(https?:\\/\\/[^\\[\\]\\(\\)]*)");
-    private static final Pattern RE_LINKS = Pattern.compile("(https?:\\/\\/.*)[\\!\\.\\?]");
+    private static final Pattern RE_LINKS = Pattern.compile("(https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*))");
     private static final Pattern RE_LINKS_2 = Pattern.compile("(https?:\\/\\/.*)[\\!\\.\\?]");
     private static final Pattern RE_LINKS_REPLACE_GROUP_MATCH = Pattern.compile("\\[([^\\[\\]\\(\\)]*)\\]");
     private static final Pattern RE_URL_LINE = Pattern.compile("^#*?\\s*<(?:url|img)>\\s*$", Pattern.MULTILINE);
