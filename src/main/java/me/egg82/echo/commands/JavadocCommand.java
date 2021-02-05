@@ -155,7 +155,7 @@ public class JavadocCommand extends AbstractCommand {
         if (description.length() > 250) {
             description = description.substring(0, 250) + "...";
         }
-        embed.addField("Description", "`" + description + "`", false);
+        embed.addField("Description", "```" + description + "```", false);
 
         StringBuilder params = new StringBuilder();
         for (Map.Entry<String, Object> kvp : model.getObject().getMetadata().getParameterDescriptions().entrySet()) {
@@ -239,7 +239,7 @@ public class JavadocCommand extends AbstractCommand {
         if (description.length() > 250) {
             description = description.substring(0, 250) + "...";
         }
-        embed.addField("Description", "`" + description + "`", false);
+        embed.addField("Description", "```" + description + "```", false);
 
         if (!model.getObject().getMetadata().getAllImplementations().isEmpty()) {
             StringBuilder implementations = new StringBuilder();
@@ -324,7 +324,7 @@ public class JavadocCommand extends AbstractCommand {
         if (description.length() > 250) {
             description = description.substring(0, 250) + "...";
         }
-        embed.addField("Description", "`" + description + "`", false);
+        embed.addField("Description", "```" + description + "```", false);
 
         if (!model.getObject().getMetadata().getSubInterfaces().isEmpty()) {
             StringBuilder subinterfaces = new StringBuilder();
@@ -400,7 +400,7 @@ public class JavadocCommand extends AbstractCommand {
         if (description.length() > 250) {
             description = description.substring(0, 250) + "...";
         }
-        embed.addField("Description", "`" + description + "`", false);
+        embed.addField("Description", "```" + description + "```", false);
     }
 
     private void addEnumData(@NotNull JavadocModel model, @NotNull EmbedBuilder embed) {
@@ -446,7 +446,7 @@ public class JavadocCommand extends AbstractCommand {
         if (description.length() > 250) {
             description = description.substring(0, 250) + "...";
         }
-        embed.addField("Description", "`" + description + "`", false);
+        embed.addField("Description", "```" + description + "```", false);
 
         if (!model.getObject().getMetadata().getAllImplementations().isEmpty()) {
             StringBuilder implementations = new StringBuilder();
@@ -519,7 +519,7 @@ public class JavadocCommand extends AbstractCommand {
         if (description.length() > 250) {
             description = description.substring(0, 250) + "...";
         }
-        embed.addField("Description", "`" + description + "`", false);
+        embed.addField("Description", "```" + description + "```", false);
 
         StringBuilder params = new StringBuilder();
         for (Map.Entry<String, Object> kvp : model.getObject().getMetadata().getParameterDescriptions().entrySet()) {
