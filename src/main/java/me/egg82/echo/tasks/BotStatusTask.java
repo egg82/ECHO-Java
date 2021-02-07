@@ -189,12 +189,9 @@ public class BotStatusTask extends AbstractTask {
                         .build();
 
                 try (Response response = WebUtil.getResponse(request)) {
-                    String str = response.body().string();
-                    System.out.println(str);
-
                     JSONDeserializer<List<TrendingShowModel>> modelDeserializer = new JSONDeserializer<>();
                     modelDeserializer.use("values", TrendingShowModel.class);
-                    List<TrendingShowModel> retVal = modelDeserializer.deserialize(str);
+                    List<TrendingShowModel> retVal = modelDeserializer.deserialize(response.body().charStream());
                     return retVal == null || retVal.isEmpty() ? null : retVal;
                 }
             } catch (IOException ex) {
@@ -213,13 +210,10 @@ public class BotStatusTask extends AbstractTask {
                         .build();
 
                 try (Response response = WebUtil.getResponse(request)) {
-                    String str = response.body().string();
-                    System.out.println(str);
-
                     JSONDeserializer<List<SeasonModel>> modelDeserializer = new JSONDeserializer<>();
                     modelDeserializer.use("values", SeasonModel.class);
                     modelDeserializer.use(Instant.class, new InstantTransformer());
-                    List<SeasonModel> retVal = modelDeserializer.deserialize(str);
+                    List<SeasonModel> retVal = modelDeserializer.deserialize(response.body().charStream());
                     if (retVal != null) {
                         retVal.sort(Comparator.comparingInt(SeasonModel::getNumber));
                     }
@@ -241,12 +235,9 @@ public class BotStatusTask extends AbstractTask {
                         .build();
 
                 try (Response response = WebUtil.getResponse(request)) {
-                    String str = response.body().string();
-                    System.out.println(str);
-
                     JSONDeserializer<EpisodeModel> modelDeserializer = new JSONDeserializer<>();
                     modelDeserializer.use(Instant.class, new InstantTransformer());
-                    return modelDeserializer.deserialize(str, EpisodeModel.class);
+                    return modelDeserializer.deserialize(response.body().charStream(), EpisodeModel.class);
                 }
             } catch (IOException ex) {
                 throw new CompletionException(ex);
