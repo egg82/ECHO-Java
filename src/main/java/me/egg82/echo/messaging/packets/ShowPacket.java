@@ -8,6 +8,7 @@ public class ShowPacket extends AbstractPacket {
     private long tvdb;
     private int season;
     private int episode;
+    private String overview;
 
     public byte getPacketId() { return 0x04; }
 
@@ -17,6 +18,7 @@ public class ShowPacket extends AbstractPacket {
         this.tvdb = -1L;
         this.season = -1;
         this.episode = -1;
+        this.overview = "";
     }
 
     public void read(@NotNull ByteBuf buffer) {
@@ -27,6 +29,7 @@ public class ShowPacket extends AbstractPacket {
         this.tvdb = buffer.readLong();
         this.season = readVarInt(buffer);
         this.episode = readVarInt(buffer);
+        this.overview = readString(buffer);
 
         checkReadPacket(buffer);
     }
@@ -37,6 +40,7 @@ public class ShowPacket extends AbstractPacket {
         buffer.writeLong(this.tvdb);
         writeVarInt(this.season, buffer);
         writeVarInt(this.episode, buffer);
+        writeString(this.overview, buffer);
     }
 
     public long getTvdb() { return tvdb; }
@@ -51,20 +55,25 @@ public class ShowPacket extends AbstractPacket {
 
     public void setEpisode(int episode) { this.episode = episode; }
 
+    public @NotNull String getOverview() { return overview; }
+
+    public void setOverview(@NotNull String overview) { this.overview = overview; }
+
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ShowPacket)) return false;
         ShowPacket that = (ShowPacket) o;
-        return tvdb == that.tvdb && season == that.season && episode == that.episode;
+        return tvdb == that.tvdb && season == that.season && episode == that.episode && overview.equals(that.overview);
     }
 
-    public int hashCode() { return Objects.hash(tvdb, season, episode); }
+    public int hashCode() { return Objects.hash(tvdb, season, episode, overview); }
 
     public String toString() {
         return "ShowPacket{" +
                 "tvdb=" + tvdb +
                 ", season=" + season +
                 ", episode=" + episode +
+                ", overview='" + overview + '\'' +
                 '}';
     }
 }

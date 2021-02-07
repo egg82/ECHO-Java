@@ -52,8 +52,11 @@ public class GenericMessagingHandler implements MessagingHandler {
             return;
         }
 
+        cachedConfig.getMegaHal().add(packet.getOverview());
+
         for (StorageService service : cachedConfig.getStorage()) {
             service.getOrCreateShowModel(packet.getTvdb(), packet.getSeason(), packet.getEpisode());
+            service.getOrCreateMessageModel(packet.getOverview());
         }
     }
 

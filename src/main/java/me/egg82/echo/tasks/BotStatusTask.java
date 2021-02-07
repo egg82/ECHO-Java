@@ -139,6 +139,7 @@ public class BotStatusTask extends AbstractTask {
                             packet.setTvdb(trendingModel.getShow().getIds().getTvdb());
                             packet.setSeason(seasonNum);
                             packet.setEpisode(episodeNum);
+                            packet.setOverview(episodeModel.getOverview());
                             PacketUtil.queuePacket(packet);
                             break;
                         } while (!tempShowList.isEmpty());
