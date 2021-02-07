@@ -122,6 +122,8 @@ keys:
   deepai: ''
   # Extractor API key
   extractor: ''
+  # Trakt client ID
+  trakt: ''
 
 # Emotes to use for various functions
 emotes:
@@ -157,6 +159,11 @@ chat:
     - 'smart bot'
     - 'stupid bot'
     - 'dumb bot'
+
+# The chance that the bot will do something other than watching Discord users
+# For example, if set to "0.1" then the bot has a 10% chance to do something random
+# The value can range from 0 to 1, and will be clipped at those values
+laziness: 0.1
 
 # When true, logs some extra output to the console so you can see if/why things might be failing
 debug: false

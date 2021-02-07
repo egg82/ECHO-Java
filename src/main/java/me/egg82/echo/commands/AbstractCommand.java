@@ -71,10 +71,17 @@ public abstract class AbstractCommand extends BaseCommand {
 
         if (val == null) {
             issuer.sendError(Message.ERROR__INTERNAL);
+            logger.warn("val is null.");
             return false;
         }
 
         if (val instanceof Pair && (((Pair<?, ?>) val).getT1() == null || ((Pair<?, ?>) val).getT2() == null)) {
+            if (((Pair<?, ?>) val).getT1() == null) {
+                logger.warn("Pair T1 is null.");
+            }
+            if (((Pair<?, ?>) val).getT2() == null) {
+                logger.warn("Pair T2 is null.");
+            }
             issuer.sendError(Message.ERROR__INTERNAL);
             return false;
         }

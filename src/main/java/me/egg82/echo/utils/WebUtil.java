@@ -6,14 +6,19 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.web.WebConstants;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WebUtil {
+    private static final Logger logger= LoggerFactory.getLogger(WebUtil.class);
+
     private static final OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(WebConstants.CONNECT_TIMEOUT.getTime(), WebConstants.CONNECT_TIMEOUT.getUnit())
             .readTimeout(WebConstants.READ_TIMEOUT.getTime(), WebConstants.READ_TIMEOUT.getUnit())
@@ -26,6 +31,10 @@ public class WebUtil {
     public static @NotNull String urlEncode(@NotNull String part) { return URLEncoder.encode(part, StandardCharsets.UTF_8); }
 
     public static @NotNull Request.Builder getDefaultRequestBuilder(@NotNull URL url) {
+        if (ConfigUtil.getDebugOrFalse()) {
+            logger.info("Getting URL: " + url);
+        }
+
         return new Request.Builder()
                 .url(url)
                 .header("Accept-Language", "en-US,en;q=0.8")

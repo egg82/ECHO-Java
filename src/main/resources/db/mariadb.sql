@@ -1,28 +1,39 @@
+CREATE TABLE IF NOT EXISTS `echo_show` (
+    `id`        BIGINT NOT NULL AUTO_INCREMENT,
+    `version`   INT NOT NULL,
+    `created`   DATETIME NOT NULL,
+    `modified`  DATETIME NOT NULL,
+    `tvdb`      BIGINT NOT NULL,
+    `season`    INT NOT NULL DEFAULT 1,
+    `episode`   INT NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`)
+);
+
 CREATE TABLE IF NOT EXISTS `echo_message` (
-	`id` INT NOT NULL AUTO_INCREMENT,
-	`version` INT NOT NULL,
-	`created` DATETIME NOT NULL,
-	`modified` DATETIME NOT NULL,
-	`message` LONGTEXT NOT NULL,
-	PRIMARY KEY( `id` )
+    `id`        BIGINT NOT NULL AUTO_INCREMENT,
+    `version`   INT NOT NULL,
+    `created`   DATETIME NOT NULL,
+    `modified`  DATETIME NOT NULL,
+    `message`   LONGTEXT NOT NULL,
+    PRIMARY KEY (`id`)
 );
 
 CREATE TABLE IF NOT EXISTS `echo_learn` (
-	`id` INT NOT NULL AUTO_INCREMENT,
-	`version` INT NOT NULL,
-	`created` DATETIME NOT NULL,
-	`modified` DATETIME NOT NULL,
-	`user` BIGINT NOT NULL,
-	`learning` BOOLEAN NOT NULL,
-	PRIMARY KEY( `id` )
+    `id`        BIGINT NOT NULL AUTO_INCREMENT,
+    `version`   INT NOT NULL,
+    `created`   DATETIME NOT NULL,
+    `modified`  DATETIME NOT NULL,
+    `user`      BIGINT NOT NULL,
+    `learning`  BOOLEAN NOT NULL,
+    PRIMARY KEY (`id`)
 );
 
 CREATE TABLE IF NOT EXISTS `echo_data` (
-	`id` INT NOT NULL AUTO_INCREMENT,
-	`version` INT NOT NULL,
-	`created` DATETIME NOT NULL,
-	`modified` DATETIME NOT NULL,
-	`key` VARCHAR(255) NOT NULL UNIQUE,
-	`value` VARCHAR(255),
-	PRIMARY KEY( `id` )
+    `id`        BIGINT NOT NULL AUTO_INCREMENT,
+    `version`   INT NOT NULL,
+    `created`   DATETIME NOT NULL,
+    `modified`  DATETIME NOT NULL,
+    `key`       VARCHAR(255) NOT NULL UNIQUE,
+    `value`     VARCHAR(255),
+    PRIMARY KEY (`id`)
 );

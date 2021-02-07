@@ -24,7 +24,11 @@ public class CollectionProvider {
 
     private CollectionProvider() { }
 
-    private static final LoadingCache<Long, Boolean> canLearnCache = Caffeine.newBuilder().expireAfterWrite(1L, TimeUnit.HOURS).expireAfterAccess(30L, TimeUnit.MINUTES).build(CollectionProvider::canLearnExpensive);
+    private static final LoadingCache<Long, Boolean> canLearnCache = Caffeine.newBuilder()
+            .expireAfterWrite(1L, TimeUnit.HOURS)
+            .expireAfterAccess(30L, TimeUnit.MINUTES)
+            .build(CollectionProvider::canLearnExpensive);
+
     public static @NotNull LoadingCache<Long, Boolean> getCanLearnCache() { return canLearnCache; }
 
     private static ImmutableList<Class<AbstractCommand>> commandClasses = null;

@@ -20,7 +20,11 @@ import org.slf4j.LoggerFactory;
 public class GenericMessagingHandler implements MessagingHandler {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public static final LoadingCache<UUID, Boolean> messageCache = Caffeine.newBuilder().expireAfterWrite(2L, TimeUnit.MINUTES).expireAfterAccess(30L, TimeUnit.SECONDS).build(k -> Boolean.FALSE);
+    public static final LoadingCache<UUID, Boolean> messageCache = Caffeine.newBuilder()
+            .expireAfterWrite(2L, TimeUnit.MINUTES)
+            .expireAfterAccess(30L, TimeUnit.SECONDS)
+            .build(k -> Boolean.FALSE);
+
     private final Object messageCacheLock = new Object();
 
     public GenericMessagingHandler() { }

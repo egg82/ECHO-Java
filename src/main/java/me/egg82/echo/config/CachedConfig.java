@@ -50,6 +50,9 @@ public class CachedConfig {
     private String extractorKey = "";
     public @NotNull String getExtractorKey() { return extractorKey; }
 
+    private String traktKey = "";
+    public @NotNull String getTraktKey() { return traktKey; }
+
     private String alotEmote = "alot";
     public @NotNull String getAlotEmote() { return alotEmote; }
 
@@ -73,6 +76,9 @@ public class CachedConfig {
 
     private ImmutableSet<String> replyPhrasesReversed = ImmutableSet.of();
     public @NotNull ImmutableSet<String> getReplyPhrasesReversed() { return replyPhrasesReversed; }
+
+    private double laziness = 0.1d;
+    public double getLaziness() { return laziness; }
 
     public static @NotNull CachedConfig.Builder builder() { return new CachedConfig.Builder(); }
 
@@ -142,6 +148,11 @@ public class CachedConfig {
             return this;
         }
 
+        public @NotNull CachedConfig.Builder traktKey(@NotNull String value) {
+            values.traktKey = value;
+            return this;
+        }
+
         public @NotNull CachedConfig.Builder alotEmote(@NotNull String value) {
             values.alotEmote = value;
             return this;
@@ -179,6 +190,11 @@ public class CachedConfig {
                 reversedPhrases.add(reverse(phrase));
             }
             values.replyPhrasesReversed = ImmutableSet.copyOf(reversedPhrases);
+            return this;
+        }
+
+        public @NotNull CachedConfig.Builder laziness(double value) {
+            values.laziness = value;
             return this;
         }
 

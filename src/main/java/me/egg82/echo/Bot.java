@@ -10,6 +10,7 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import javax.security.auth.login.LoginException;
@@ -28,6 +29,7 @@ import me.egg82.echo.messaging.GenericMessagingHandler;
 import me.egg82.echo.messaging.MessagingService;
 import me.egg82.echo.services.CollectionProvider;
 import me.egg82.echo.storage.StorageService;
+import me.egg82.echo.tasks.BotStatusTask;
 import me.egg82.echo.tasks.TaskScheduler;
 import me.egg82.echo.utils.*;
 import net.dv8tion.jda.api.JDA;
@@ -40,6 +42,8 @@ import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import ninja.egg82.events.EventSubscriber;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -168,24 +172,12 @@ public class Bot {
         eventHolders.add(new ReplyEvents(jda, commandManager));
     }
 
-    private final Random random = new Random();
-
     private void loadTasks() {
-        tasks.add(TaskScheduler.createRepeatingTask(() -> {
-            if (jda.getGuilds().isEmpty()) {
-                return;
-            }
-
-            Guild guild = jda.getGuilds().get(random.nextInt(jda.getGuilds().size()));
-            guild.findMembers(m -> !m.getUser().isBot()).onSuccess(members -> {
-                if (members.isEmpty()) {
-                    return;
-                }
-
-                Member member = members.get(random.nextInt(members.size()));
-                jda.getPresence().setActivity(Activity.watching(member.getEffectiveName()));
-            });
-        }, new TimeUtil.Time(10L, TimeUnit.SECONDS), new TimeUtil.Time(10L, TimeUnit.MINUTES)));
+        tasks.add(TaskScheduler.createRepeatingTask(
+                new BotStatusTask(jda, tasks),
+                new TimeUtil.Time(10L, TimeUnit.SECONDS),
+                new TimeUtil.Time(10L, TimeUnit.MINUTES)
+        ));
 
         tasks.add(TaskScheduler.createRepeatingTask(PacketUtil::trySendQueue, new TimeUtil.Time(1L, TimeUnit.SECONDS), new TimeUtil.Time(1L, TimeUnit.SECONDS)));
     }

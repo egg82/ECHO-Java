@@ -6,6 +6,7 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.IntConsumer;
 import me.egg82.echo.utils.TimeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -40,6 +41,25 @@ public class TaskScheduler {
         return retVal;
     }
 
+    public static int createTask(@NotNull IntConsumer task, @NotNull TimeUtil.Time initialDelay) {
+        int retVal = currentTaskId.getAndIncrement();
+        aliveIds.add(retVal);
+
+        threadPool.schedule(() -> {
+            if (!aliveIds.contains(retVal)) {
+                return;
+            }
+
+            try {
+                task.accept(retVal);
+            } catch (Exception ex) {
+                logger.error(ex.getMessage(), ex);
+            }
+        }, initialDelay.getTime(), initialDelay.getUnit());
+
+        return retVal;
+    }
+
     public static int createRepeatingTask(@NotNull Runnable task, @NotNull TimeUtil.Time initialDelay, @NotNull TimeUtil.Time repeatedDelay) {
         int retVal = currentTaskId.getAndIncrement();
         aliveIds.add(retVal);
@@ -55,7 +75,32 @@ public class TaskScheduler {
                 logger.error(ex.getMessage(), ex);
             }
 
-            repeatTask(retVal, task, repeatedDelay);
+            if (aliveIds.contains(retVal)) {
+                repeatTask(retVal, task, repeatedDelay);
+            }
+        }, initialDelay.getTime(), initialDelay.getUnit());
+
+        return retVal;
+    }
+
+    public static int createRepeatingTask(@NotNull IntConsumer task, @NotNull TimeUtil.Time initialDelay, @NotNull TimeUtil.Time repeatedDelay) {
+        int retVal = currentTaskId.getAndIncrement();
+        aliveIds.add(retVal);
+
+        threadPool.schedule(() -> {
+            if (!aliveIds.contains(retVal)) {
+                return;
+            }
+
+            try {
+                task.accept(retVal);
+            } catch (Exception ex) {
+                logger.error(ex.getMessage(), ex);
+            }
+
+            if (aliveIds.contains(retVal)) {
+                repeatTask(retVal, task, repeatedDelay);
+            }
         }, initialDelay.getTime(), initialDelay.getUnit());
 
         return retVal;
@@ -77,7 +122,27 @@ public class TaskScheduler {
                 logger.error(ex.getMessage(), ex);
             }
 
-            repeatTask(id, task, time);
+            if (aliveIds.contains(id)) {
+                repeatTask(id, task, time);
+            }
+        }, time.getTime(), time.getUnit());
+    }
+
+    private static void repeatTask(int id, @NotNull IntConsumer task, @NotNull TimeUtil.Time time) {
+        threadPool.schedule(() -> {
+            if (!aliveIds.contains(id)) {
+                return;
+            }
+
+            try {
+                task.accept(id);
+            } catch (Exception ex) {
+                logger.error(ex.getMessage(), ex);
+            }
+
+            if (aliveIds.contains(id)) {
+                repeatTask(id, task, time);
+            }
         }, time.getTime(), time.getUnit());
     }
 }

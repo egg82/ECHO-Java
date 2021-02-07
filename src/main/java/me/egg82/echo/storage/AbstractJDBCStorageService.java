@@ -10,13 +10,11 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import java.io.File;
 import java.util.*;
 import javax.persistence.PersistenceException;
-import me.egg82.echo.storage.models.BaseModel;
-import me.egg82.echo.storage.models.DataModel;
-import me.egg82.echo.storage.models.LearnModel;
-import me.egg82.echo.storage.models.MessageModel;
+import me.egg82.echo.storage.models.*;
 import me.egg82.echo.storage.models.query.QDataModel;
 import me.egg82.echo.storage.models.query.QLearnModel;
 import me.egg82.echo.storage.models.query.QMessageModel;
+import me.egg82.echo.storage.models.query.QShowModel;
 import me.egg82.echo.utils.VersionUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -73,6 +71,59 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         queueLock.readLock().lock();
         try {
             connection.delete(newModel);
+        } finally {
+            queueLock.readLock().unlock();
+        }
+    }
+
+    public @NotNull ShowModel getOrCreateShowModel(long tvdbId, int season, int episode) {
+        queueLock.readLock().lock();
+        try {
+            ShowModel model = new QShowModel(connection)
+                    .tvdb.equalTo(tvdbId)
+                    .findOne();
+            if (model == null) {
+                model = new ShowModel();
+                model.setTvdb(tvdbId);
+                model.setSeason(season);
+                model.setEpisode(episode);
+                connection.save(model);
+                model = new QShowModel(connection)
+                        .tvdb.equalTo(tvdbId)
+                        .findOne();
+                if (model == null) {
+                    throw new PersistenceException("findOne() returned null after saving.");
+                }
+            }
+            return model;
+        } finally {
+            queueLock.readLock().unlock();
+        }
+    }
+
+    public @Nullable ShowModel getShowModel(long idOrTvdbId) {
+        queueLock.readLock().lock();
+        try {
+            ShowModel retVal = new QShowModel(connection)
+                    .tvdb.equalTo(idOrTvdbId)
+                    .findOne();
+            if (retVal == null) {
+                retVal = new QShowModel(connection)
+                        .id.equalTo(idOrTvdbId)
+                        .findOne();
+            }
+            return retVal;
+        } finally {
+            queueLock.readLock().unlock();
+        }
+    }
+
+    public @NotNull Set<ShowModel> getAllShows(int start, int max) {
+        queueLock.readLock().lock();
+        try {
+            return new QShowModel(connection)
+                    .id.between(start, start + max - 1)
+                    .findSet();
         } finally {
             queueLock.readLock().unlock();
         }
@@ -247,7 +298,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         dbConfig.setDefaultServer(false);
         dbConfig.setRegister(false);
         dbConfig.setName(name);
-        dbConfig.setClasses(Arrays.asList(BaseModel.class, MessageModel.class, LearnModel.class, DataModel.class));
+        dbConfig.setClasses(Arrays.asList(BaseModel.class, ShowModel.class, MessageModel.class, LearnModel.class, DataModel.class));
         connection = DatabaseFactory.createWithContextClassLoader(dbConfig, getClass().getClassLoader());
 
         DataModel model;
@@ -323,7 +374,13 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
 
     private @Nullable BaseModel duplicateModel(@NotNull BaseModel model, boolean keepModified) {
         BaseModel retVal = null;
-        if (model instanceof MessageModel) {
+        if (model instanceof ShowModel) {
+            ShowModel m = new ShowModel();
+            m.setTvdb(((ShowModel) model).getTvdb());
+            m.setSeason(((ShowModel) model).getSeason());
+            m.setEpisode(((ShowModel) model).getEpisode());
+            retVal = m;
+        } else if (model instanceof MessageModel) {
             MessageModel m = new MessageModel();
             m.setMessage(((MessageModel) model).getMessage());
             retVal = m;
@@ -350,7 +407,25 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
     }
 
     private void createOrUpdate(@NotNull BaseModel model, boolean keepModified) {
-        if (model instanceof MessageModel) {
+        if (model instanceof ShowModel) {
+            ShowModel m = new QShowModel(connection)
+                    .tvdb.equalTo(((ShowModel) model).getTvdb())
+                    .findOne();
+            if (m == null) {
+                m = (ShowModel) duplicateModel(model, keepModified);
+                if (m == null) {
+                    return;
+                }
+                connection.save(m);
+            } else {
+                m.setTvdb(((ShowModel) model).getTvdb());
+                m.setSeason(((ShowModel) model).getSeason());
+                m.setEpisode(((ShowModel) model).getEpisode());
+                m.setCreated(model.getCreated());
+                m.setModified(keepModified ? model.getModified() : null);
+                connection.update(m);
+            }
+        } else if (model instanceof MessageModel) {
             MessageModel m = new QMessageModel(connection)
                     .message.equalTo(((MessageModel) model).getMessage())
                     .findOne();

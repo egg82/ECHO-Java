@@ -90,15 +90,24 @@ public class WolframAlphaCommand extends AbstractCommand {
                 });
     }
 
-    private static final Cache<String, String> resultCache = Caffeine.newBuilder().expireAfterWrite(7L, TimeUnit.DAYS).expireAfterAccess(1L, TimeUnit.DAYS).build();
+    private static final Cache<String, String> resultCache = Caffeine.newBuilder()
+            .expireAfterWrite(7L, TimeUnit.DAYS)
+            .expireAfterAccess(1L, TimeUnit.DAYS)
+            .build();
 
     public static @NotNull CompletableFuture<String> getResult(@NotNull String key, @NotNull String query) { return CompletableFuture.supplyAsync(() -> resultCache.get(query, q -> WebUtil.getString(String.format(RESULT_URL, key, WebUtil.urlEncode(q))).join())); }
 
-    private static final Cache<String, byte[]> imageCache = Caffeine.newBuilder().expireAfterWrite(7L, TimeUnit.DAYS).expireAfterAccess(1L, TimeUnit.DAYS).build();
+    private static final Cache<String, byte[]> imageCache = Caffeine.newBuilder()
+            .expireAfterWrite(7L, TimeUnit.DAYS)
+            .expireAfterAccess(1L, TimeUnit.DAYS)
+            .build();
 
     public static @NotNull CompletableFuture<byte[]> getImage(@NotNull String key, @NotNull String query) { return CompletableFuture.supplyAsync(() -> imageCache.get(query, q -> WebUtil.getBytes(String.format(IMAGE_URL, key, WebUtil.urlEncode(q))).join())); }
 
-    private static final Cache<byte[], ImgurUploadModel> imgurCache = Caffeine.newBuilder().expireAfterWrite(7L, TimeUnit.DAYS).expireAfterAccess(1L, TimeUnit.DAYS).build();
+    private static final Cache<byte[], ImgurUploadModel> imgurCache = Caffeine.newBuilder()
+            .expireAfterWrite(7L, TimeUnit.DAYS)
+            .expireAfterAccess(1L, TimeUnit.DAYS)
+            .build();
 
     public static @NotNull CompletableFuture<ImgurUploadModel> uploadImage(@NotNull String key, byte @NotNull [] data) {
         return CompletableFuture.supplyAsync(() -> imgurCache.get(data, d -> {

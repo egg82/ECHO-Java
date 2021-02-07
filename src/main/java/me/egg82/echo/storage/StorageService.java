@@ -2,10 +2,7 @@ package me.egg82.echo.storage;
 
 import java.util.Collection;
 import java.util.Set;
-import me.egg82.echo.storage.models.BaseModel;
-import me.egg82.echo.storage.models.DataModel;
-import me.egg82.echo.storage.models.LearnModel;
-import me.egg82.echo.storage.models.MessageModel;
+import me.egg82.echo.storage.models.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,6 +15,13 @@ public interface StorageService {
     void storeModel(@NotNull BaseModel model);
     void storeModels(@NotNull Collection<? extends BaseModel> models);
     void deleteModel(@NotNull BaseModel model);
+
+    /*
+   Note: Can be an expensive operation
+    */
+    @NotNull ShowModel getOrCreateShowModel(long tvdbId, int season, int episode);
+    @Nullable ShowModel getShowModel(long idOrTvdbId);
+    @NotNull Set<ShowModel> getAllShows(int start, int max);
 
     /*
    Note: Can be an expensive operation

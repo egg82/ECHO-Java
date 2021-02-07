@@ -86,6 +86,11 @@ public class ConfigurationFileUtil {
             BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Extractor key:</c2> <c1>" + extractorKey + "</c1>");
         }
 
+        String traktKey = config.node("keys", "trakt").getString("");
+        if (debug) {
+            BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Trakt key:</c2> <c1>" + traktKey + "</c1>");
+        }
+
         String adminRole = config.node("roles", "admin").getString("owner");
         if (debug) {
             BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Admin role:</c2> <c1>" + adminRole + "</c1>");
@@ -125,6 +130,7 @@ public class ConfigurationFileUtil {
                 .imgurKey(imgurKey)
                 .deepAiKey(deepAiKey)
                 .extractorKey(extractorKey)
+                .traktKey(traktKey)
                 .adminRole(adminRole)
                 .disallowedRole(disallowedRole)
                 .alotEmote(alotEmote)
@@ -132,6 +138,7 @@ public class ConfigurationFileUtil {
                 .disabledCommands(getDisabledCommands(config, debug, manager))
                 .replyChance(replyChance)
                 .replyPhrases(getReplyPhrases(config, debug, manager))
+                .laziness(getLaziness(config, debug, manager))
                 .build();
 
         PacketUtil.setPoolSize(cachedConfig.getMessaging().size() + 1);
@@ -161,7 +168,7 @@ public class ConfigurationFileUtil {
         return retVal;
     }
 
-    private static @NonNull Set<String> getCommandPrefixes(@NonNull ConfigurationNode config, boolean debug, @NonNull JDACommandManager manager) {
+    private static @NotNull Set<String> getCommandPrefixes(@NotNull ConfigurationNode config, boolean debug, @NotNull JDACommandManager manager) {
         Set<String> retVal;
         try {
             retVal = new HashSet<>(!config.node("prefixes").empty() ? config.node("prefixes").getList(String.class) : new ArrayList<>());
@@ -434,7 +441,7 @@ public class ConfigurationFileUtil {
         return null;
     }
 
-    private static @NonNull Set<String> getDisabledCommands(@NonNull ConfigurationNode config, boolean debug, @NonNull JDACommandManager manager) {
+    private static @NotNull Set<String> getDisabledCommands(@NotNull ConfigurationNode config, boolean debug, @NotNull JDACommandManager manager) {
         Set<String> retVal;
         try {
             retVal = new HashSet<>(!config.node("disabled-commands").empty() ? config.node("disabled-commands").getList(String.class) : new ArrayList<>());
@@ -452,7 +459,7 @@ public class ConfigurationFileUtil {
         return retVal;
     }
 
-    private static @NonNull Set<String> getReplyPhrases(@NonNull ConfigurationNode config, boolean debug, @NonNull JDACommandManager manager) {
+    private static @NotNull Set<String> getReplyPhrases(@NotNull ConfigurationNode config, boolean debug, @NotNull JDACommandManager manager) {
         Set<String> phrases;
         try {
             phrases = new HashSet<>(!config.node("chat", "respond").empty() ? config.node("chat", "respond").getList(String.class) : new ArrayList<>());
@@ -470,6 +477,17 @@ public class ConfigurationFileUtil {
             if (debug) {
                 BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Enabling reply phrase:</c2> <c1>" + phrase + "</c1>");
             }
+        }
+
+        return retVal;
+    }
+
+    private static double getLaziness(ConfigurationNode config, boolean debug, @NotNull JDACommandManager manager) {
+        double retVal = config.node("laziness").getDouble(0.1d);
+        retVal = Math.max(0.0d, Math.min(1.0d, retVal));
+
+        if (debug) {
+            BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Laziness value:</c2> <c1>" + retVal + "</c1>");
         }
 
         return retVal;

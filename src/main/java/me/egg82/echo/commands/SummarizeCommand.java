@@ -216,7 +216,10 @@ public class SummarizeCommand extends AbstractCommand {
         return text;
     }
 
-    private static final Cache<String, ExtractionModel> extractionCache = Caffeine.newBuilder().expireAfterWrite(1L, TimeUnit.DAYS).expireAfterAccess(12L, TimeUnit.HOURS).build();
+    private static final Cache<String, ExtractionModel> extractionCache = Caffeine.newBuilder()
+            .expireAfterWrite(1L, TimeUnit.DAYS)
+            .expireAfterAccess(12L, TimeUnit.HOURS)
+            .build();
 
     public static @NotNull CompletableFuture<ExtractionModel> getExtractionModel(@NotNull String key, @NotNull String url) {
         return CompletableFuture.supplyAsync(() -> extractionCache.get(url, u -> WebUtil.getUnclosedResponse(String.format(EXTRACT_URL, key, u), "application/json").thenApplyAsync(response -> {
@@ -228,14 +231,17 @@ public class SummarizeCommand extends AbstractCommand {
         }).join()));
     }
 
-    private static final Cache<String, String> bytebinCache = Caffeine.newBuilder().expireAfterWrite(7L, TimeUnit.DAYS).expireAfterAccess(1L, TimeUnit.DAYS).build();
+    private static final Cache<String, String> bytebinCache = Caffeine.newBuilder()
+            .expireAfterWrite(7L, TimeUnit.DAYS)
+            .expireAfterAccess(1L, TimeUnit.DAYS)
+            .build();
 
     public static @NotNull CompletableFuture<String> getBytebinUrl(@NotNull String text) {
         return CompletableFuture.supplyAsync(() -> bytebinCache.get(text, t -> {
             try {
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 try (GZIPOutputStream gzip = new GZIPOutputStream(out)) {
-                    gzip.write(text.getBytes(StandardCharsets.UTF_8));
+                    gzip.write(t.getBytes(StandardCharsets.UTF_8));
                 }
 
                 RequestBody body = RequestBody.create(MediaType.get("text/plain"), out.toByteArray());
@@ -264,7 +270,10 @@ public class SummarizeCommand extends AbstractCommand {
         }));
     }
 
-    private static final Cache<String, SummaryModel> summaryCache = Caffeine.newBuilder().expireAfterWrite(7L, TimeUnit.DAYS).expireAfterAccess(1L, TimeUnit.DAYS).build();
+    private static final Cache<String, SummaryModel> summaryCache = Caffeine.newBuilder()
+            .expireAfterWrite(7L, TimeUnit.DAYS)
+            .expireAfterAccess(1L, TimeUnit.DAYS)
+            .build();
 
     public static @NotNull CompletableFuture<SummaryModel> getSummaryModel(@NotNull String key, @NotNull String url) {
         System.out.println("Getting summary for " + url);

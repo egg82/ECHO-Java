@@ -52,7 +52,10 @@ public class ChatEvents extends EventHolder {
         tripletNlp = new StanfordCoreNLP(tripletProps);
     }
 
-    private final Cache<Long, String> oldMessages = Caffeine.newBuilder().expireAfterWrite(1L, TimeUnit.HOURS).expireAfterAccess(30L, TimeUnit.MINUTES).build();
+    private final Cache<Long, String> oldMessages = Caffeine.newBuilder()
+            .expireAfterWrite(1L, TimeUnit.HOURS)
+            .expireAfterAccess(30L, TimeUnit.MINUTES)
+            .build();
 
     public ChatEvents(@NotNull JDA jda, @NotNull JDACommandManager manager) {
         this.jda = jda;
