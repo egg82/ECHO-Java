@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class EpisodeModel implements Serializable {
     private int season = -1;
@@ -15,7 +14,7 @@ public class EpisodeModel implements Serializable {
     private String title = "";
     private EpisodeIDListModel ids = new EpisodeIDListModel();
     @JSON(name = "number_abs")
-    private String numAbs = null;
+    private long numAbs = -1L;
     private String overview = "";
     @JSON(name = "first_aired")
     private Instant firstAired = Instant.now();
@@ -27,7 +26,7 @@ public class EpisodeModel implements Serializable {
     private long commentCount = -1L;
     @JSON(name = "available_translations")
     private List<String> translations = new ArrayList<>();
-    private short runtime = -1;
+    private int runtime = -1;
 
     public EpisodeModel() { }
 
@@ -48,10 +47,10 @@ public class EpisodeModel implements Serializable {
     public void setIds(@NotNull EpisodeIDListModel ids) { this.ids = ids; }
 
     @JSON(name = "number_abs")
-    public @Nullable String getNumAbs() { return numAbs; }
+    public long getNumAbs() { return numAbs; }
 
     @JSON(name = "number_abs")
-    public void setNumAbs(String numAbs) { this.numAbs = numAbs; }
+    public void setNumAbs(long numAbs) { this.numAbs = numAbs; }
 
     public @NotNull String getOverview() { return overview; }
 
@@ -89,9 +88,9 @@ public class EpisodeModel implements Serializable {
     @JSON(name = "available_translations")
     public void setTranslations(@NotNull List<String> translations) { this.translations = translations; }
 
-    public short getRuntime() { return runtime; }
+    public int getRuntime() { return runtime; }
 
-    public void setRuntime(short runtime) { this.runtime = runtime; }
+    public void setRuntime(int runtime) { this.runtime = runtime; }
 
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -125,6 +124,7 @@ public class EpisodeModel implements Serializable {
         private long tvdb = -1L;
         private String imdb = "";
         private long tmdb = -1L;
+        private long tvrange = -1L;
 
         public EpisodeIDListModel() { }
 
@@ -144,14 +144,18 @@ public class EpisodeModel implements Serializable {
 
         public void setTmdb(long tmdb) { this.tmdb = tmdb; }
 
+        public long getTvrange() { return tvrange; }
+
+        public void setTvrange(long tvrange) { this.tvrange = tvrange; }
+
         public boolean equals(Object o) {
             if (this == o) return true;
             if (!(o instanceof EpisodeIDListModel)) return false;
             EpisodeIDListModel that = (EpisodeIDListModel) o;
-            return trakt == that.trakt && tvdb == that.tvdb && tmdb == that.tmdb && imdb.equals(that.imdb);
+            return trakt == that.trakt && tvdb == that.tvdb && tmdb == that.tmdb && tvrange == that.tvrange && imdb.equals(that.imdb);
         }
 
-        public int hashCode() { return Objects.hash(trakt, tvdb, imdb, tmdb); }
+        public int hashCode() { return Objects.hash(trakt, tvdb, imdb, tmdb, tvrange); }
 
         public String toString() {
             return "EpisodeIDListModel{" +
@@ -159,6 +163,7 @@ public class EpisodeModel implements Serializable {
                     ", tvdb=" + tvdb +
                     ", imdb='" + imdb + '\'' +
                     ", tmdb=" + tmdb +
+                    ", tvrange=" + tvrange +
                     '}';
         }
     }

@@ -144,20 +144,20 @@ public class BotStatusTask extends AbstractTask {
                             return null;
                         }
 
-                        return new Pair<>(trendingModel.getShow().getTitle(), new IntIntImmutablePair(seasonNum, episodeNum));
+                        return new Pair<>(trendingModel.getShow().getTitle(), episodeModel);
                     })
                     .whenCompleteAsync((val, ex) -> {
                         if (!canCompleteContinue(val, ex)) {
                             return;
                         }
 
-                        jda.getPresence().setActivity(Activity.watching(val.getT1() + " S" + val.getT2().leftInt() + "E" + val.getT2().rightInt()));
+                        jda.getPresence().setActivity(Activity.watching(val.getT1() + " S" + val.getT2().getSeason() + "E" + val.getT2().getNumber()));
 
                         TaskScheduler.cancelTask(id);
                         tasks.rem(id);
                         tasks.add(TaskScheduler.createRepeatingTask(
                                 new BotStatusTask(jda, tasks),
-                                new TimeUtil.Time(45L, TimeUnit.MINUTES),
+                                new TimeUtil.Time(val.getT2().getRuntime(), TimeUnit.MINUTES),
                                 new TimeUtil.Time(10L, TimeUnit.MINUTES)
                         ));
                     });
