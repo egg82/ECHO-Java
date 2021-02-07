@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class SeasonModel implements Serializable {
     private int number = -1;
-    private SeasonIDListModel ids = new SeasonIDListModel();
+    private TraktIDListModel ids = new TraktIDListModel();
     private double rating = -1.0d;
     private long votes = -1L;
     @JSON(name = "episode_count")
@@ -19,7 +19,7 @@ public class SeasonModel implements Serializable {
     private String title = "";
     private String overview = null;
     @JSON(name = "first_aired")
-    private Instant firstAired = Instant.now();
+    private Instant firstAired = null;
     @JSON(name = "updated_at")
     private Instant updatedAt = Instant.now();
     private String network = "";
@@ -30,9 +30,9 @@ public class SeasonModel implements Serializable {
 
     public void setNumber(int number) { this.number = number; }
 
-    public @NotNull SeasonIDListModel getIds() { return ids; }
+    public @NotNull TraktIDListModel getIds() { return ids; }
 
-    public void setIds(@NotNull SeasonIDListModel ids) { this.ids = ids; }
+    public void setIds(@NotNull TraktIDListModel ids) { this.ids = ids; }
 
     public double getRating() { return rating; }
 
@@ -63,10 +63,10 @@ public class SeasonModel implements Serializable {
     public void setOverview(String overview) { this.overview = overview; }
 
     @JSON(name = "first_aired")
-    public @NotNull Instant getFirstAired() { return firstAired; }
+    public @Nullable Instant getFirstAired() { return firstAired; }
 
     @JSON(name = "first_aired")
-    public void setFirstAired(@NotNull Instant firstAired) { this.firstAired = firstAired; }
+    public void setFirstAired(Instant firstAired) { this.firstAired = firstAired; }
 
     @JSON(name = "updated_at")
     public @NotNull Instant getUpdatedAt() { return updatedAt; }
@@ -82,7 +82,7 @@ public class SeasonModel implements Serializable {
         if (this == o) return true;
         if (!(o instanceof SeasonModel)) return false;
         SeasonModel that = (SeasonModel) o;
-        return number == that.number && rating == that.rating && votes == that.votes && episodeCount == that.episodeCount && airedEpisodes == that.airedEpisodes && ids.equals(that.ids) && title.equals(that.title) && Objects.equals(overview, that.overview) && firstAired.equals(that.firstAired) && updatedAt.equals(that.updatedAt) && network.equals(that.network);
+        return number == that.number && Double.compare(that.rating, rating) == 0 && votes == that.votes && episodeCount == that.episodeCount && airedEpisodes == that.airedEpisodes && ids.equals(that.ids) && title.equals(that.title) && Objects.equals(overview, that.overview) && Objects.equals(firstAired, that.firstAired) && updatedAt.equals(that.updatedAt) && network.equals(that.network);
     }
 
     public int hashCode() { return Objects.hash(number, ids, rating, votes, episodeCount, airedEpisodes, title, overview, firstAired, updatedAt, network); }
@@ -101,42 +101,5 @@ public class SeasonModel implements Serializable {
                 ", updatedAt=" + updatedAt +
                 ", network='" + network + '\'' +
                 '}';
-    }
-
-    public static final class SeasonIDListModel implements Serializable {
-        private long trakt = -1L;
-        private long tvdb = -1L;
-        private long tmdb = -1L;
-
-        public SeasonIDListModel() { }
-
-        public long getTrakt() { return trakt; }
-
-        public void setTrakt(long trakt) { this.trakt = trakt; }
-
-        public long getTvdb() { return tvdb; }
-
-        public void setTvdb(long tvdb) { this.tvdb = tvdb; }
-
-        public long getTmdb() { return tmdb; }
-
-        public void setTmdb(long tmdb) { this.tmdb = tmdb; }
-
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof SeasonIDListModel)) return false;
-            SeasonIDListModel that = (SeasonIDListModel) o;
-            return trakt == that.trakt && tvdb == that.tvdb && tmdb == that.tmdb;
-        }
-
-        public int hashCode() { return Objects.hash(trakt, tvdb, tmdb); }
-
-        public String toString() {
-            return "SeasonIDListModel{" +
-                    "trakt=" + trakt +
-                    ", tvdb=" + tvdb +
-                    ", tmdb=" + tmdb +
-                    '}';
-        }
     }
 }

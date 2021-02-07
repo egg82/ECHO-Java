@@ -16,6 +16,7 @@ import me.egg82.echo.messaging.packets.ShowPacket;
 import me.egg82.echo.storage.StorageService;
 import me.egg82.echo.storage.models.ShowModel;
 import me.egg82.echo.utils.PacketUtil;
+import me.egg82.echo.utils.ResponseUtil;
 import me.egg82.echo.utils.TimeUtil;
 import me.egg82.echo.utils.WebUtil;
 import me.egg82.echo.web.models.EpisodeModel;
@@ -86,8 +87,8 @@ public class BotStatusTask extends AbstractTask {
                                             m.setSeason(dbModel.getSeason());
                                             modified = true;
                                         }
-                                        if (m.getEpisode() != dbModel.getEpisode()) {
-                                            m.setEpisode(dbModel.getEpisode());
+                                        if (m.getEpisode() != dbModel.getEpisode() + 1) {
+                                            m.setEpisode(dbModel.getEpisode() + 1);
                                             modified = true;
                                         }
                                         if (modified) {
@@ -123,7 +124,7 @@ public class BotStatusTask extends AbstractTask {
                             if (seasonNum != -1 && episodeNum != -1) {
                                 episodeModel = getEpisodeModel(cachedConfig.getTraktKey(), trendingModel.getShow().getIds().getTrakt(), seasonNum, episodeNum).join();
                                 if (episodeModel != null) {
-                                    cachedConfig.getMegaHal().add(episodeModel.getOverview());
+                                    ResponseUtil.learn(cachedConfig, episodeModel.getOverview());
                                 }
                             }
 
@@ -157,7 +158,8 @@ public class BotStatusTask extends AbstractTask {
                         tasks.rem(id);
                         tasks.add(TaskScheduler.createRepeatingTask(
                                 new BotStatusTask(jda, tasks),
-                                new TimeUtil.Time(val.getT2().getRuntime(), TimeUnit.MINUTES),
+                                new TimeUtil.Time(10L, TimeUnit.SECONDS),
+                                //new TimeUtil.Time(val.getT2().getRuntime(), TimeUnit.MINUTES),
                                 new TimeUtil.Time(10L, TimeUnit.MINUTES)
                         ));
                     });

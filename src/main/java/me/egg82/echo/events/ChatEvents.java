@@ -123,7 +123,7 @@ public class ChatEvents extends EventHolder {
 
         oldMessages.put(event.getMessageIdLong(), event.getMessage().getContentStripped());
 
-        cachedConfig.getMegaHal().add(event.getMessage().getContentStripped());
+        ResponseUtil.learn(cachedConfig, event.getMessage().getContentStripped());
 
         for (StorageService service : cachedConfig.getStorage()) {
             service.getOrCreateMessageModel(event.getMessage().getContentStripped());
@@ -219,7 +219,7 @@ public class ChatEvents extends EventHolder {
 
         MarkovMegaHal megaHal = cachedConfig.getMegaHal();
         //megaHal.remove(old); // TODO: Add MegaHal removal once that becomes a thing in the library
-        megaHal.add(event.getMessage().getContentStripped());
+        ResponseUtil.learn(cachedConfig, event.getMessage().getContentStripped());
 
         for (StorageService service : cachedConfig.getStorage()) {
             MessageModel model = service.getOrCreateMessageModel(old);

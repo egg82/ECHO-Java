@@ -12,7 +12,7 @@ public class EpisodeModel implements Serializable {
     private int season = -1;
     private int number = -1;
     private String title = "";
-    private EpisodeIDListModel ids = new EpisodeIDListModel();
+    private TraktIDListModel ids = new TraktIDListModel();
     @JSON(name = "number_abs")
     private long numAbs = -1L;
     private String overview = "";
@@ -42,9 +42,9 @@ public class EpisodeModel implements Serializable {
 
     public void setTitle(@NotNull String title) { this.title = title; }
 
-    public @NotNull EpisodeIDListModel getIds() { return ids; }
+    public @NotNull TraktIDListModel getIds() { return ids; }
 
-    public void setIds(@NotNull EpisodeIDListModel ids) { this.ids = ids; }
+    public void setIds(@NotNull TraktIDListModel ids) { this.ids = ids; }
 
     @JSON(name = "number_abs")
     public long getNumAbs() { return numAbs; }
@@ -117,54 +117,5 @@ public class EpisodeModel implements Serializable {
                 ", translations=" + translations +
                 ", runtime=" + runtime +
                 '}';
-    }
-
-    public static final class EpisodeIDListModel implements Serializable {
-        private long trakt = -1L;
-        private long tvdb = -1L;
-        private String imdb = "";
-        private long tmdb = -1L;
-        private long tvrange = -1L;
-
-        public EpisodeIDListModel() { }
-
-        public long getTrakt() { return trakt; }
-
-        public void setTrakt(long trakt) { this.trakt = trakt; }
-
-        public long getTvdb() { return tvdb; }
-
-        public void setTvdb(long tvdb) { this.tvdb = tvdb; }
-
-        public @NotNull String getImdb() { return imdb; }
-
-        public void setImdb(@NotNull String imdb) { this.imdb = imdb; }
-
-        public long getTmdb() { return tmdb; }
-
-        public void setTmdb(long tmdb) { this.tmdb = tmdb; }
-
-        public long getTvrange() { return tvrange; }
-
-        public void setTvrange(long tvrange) { this.tvrange = tvrange; }
-
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof EpisodeIDListModel)) return false;
-            EpisodeIDListModel that = (EpisodeIDListModel) o;
-            return trakt == that.trakt && tvdb == that.tvdb && tmdb == that.tmdb && tvrange == that.tvrange && imdb.equals(that.imdb);
-        }
-
-        public int hashCode() { return Objects.hash(trakt, tvdb, imdb, tmdb, tvrange); }
-
-        public String toString() {
-            return "EpisodeIDListModel{" +
-                    "trakt=" + trakt +
-                    ", tvdb=" + tvdb +
-                    ", imdb='" + imdb + '\'' +
-                    ", tmdb=" + tmdb +
-                    ", tvrange=" + tvrange +
-                    '}';
-        }
     }
 }

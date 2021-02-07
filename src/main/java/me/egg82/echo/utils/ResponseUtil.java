@@ -2,10 +2,12 @@ package me.egg82.echo.utils;
 
 import co.aikar.commands.JDACommandManager;
 import io.paradaux.ai.MarkovMegaHal;
+import java.util.Collection;
 import java.util.Set;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.lang.Message;
+import me.egg82.echo.messaging.packets.MessagePacket;
 import me.egg82.echo.services.CollectionProvider;
 import me.egg82.echo.storage.StorageService;
 import me.egg82.echo.storage.models.MessageModel;
@@ -59,4 +61,59 @@ public class ResponseUtil {
     public static boolean canLearn(@NotNull User user) { return Boolean.TRUE.equals(CollectionProvider.getCanLearnCache().get(user.getIdLong())); }
 
     public static boolean canLearn(@NotNull Member member) { return Boolean.TRUE.equals(CollectionProvider.getCanLearnCache().get(member.getIdLong())); }
+
+    public static void learn(@NotNull CachedConfig cachedConfig, @NotNull String sentence) {
+        boolean learned = false;
+        for (StorageService service : cachedConfig.getStorage()) {
+            MessageModel m = service.getMessageModel(sentence);
+            if (m != null) {
+                learned = true;
+            } else {
+                m = new MessageModel();
+                m.setMessage(sentence);
+                service.storeModel(m);
+            }
+        }
+
+        if (!learned) {
+            cachedConfig.getMegaHal().add(sentence);
+
+            MessagePacket packet = new MessagePacket();
+            packet.setMessage(sentence);
+            PacketUtil.queuePacket(packet);
+        }
+    }
+
+    public static void learnAll(@NotNull CachedConfig cachedConfig, @NotNull Collection<String> sentences) { learnAll(cachedConfig, sentences.toArray(new String[0])); }
+
+    public static void learnAll(@NotNull CachedConfig cachedConfig, @NotNull String[] sentences) {
+        MarkovMegaHal megaHal = cachedConfig.getMegaHal();
+
+        for (String sentence : sentences) {
+            sentence = sentence.trim();
+            if (sentence.isEmpty()) {
+                continue;
+            }
+
+            boolean learned = false;
+            for (StorageService service : cachedConfig.getStorage()) {
+                MessageModel m = service.getMessageModel(sentence);
+                if (m != null) {
+                    learned = true;
+                } else {
+                    m = new MessageModel();
+                    m.setMessage(sentence);
+                    service.storeModel(m);
+                }
+            }
+
+            if (!learned) {
+                megaHal.add(sentence);
+
+                MessagePacket packet = new MessagePacket();
+                packet.setMessage(sentence);
+                PacketUtil.queuePacket(packet);
+            }
+        }
+    }
 }

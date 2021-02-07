@@ -41,6 +41,22 @@ public class GenericMessagingHandler implements MessagingHandler {
         }
     }
 
+    private void handleShow(@NotNull ShowPacket packet) {
+        if (ConfigUtil.getDebugOrFalse()) {
+            logger.info("Handling show packet: " + packet.getTvdb() + ", S" + packet.getSeason() + "E" + packet.getEpisode());
+        }
+
+        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+        if (cachedConfig == null) {
+            logger.error("Could not get cached config.");
+            return;
+        }
+
+        for (StorageService service : cachedConfig.getStorage()) {
+            service.getOrCreateShowModel(packet.getTvdb(), packet.getSeason(), packet.getEpisode());
+        }
+    }
+
     private void handleMessage(@NotNull MessagePacket packet) {
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Handling message packet: " + packet.getMessage());
@@ -112,7 +128,9 @@ public class GenericMessagingHandler implements MessagingHandler {
     }
 
     private void handleGenericPacket(@NotNull Packet packet) {
-        if (packet instanceof MessagePacket) {
+        if (packet instanceof ShowPacket) {
+            handleShow((ShowPacket) packet);
+        } else if (packet instanceof MessagePacket) {
             handleMessage((MessagePacket) packet);
         } else if (packet instanceof MessageUpdatePacket) {
             handleMessageUpdate((MessageUpdatePacket) packet);

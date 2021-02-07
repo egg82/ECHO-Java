@@ -1,12 +1,9 @@
 package me.egg82.echo.commands.internal;
 
 import co.aikar.commands.CommandIssuer;
-import io.paradaux.ai.MarkovMegaHal;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.lang.Message;
-import me.egg82.echo.messaging.packets.MessagePacket;
-import me.egg82.echo.storage.StorageService;
-import me.egg82.echo.utils.PacketUtil;
+import me.egg82.echo.utils.ResponseUtil;
 import me.egg82.echo.utils.WebUtil;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
@@ -40,24 +37,7 @@ public class LearnCommand extends AbstractInternalCommand {
                 return;
             }
 
-            MarkovMegaHal megaHal = cachedConfig.getMegaHal();
-
-            for (String sentence : splitContent) {
-                sentence = sentence.trim();
-                if (sentence.isEmpty()) {
-                    continue;
-                }
-
-                megaHal.add(sentence);
-
-                for (StorageService service : cachedConfig.getStorage()) {
-                    service.getOrCreateMessageModel(sentence);
-                }
-
-                MessagePacket packet = new MessagePacket();
-                packet.setMessage(sentence);
-                PacketUtil.queuePacket(packet);
-            }
+            ResponseUtil.learnAll(cachedConfig, splitContent);
 
             issuer.sendInfo(Message.LEARN__END, "{url}", url);
         });
