@@ -18,7 +18,6 @@ import java.util.regex.Pattern;
 import me.egg82.echo.commands.GoogleSearchCommand;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
-import me.egg82.echo.messaging.packets.MessagePacket;
 import me.egg82.echo.messaging.packets.MessageUpdatePacket;
 import me.egg82.echo.storage.StorageService;
 import me.egg82.echo.storage.models.MessageModel;
@@ -124,14 +123,6 @@ public class ChatEvents extends EventHolder {
         oldMessages.put(event.getMessageIdLong(), event.getMessage().getContentStripped());
 
         ResponseUtil.learn(cachedConfig, event.getMessage().getContentStripped());
-
-        for (StorageService service : cachedConfig.getStorage()) {
-            service.getOrCreateMessageModel(event.getMessage().getContentStripped());
-        }
-
-        MessagePacket packet = new MessagePacket();
-        packet.setMessage(event.getMessage().getContentStripped());
-        PacketUtil.queuePacket(packet);
     }
 
     private void speak(@NotNull MessageReceivedEvent event) {
@@ -217,7 +208,6 @@ public class ChatEvents extends EventHolder {
 
         oldMessages.put(event.getMessageIdLong(), event.getMessage().getContentStripped());
 
-        MarkovMegaHal megaHal = cachedConfig.getMegaHal();
         //megaHal.remove(old); // TODO: Add MegaHal removal once that becomes a thing in the library
         ResponseUtil.learn(cachedConfig, event.getMessage().getContentStripped());
 

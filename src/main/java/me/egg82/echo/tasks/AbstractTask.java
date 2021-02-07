@@ -5,7 +5,6 @@ import java.util.function.IntConsumer;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.core.Pair;
-import me.egg82.echo.lang.Message;
 import net.dv8tion.jda.api.JDA;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
