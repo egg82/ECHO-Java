@@ -8,12 +8,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import me.egg82.echo.core.GameStatus;
 import me.egg82.echo.messaging.*;
 import me.egg82.echo.storage.*;
 import me.egg82.echo.utils.BotLogUtil;
 import me.egg82.echo.utils.LogUtil;
 import me.egg82.echo.utils.PacketUtil;
+import me.egg82.echo.utils.TimeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.reflections.Reflections;
@@ -138,6 +141,7 @@ public class ConfigurationFileUtil {
                 .replyChance(replyChance)
                 .replyPhrases(getReplyPhrases(config, debug, manager))
                 .laziness(getLaziness(config, debug, manager))
+                .games(getGames(config, debug, manager))
                 .build();
 
         PacketUtil.setPoolSize(cachedConfig.getMessaging().size() + 1);
@@ -492,6 +496,46 @@ public class ConfigurationFileUtil {
         return retVal;
     }
 
+    private static @NotNull List<GameStatus> getGames(@NotNull ConfigurationNode config, boolean debug, @NotNull JDACommandManager manager) {
+        List<GameStatus> retVal = new ArrayList<>();
+
+        for (Map.Entry<Object, ? extends ConfigurationNode> kvp : config.node("games").childrenMap().entrySet()) {
+            GameStatus status = getGameOf((String) kvp.getKey(), kvp.getValue());
+            if (status == null) {
+                continue;
+            }
+
+            if (debug) {
+                BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Added game:</c2> <c1>" + status.getDisplayName() + " (" + status.getName() + ")</c1>");
+            }
+            retVal.add(status);
+        }
+
+        return retVal;
+    }
+
+    private static @Nullable GameStatus getGameOf(@NotNull String name, @NotNull ConfigurationNode gameNode) {
+        String displayName = gameNode.node("name").getString("").toLowerCase();
+        if (displayName.isEmpty()) {
+            logger.error("Could not create game \"" + name + "\" due to invalid name.");
+            return null;
+        }
+
+        TimeUtil.Time min = TimeUtil.getTime(gameNode.node("min").getString(""));
+        if (min == null) {
+            logger.error("Could not create game \"" + name + "\" due to invalid min time.");
+            return null;
+        }
+
+        TimeUtil.Time max = TimeUtil.getTime(gameNode.node("max").getString(""));
+        if (max == null) {
+            logger.error("Could not create game \"" + name + "\" due to invalid max time.");
+            return null;
+        }
+
+        return new GameStatus(name, displayName, min, max);
+    }
+
     private static @NotNull CommentedConfigurationNode getConfig(@NotNull String resourcePath, @NotNull File fileOnDisk) throws IOException {
         File parentDir = fileOnDisk.getParentFile();
         if (parentDir.exists() && !parentDir.isDirectory()) {
@@ -561,8 +605,18 @@ public class ConfigurationFileUtil {
         public PoolSettings(ConfigurationNode settingsNode) {
             minPoolSize = settingsNode.node("min-idle").getInt();
             maxPoolSize = settingsNode.node("max-pool-size").getInt();
-            maxLifetime = settingsNode.node("max-lifetime").getLong();
-            timeout = settingsNode.node("timeout").getLong();
+
+            TimeUtil.Time l = TimeUtil.getTime(settingsNode.node("max-lifetime").getString("30minutes"));
+            if (l == null) {
+                l = new TimeUtil.Time(30L, TimeUnit.MINUTES);
+            }
+            maxLifetime = l.getMillis();
+
+            TimeUtil.Time t = TimeUtil.getTime(settingsNode.node("timeout").getString("5seconds"));
+            if (t == null) {
+                t = new TimeUtil.Time(5L, TimeUnit.SECONDS);
+            }
+            timeout = t.getMillis();
         }
 
         public int getMinPoolSize() { return minPoolSize; }

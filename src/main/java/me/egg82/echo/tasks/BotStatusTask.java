@@ -13,6 +13,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 import me.egg82.echo.config.CachedConfig;
+import me.egg82.echo.core.GameStatus;
 import me.egg82.echo.core.Pair;
 import me.egg82.echo.messaging.packets.ShowPacket;
 import me.egg82.echo.storage.StorageService;
@@ -50,124 +51,147 @@ public class BotStatusTask extends AbstractTask {
             return;
         }
 
-        if (!cachedConfig.getTraktKey().isEmpty() && random.nextDouble() <= cachedConfig.getLaziness()) {
-            getTrendingModel(cachedConfig.getTraktKey())
-                    .thenApplyAsync(v -> {
-                        if (v == null) {
-                            return null;
-                        }
-
-                        List<TrendingShowModel> tempShowList = new ArrayList<>(v);
-
-                        int seasonNum = -1;
-                        int episodeNum = -1;
-                        TrendingShowModel trendingModel;
-                        EpisodeModel episodeModel = null;
-
-                        do {
-                            int index = random.nextInt(tempShowList.size());
-                            trendingModel = tempShowList.get(index);
-
-                            ShowModel dbModel = null;
-                            for (StorageService service : cachedConfig.getStorage()) {
-                                dbModel = service.getOrCreateShowModel(trendingModel.getShow().getIds().getTvdb(), 1, 0);
-                            }
-
-                            if (dbModel == null) {
-                                logger.error("dbModel was null.");
+        if (random.nextDouble() <= cachedConfig.getLaziness()) {
+            if (!cachedConfig.getTraktKey().isEmpty() && random.nextDouble() <= 0.5d) {
+                getTrendingModel(cachedConfig.getTraktKey())
+                        .thenApplyAsync(v -> {
+                            if (v == null) {
                                 return null;
                             }
 
-                            List<SeasonModel> seasons = getSeasonsModel(cachedConfig.getTraktKey(), trendingModel.getShow().getIds().getTrakt()).join();
-                            for (SeasonModel season : seasons) {
-                                if (season.getNumber() == dbModel.getSeason() && season.getAiredEpisodes() > dbModel.getEpisode()) {
-                                    // Same season, new episode
-                                    for (StorageService service : cachedConfig.getStorage()) {
-                                        ShowModel m = service.getOrCreateShowModel(trendingModel.getShow().getIds().getTvdb(), dbModel.getSeason(), dbModel.getEpisode() + 1);
-                                        boolean modified = false;
-                                        if (m.getSeason() != dbModel.getSeason()) {
-                                            m.setSeason(dbModel.getSeason());
-                                            modified = true;
-                                        }
-                                        if (m.getEpisode() != dbModel.getEpisode() + 1) {
-                                            m.setEpisode(dbModel.getEpisode() + 1);
-                                            modified = true;
-                                        }
-                                        if (modified) {
-                                            service.storeModel(m);
-                                        }
-                                    }
-                                    seasonNum = dbModel.getSeason();
-                                    episodeNum = dbModel.getEpisode() + 1;
-                                    break;
-                                } else if (season.getNumber() > dbModel.getSeason()) {
-                                    // New season
-                                    for (StorageService service : cachedConfig.getStorage()) {
-                                        ShowModel m = service.getOrCreateShowModel(trendingModel.getShow().getIds().getTvdb(), season.getNumber(), 1);
-                                        boolean modified = false;
-                                        if (m.getSeason() != season.getNumber()) {
-                                            m.setSeason(season.getNumber());
-                                            modified = true;
-                                        }
-                                        if (m.getEpisode() != 1) {
-                                            m.setEpisode(1);
-                                            modified = true;
-                                        }
-                                        if (modified) {
-                                            service.storeModel(m);
-                                        }
-                                    }
-                                    seasonNum = season.getNumber();
-                                    episodeNum = 1;
-                                    break;
-                                }
-                            }
+                            List<TrendingShowModel> tempShowList = new ArrayList<>(v);
 
-                            if (seasonNum != -1 && episodeNum != -1) {
-                                episodeModel = getEpisodeModel(cachedConfig.getTraktKey(), trendingModel.getShow().getIds().getTrakt(), seasonNum, episodeNum).join();
-                                if (episodeModel != null) {
-                                    ResponseUtil.learn(cachedConfig, episodeModel.getOverview());
+                            int seasonNum = -1;
+                            int episodeNum = -1;
+                            TrendingShowModel trendingModel;
+                            EpisodeModel episodeModel = null;
+
+                            do {
+                                int index = random.nextInt(tempShowList.size());
+                                trendingModel = tempShowList.get(index);
+
+                                ShowModel dbModel = null;
+                                for (StorageService service : cachedConfig.getStorage()) {
+                                    dbModel = service.getOrCreateShowModel(trendingModel.getShow().getIds().getTvdb(), 1, 0);
                                 }
-                            }
+
+                                if (dbModel == null) {
+                                    logger.error("dbModel was null.");
+                                    return null;
+                                }
+
+                                List<SeasonModel> seasons = getSeasonsModel(cachedConfig.getTraktKey(), trendingModel.getShow().getIds().getTrakt()).join();
+                                for (SeasonModel season : seasons) {
+                                    if (season.getNumber() == dbModel.getSeason() && season.getAiredEpisodes() > dbModel.getEpisode()) {
+                                        // Same season, new episode
+                                        for (StorageService service : cachedConfig.getStorage()) {
+                                            ShowModel m = service.getOrCreateShowModel(trendingModel.getShow().getIds().getTvdb(), dbModel.getSeason(), dbModel.getEpisode() + 1);
+                                            boolean modified = false;
+                                            if (m.getSeason() != dbModel.getSeason()) {
+                                                m.setSeason(dbModel.getSeason());
+                                                modified = true;
+                                            }
+                                            if (m.getEpisode() != dbModel.getEpisode() + 1) {
+                                                m.setEpisode(dbModel.getEpisode() + 1);
+                                                modified = true;
+                                            }
+                                            if (modified) {
+                                                service.storeModel(m);
+                                            }
+                                        }
+                                        seasonNum = dbModel.getSeason();
+                                        episodeNum = dbModel.getEpisode() + 1;
+                                        break;
+                                    } else if (season.getNumber() > dbModel.getSeason()) {
+                                        // New season
+                                        for (StorageService service : cachedConfig.getStorage()) {
+                                            ShowModel m = service.getOrCreateShowModel(trendingModel.getShow().getIds().getTvdb(), season.getNumber(), 1);
+                                            boolean modified = false;
+                                            if (m.getSeason() != season.getNumber()) {
+                                                m.setSeason(season.getNumber());
+                                                modified = true;
+                                            }
+                                            if (m.getEpisode() != 1) {
+                                                m.setEpisode(1);
+                                                modified = true;
+                                            }
+                                            if (modified) {
+                                                service.storeModel(m);
+                                            }
+                                        }
+                                        seasonNum = season.getNumber();
+                                        episodeNum = 1;
+                                        break;
+                                    }
+                                }
+
+                                if (seasonNum != -1 && episodeNum != -1) {
+                                    episodeModel = getEpisodeModel(cachedConfig.getTraktKey(), trendingModel.getShow().getIds().getTrakt(), seasonNum, episodeNum).join();
+                                    if (episodeModel != null) {
+                                        ResponseUtil.learn(cachedConfig, episodeModel.getOverview());
+                                    }
+                                }
+
+                                if (episodeModel == null) {
+                                    tempShowList.remove(index);
+                                    continue;
+                                }
+
+                                ShowPacket packet = new ShowPacket();
+                                packet.setTvdb(trendingModel.getShow().getIds().getTvdb());
+                                packet.setSeason(seasonNum);
+                                packet.setEpisode(episodeNum);
+                                packet.setOverview(episodeModel.getOverview());
+                                PacketUtil.queuePacket(packet);
+                                break;
+                            } while (!tempShowList.isEmpty());
 
                             if (episodeModel == null) {
-                                tempShowList.remove(index);
-                                continue;
+                                return null;
                             }
 
-                            ShowPacket packet = new ShowPacket();
-                            packet.setTvdb(trendingModel.getShow().getIds().getTvdb());
-                            packet.setSeason(seasonNum);
-                            packet.setEpisode(episodeNum);
-                            packet.setOverview(episodeModel.getOverview());
-                            PacketUtil.queuePacket(packet);
-                            break;
-                        } while (!tempShowList.isEmpty());
+                            return new Pair<>(trendingModel.getShow().getTitle(), episodeModel);
+                        })
+                        .whenCompleteAsync((val, ex) -> {
+                            if (!canCompleteContinue(val, ex)) {
+                                return;
+                            }
 
-                        if (episodeModel == null) {
-                            return null;
-                        }
+                            jda.getPresence().setActivity(Activity.watching(val.getT1() + " S" + val.getT2().getSeason() + "E" + val.getT2().getNumber()));
 
-                        return new Pair<>(trendingModel.getShow().getTitle(), episodeModel);
-                    })
-                    .whenCompleteAsync((val, ex) -> {
-                        if (!canCompleteContinue(val, ex)) {
-                            return;
-                        }
+                            TaskScheduler.cancelTask(id);
+                            tasks.rem(id);
+                            tasks.add(TaskScheduler.createRepeatingTask(
+                                    new BotStatusTask(jda, tasks),
+                                    new TimeUtil.Time(val.getT2().getRuntime(), TimeUnit.MINUTES),
+                                    new TimeUtil.Time(10L, TimeUnit.MINUTES)
+                            ));
+                        });
 
-                        jda.getPresence().setActivity(Activity.watching(val.getT1() + " S" + val.getT2().getSeason() + "E" + val.getT2().getNumber()));
+                jda.getPresence().setActivity(Activity.playing("\"find a show\""));
+                return;
+            } else if (!cachedConfig.getGames().isEmpty()) {
+                GameStatus status;
+                int tries = 0;
+                do {
+                    status = cachedConfig.getGames().get(random.nextInt(cachedConfig.getGames().size()));
+                    tries++;
+                } while (Activity.playing(status.getDisplayName()).equals(jda.getPresence().getActivity()) && tries < 25);
 
-                        TaskScheduler.cancelTask(id);
-                        tasks.rem(id);
-                        tasks.add(TaskScheduler.createRepeatingTask(
-                                new BotStatusTask(jda, tasks),
-                                new TimeUtil.Time(val.getT2().getRuntime(), TimeUnit.MINUTES),
-                                new TimeUtil.Time(10L, TimeUnit.MINUTES)
-                        ));
-                    });
+                jda.getPresence().setActivity(Activity.playing(status.getDisplayName()));
 
-            jda.getPresence().setActivity(Activity.playing("\"find a show\""));
-            return;
+                long time = (long) (random.nextDouble() * (status.getMax().getMillis() - status.getMin().getMillis()) + status.getMin().getMillis());
+
+                TaskScheduler.cancelTask(id);
+                tasks.rem(id);
+                tasks.add(TaskScheduler.createRepeatingTask(
+                        new BotStatusTask(jda, tasks),
+                        new TimeUtil.Time(time, TimeUnit.MILLISECONDS),
+                        new TimeUtil.Time(10L, TimeUnit.MINUTES)
+                ));
+
+                return;
+            }
         }
 
         Guild guild = jda.getGuilds().get(random.nextInt(jda.getGuilds().size()));

@@ -1,9 +1,11 @@
 package me.egg82.echo.config;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import io.paradaux.ai.MarkovMegaHal;
 import java.util.*;
+import me.egg82.echo.core.GameStatus;
 import me.egg82.echo.messaging.MessagingService;
 import me.egg82.echo.storage.StorageService;
 import org.jetbrains.annotations.NotNull;
@@ -79,6 +81,9 @@ public class CachedConfig {
 
     private double laziness = 0.1d;
     public double getLaziness() { return laziness; }
+
+    private ImmutableList<GameStatus> games = ImmutableList.of();
+    public @NotNull ImmutableList<GameStatus> getGames() { return games; }
 
     public static @NotNull CachedConfig.Builder builder() { return new CachedConfig.Builder(); }
 
@@ -195,6 +200,11 @@ public class CachedConfig {
 
         public @NotNull CachedConfig.Builder laziness(double value) {
             values.laziness = value;
+            return this;
+        }
+
+        public @NotNull CachedConfig.Builder games(List<GameStatus> value) {
+            values.games = ImmutableList.copyOf(value);
             return this;
         }
 

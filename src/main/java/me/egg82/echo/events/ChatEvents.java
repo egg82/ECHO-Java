@@ -233,8 +233,14 @@ public class ChatEvents extends EventHolder {
         for (CoreMap sentence : sentences) {
             Collection<RelationTriple> triples = sentence.get(NaturalLogicAnnotations.RelationTriplesAnnotation.class);
             for (RelationTriple triple : triples) {
-                options.add(swapSubjects(triple.subjectLemmaGloss()));
-                options.add(triple.objectLemmaGloss());
+                String subject = triple.subjectLemmaGloss().trim();
+                if (!subject.isEmpty()) {
+                    options.add(swapSubjects(subject));
+                }
+                String object = triple.objectLemmaGloss().trim();
+                if (!object.isEmpty()) {
+                    options.add(object);
+                }
             }
         }
 

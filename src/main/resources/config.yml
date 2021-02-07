@@ -165,6 +165,63 @@ chat:
 # The value can range from 0 to 1, and will be clipped at those values
 laziness: 0.1
 
+# Games to play
+games:
+  # Internal game name
+  # Can be anything
+  league:
+    # Game name to show in status
+    name: 'League of Legends'
+    # Minimum amount of time to play the game for
+    min: '15m'
+    # Maximum amount of time to play the game for
+    max: '75m'
+  # Internal game name
+  # Can be anything
+  rocket:
+    # Game name to show in status
+    name: 'Rocket League'
+    # Minimum amount of time to play the game for
+    min: '2m'
+    # Maximum amount of time to play the game for
+    max: '8m'
+  # Internal game name
+  # Can be anything
+  minecraft:
+    # Game name to show in status
+    name: 'Minecraft'
+    # Minimum amount of time to play the game for
+    min: '10m'
+    # Maximum amount of time to play the game for
+    max: '1h'
+  # Internal game name
+  # Can be anything
+  satisfactory:
+    # Game name to show in status
+    name: 'Satisfactory'
+    # Minimum amount of time to play the game for
+    min: '15m'
+    # Maximum amount of time to play the game for
+    max: '1h'
+  # Internal game name
+  # Can be anything
+  terraria:
+    # Game name to show in status
+    name: 'Terraria'
+    # Minimum amount of time to play the game for
+    min: '10m'
+    # Maximum amount of time to play the game for
+    max: '1h'
+  # Internal game name
+  # Can be anything
+  stardew:
+    # Game name to show in status
+    name: 'Stardew Valley'
+    # Minimum amount of time to play the game for
+    min: '20m'
+    # Maximum amount of time to play the game for
+    max: '45m'
+
 # When true, logs some extra output to the console so you can see if/why things might be failing
 debug: false
 # Default language (affects console output)
