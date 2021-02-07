@@ -128,7 +128,7 @@ public class BotStatusTask extends AbstractTask {
                                 }
                             }
 
-                            if (seasonNum == -1 || episodeNum == -1) {
+                            if (episodeModel == null) {
                                 tempShowList.remove(index);
                                 continue;
                             }
@@ -139,7 +139,7 @@ public class BotStatusTask extends AbstractTask {
                             packet.setEpisode(episodeNum);
                             PacketUtil.queuePacket(packet);
                             break;
-                        } while (tempShowList.size() > 0);
+                        } while (!tempShowList.isEmpty());
 
                         if (episodeModel == null) {
                             return null;
@@ -158,8 +158,7 @@ public class BotStatusTask extends AbstractTask {
                         tasks.rem(id);
                         tasks.add(TaskScheduler.createRepeatingTask(
                                 new BotStatusTask(jda, tasks),
-                                new TimeUtil.Time(10L, TimeUnit.SECONDS),
-                                //new TimeUtil.Time(val.getT2().getRuntime(), TimeUnit.MINUTES),
+                                new TimeUtil.Time(val.getT2().getRuntime(), TimeUnit.MINUTES),
                                 new TimeUtil.Time(10L, TimeUnit.MINUTES)
                         ));
                     });
