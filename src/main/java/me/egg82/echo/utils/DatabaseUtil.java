@@ -13,6 +13,8 @@ import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 import me.egg82.echo.compression.ZstdCompressionStream;
 import me.egg82.echo.config.CachedConfig;
@@ -31,16 +33,10 @@ public class DatabaseUtil {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseUtil.class);
 
     private static final ZstdCompressionStream ZSTD_COMPRESSION = new ZstdCompressionStream();
-    private static final MessageDigest DIGEST;
+    private static final Queue<MessageDigest> DIGESTS = new ConcurrentLinkedQueue<>();
     private static final File PATH = new File(FileUtil.getCwd(), "web");
 
     static {
-        try {
-            DIGEST = MessageDigest.getInstance("SHA-512");
-        } catch (NoSuchAlgorithmException ex) {
-            throw new IllegalStateException("Digest could not be instantiated.", ex);
-        }
-
         try {
             if (PATH.exists() && !PATH.isDirectory()) {
                 Files.delete(PATH.toPath());
@@ -49,9 +45,6 @@ public class DatabaseUtil {
                 if (!PATH.mkdirs()) {
                     throw new IOException("Could not create parent directory structure.");
                 }
-            }
-            if (PATH.exists() && PATH.isDirectory()) {
-                Files.delete(PATH.toPath());
             }
         } catch (IOException ex) {
             throw new IllegalStateException("Could not create PATH.", ex);
@@ -194,5 +187,19 @@ public class DatabaseUtil {
 
     public static @NotNull String sha512(@NotNull String content) { return sha512(content.getBytes(StandardCharsets.UTF_8)); }
 
-    public static @NotNull String sha512(byte @NotNull [] content) { return HashCode.fromBytes(DIGEST.digest(content)).toString(); }
+    public static @NotNull String sha512(byte @NotNull [] content) {
+        MessageDigest digest = DIGESTS.poll();
+        if (digest == null) {
+            try {
+                digest = MessageDigest.getInstance("SHA-512");
+            } catch (NoSuchAlgorithmException ex) {
+                throw new RuntimeException("Could not get SHA512.", ex);
+            }
+        }
+
+        byte[] retVal = digest.digest(content);
+        digest.reset();
+        DIGESTS.add(digest);
+        return HashCode.fromBytes(retVal).toString();
+    }
 }
