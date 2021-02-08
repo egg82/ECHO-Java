@@ -162,7 +162,7 @@ public class DatabaseUtil {
 
         String fileName;
         do {
-            fileName = RandomStringUtils.randomAlphanumeric(12);
+            fileName = RandomStringUtils.randomAlphanumeric(18);
         } while (new File(PATH, fileName).exists());
 
         try {
