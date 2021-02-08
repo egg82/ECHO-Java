@@ -1,5 +1,6 @@
 package me.egg82.echo;
 
+import com.nixxcode.jvmbrotli.common.BrotliLoader;
 import javax.security.auth.login.LoginException;
 import joptsimple.OptionParser;
 import org.slf4j.Logger;
@@ -11,6 +12,11 @@ public class Main {
     private static Bot bot;
 
     public static void main(String[] args) {
+        if (!BrotliLoader.isBrotliAvailable()) {
+            logger.error("Brotli is unavailable.");
+            return;
+        }
+
         OptionParser parser = new OptionParser();
         parser.accepts("token", "Discord bot token").withRequiredArg();
 

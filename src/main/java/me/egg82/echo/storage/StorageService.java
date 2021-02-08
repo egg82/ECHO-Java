@@ -26,6 +26,17 @@ public interface StorageService {
     /*
    Note: Can be an expensive operation
     */
+    @NotNull UploadModel getOrCreateUploadModel(@NotNull String hash, @NotNull String service, byte @NotNull [] data);
+    @Nullable UploadModel getUploadModel(@NotNull String hash, @NotNull String service);
+    @Nullable UploadModel getUploadModel(@NotNull String hash, @NotNull String service, long cacheTimeMillis);
+    @Nullable UploadModel getUploadModel(long uploadId);
+    @Nullable UploadModel getUploadModel(long uploadId, long cacheTimeMillis);
+    @NotNull Set<UploadModel> getAllUploads(long cacheTimeMillis);
+    @NotNull Set<UploadModel> getAllUploads(int start, int max);
+
+    /*
+   Note: Can be an expensive operation
+    */
     @NotNull MessageModel getOrCreateMessageModel(@NotNull String message);
     @Nullable MessageModel getMessageModel(@NotNull String message);
     @Nullable MessageModel getMessageModel(long messageId);

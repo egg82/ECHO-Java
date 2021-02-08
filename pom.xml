@@ -411,6 +411,11 @@
             <artifactId>zstd-jni</artifactId>
             <version>1.4.8-2</version>
         </dependency>
+        <dependency>
+            <groupId>com.nixxcode.jvmbrotli</groupId>
+            <artifactId>jvmbrotli</artifactId>
+            <version>0.2.0</version>
+        </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>

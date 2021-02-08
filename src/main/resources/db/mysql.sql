@@ -9,6 +9,18 @@ CREATE TABLE IF NOT EXISTS `echo_show` (
     PRIMARY KEY (`id`)
 );
 
+CREATE TABLE IF NOT EXISTS `echo_upload` (
+    `id`        BIGINT NOT NULL AUTO_INCREMENT,
+    `version`   INT NOT NULL,
+    `created`   DATETIME NOT NULL,
+    `modified`  DATETIME NOT NULL,
+    `hash`      CHAR(128) NOT NULL,
+    `service`   VARCHAR(255) NOT NULL,
+    `data`      LONGBLOB NOT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE (`hash`, `service`)
+);
+
 CREATE TABLE IF NOT EXISTS `echo_message` (
     `id`        BIGINT NOT NULL AUTO_INCREMENT,
     `version`   INT NOT NULL,

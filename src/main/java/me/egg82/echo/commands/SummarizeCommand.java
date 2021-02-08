@@ -9,7 +9,6 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import flexjson.JSONDeserializer;
 import java.awt.*;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -20,7 +19,6 @@ import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.zip.GZIPOutputStream;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.core.Pair;
 import me.egg82.echo.lang.Message;
@@ -30,7 +28,10 @@ import me.egg82.echo.web.models.SummaryModel;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import okhttp3.*;
+import okhttp3.MultipartBody;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,7 +39,6 @@ import org.jetbrains.annotations.Nullable;
 public class SummarizeCommand extends AbstractCommand {
     private static final String EXTRACT_URL = "https://extractorapi.com/api/v1/extractor/?apikey=%s&url=%s";
     private static final String SUMMARIZE_URL = "https://api.deepai.org/api/summarization";
-    private static final String BYTEBIN_URL = "https://bytebin.lucko.me/%s";
 
     private static final Pattern RE_DOT_PATTERN = Pattern.compile("\\.\\s*");
     private static final Pattern RE_URL_PATTERN = Pattern.compile("(https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*))");
@@ -83,7 +83,7 @@ public class SummarizeCommand extends AbstractCommand {
                         if (v == null) {
                             return null;
                         }
-                        return new Pair<>(v, getSummaryModel(cachedConfig.getDeepAiKey(), getBytebinUrl(cleanText(v.getText())).join()).join());
+                        return new Pair<>(v, getSummaryModel(cachedConfig.getDeepAiKey(), WebUtil.uploadBytebinContent(cleanText(v.getText()).getBytes(StandardCharsets.UTF_8)).join()).join());
                     })
                     .whenCompleteAsync((val, ex) -> {
                         if (!canCompleteContinue(issuer, val, ex)) {
@@ -125,7 +125,7 @@ public class SummarizeCommand extends AbstractCommand {
                         }
                     });
         } else {
-            getBytebinUrl(text)
+            WebUtil.uploadBytebinContent(text.getBytes(StandardCharsets.UTF_8))
                     .thenComposeAsync(v -> getSummaryModel(cachedConfig.getDeepAiKey(), v))
                     .whenCompleteAsync((val, ex) -> {
                         if (!canCompleteContinue(issuer, val, ex)) {
@@ -227,45 +227,6 @@ public class SummarizeCommand extends AbstractCommand {
                 return retVal == null || !"COMPLETE".equalsIgnoreCase(retVal.getStatus()) ? null : retVal;
             }
         }).join()));
-    }
-
-    private static final Cache<String, String> bytebinCache = Caffeine.newBuilder()
-            .expireAfterWrite(7L, TimeUnit.DAYS)
-            .expireAfterAccess(1L, TimeUnit.DAYS)
-            .build();
-
-    public static @NotNull CompletableFuture<String> getBytebinUrl(@NotNull String text) {
-        return CompletableFuture.supplyAsync(() -> bytebinCache.get(text, t -> {
-            try {
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                try (GZIPOutputStream gzip = new GZIPOutputStream(out)) {
-                    gzip.write(t.getBytes(StandardCharsets.UTF_8));
-                }
-
-                RequestBody body = RequestBody.create(MediaType.get("text/plain"), out.toByteArray());
-
-                Request request = WebUtil.getDefaultRequestBuilder(new URL(String.format(BYTEBIN_URL, "post")))
-                        .header("Content-Encoding", "gzip")
-                        .post(body)
-                        .build();
-
-                System.out.println("Bytebin request: " + request.toString());
-
-                try (Response response = WebUtil.getResponse(request)) {
-                    System.out.println("Bytebin response: " + response.code());
-
-                    if (!response.isSuccessful()) {
-                        throw new IOException("Could not get connection (HTTP status " + response.code() + ")");
-                    }
-
-                    System.out.println("Bytebin URL: " + String.format(BYTEBIN_URL, response.header("Location")));
-
-                    return String.format(BYTEBIN_URL, response.header("Location"));
-                }
-            } catch (IOException ex) {
-                throw new CompletionException(ex);
-            }
-        }));
     }
 
     private static final Cache<String, SummaryModel> summaryCache = Caffeine.newBuilder()

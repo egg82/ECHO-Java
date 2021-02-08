@@ -8,13 +8,11 @@ import io.ebean.Transaction;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import java.io.File;
+import java.time.Instant;
 import java.util.*;
 import javax.persistence.PersistenceException;
 import me.egg82.echo.storage.models.*;
-import me.egg82.echo.storage.models.query.QDataModel;
-import me.egg82.echo.storage.models.query.QLearnModel;
-import me.egg82.echo.storage.models.query.QMessageModel;
-import me.egg82.echo.storage.models.query.QShowModel;
+import me.egg82.echo.storage.models.query.*;
 import me.egg82.echo.utils.VersionUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -95,6 +93,12 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
                     throw new PersistenceException("findOne() returned null after saving.");
                 }
             }
+            if (model.getSeason() != season || model.getEpisode() != episode) {
+                model.setSeason(season);
+                model.setEpisode(episode);
+                model.setModified(null);
+                connection.save(model);
+            }
             return model;
         } finally {
             queueLock.readLock().unlock();
@@ -122,6 +126,107 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         queueLock.readLock().lock();
         try {
             return new QShowModel(connection)
+                    .id.between(start, start + max - 1)
+                    .findSet();
+        } finally {
+            queueLock.readLock().unlock();
+        }
+    }
+
+    public @NotNull UploadModel getOrCreateUploadModel(@NotNull String hash, @NotNull String service, byte @NotNull [] data) {
+        queueLock.readLock().lock();
+        try {
+            UploadModel model = new QUploadModel(connection)
+                    .hash.equalTo(hash)
+                    .service.equalTo(service)
+                    .findOne();
+            if (model == null) {
+                model = new UploadModel();
+                model.setHash(hash);
+                model.setData(data);
+                connection.save(model);
+                model = new QUploadModel(connection)
+                        .hash.equalTo(hash)
+                        .service.equalTo(service)
+                        .findOne();
+                if (model == null) {
+                    throw new PersistenceException("findOne() returned null after saving.");
+                }
+            }
+            if (!Arrays.equals(model.getData(), data)) {
+                model.setData(data);
+                model.setModified(null);
+                connection.save(model);
+            }
+            return model;
+        } finally {
+            queueLock.readLock().unlock();
+        }
+    }
+
+    public @Nullable UploadModel getUploadModel(@NotNull String hash, @NotNull String service) {
+        queueLock.readLock().lock();
+        try {
+            return new QUploadModel(connection)
+                    .hash.equalTo(hash)
+                    .service.equalTo(service)
+                    .findOne();
+        } finally {
+            queueLock.readLock().unlock();
+        }
+    }
+
+    public @Nullable UploadModel getUploadModel(@NotNull String hash, @NotNull String service, long cacheTimeMillis) {
+        queueLock.readLock().lock();
+        try {
+            return new QUploadModel(connection)
+                    .hash.equalTo(hash)
+                    .service.equalTo(service)
+                    .modified.after(Instant.now().minusMillis(cacheTimeMillis))
+                    .findOne();
+        } finally {
+            queueLock.readLock().unlock();
+        }
+    }
+
+    public @Nullable UploadModel getUploadModel(long uploadId) {
+        queueLock.readLock().lock();
+        try {
+            return new QUploadModel(connection)
+                    .id.equalTo(uploadId)
+                    .findOne();
+        } finally {
+            queueLock.readLock().unlock();
+        }
+    }
+
+    public @Nullable UploadModel getUploadModel(long uploadId, long cacheTimeMillis) {
+        queueLock.readLock().lock();
+        try {
+            return new QUploadModel(connection)
+                    .id.equalTo(uploadId)
+                    .modified.after(Instant.now().minusMillis(cacheTimeMillis))
+                    .findOne();
+        } finally {
+            queueLock.readLock().unlock();
+        }
+    }
+
+    public @NotNull Set<UploadModel> getAllUploads(long cacheTimeMillis) {
+        queueLock.readLock().lock();
+        try {
+            return new QUploadModel(connection)
+                    .modified.after(Instant.now().minusMillis(cacheTimeMillis))
+                    .findSet();
+        } finally {
+            queueLock.readLock().unlock();
+        }
+    }
+
+    public @NotNull Set<UploadModel> getAllUploads(int start, int max) {
+        queueLock.readLock().lock();
+        try {
+            return new QUploadModel(connection)
                     .id.between(start, start + max - 1)
                     .findSet();
         } finally {
@@ -202,6 +307,11 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
                 if (model == null) {
                     throw new PersistenceException("findOne() returned null after saving.");
                 }
+            }
+            if (model.isLearning() != learn) {
+                model.setLearning(learn);
+                model.setModified(null);
+                connection.save(model);
             }
             return model;
         } finally {
@@ -298,7 +408,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         dbConfig.setDefaultServer(false);
         dbConfig.setRegister(false);
         dbConfig.setName(name);
-        dbConfig.setClasses(Arrays.asList(BaseModel.class, ShowModel.class, MessageModel.class, LearnModel.class, DataModel.class));
+        dbConfig.setClasses(Arrays.asList(BaseModel.class, ShowModel.class, UploadModel.class, MessageModel.class, LearnModel.class, DataModel.class));
         connection = DatabaseFactory.createWithContextClassLoader(dbConfig, getClass().getClassLoader());
 
         DataModel model;
@@ -380,6 +490,12 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
             m.setSeason(((ShowModel) model).getSeason());
             m.setEpisode(((ShowModel) model).getEpisode());
             retVal = m;
+        } else if (model instanceof UploadModel) {
+            UploadModel m = new UploadModel();
+            m.setHash(((UploadModel) model).getHash());
+            m.setService(((UploadModel) model).getService());
+            m.setData(((UploadModel) model).getData());
+            retVal = m;
         } else if (model instanceof MessageModel) {
             MessageModel m = new MessageModel();
             m.setMessage(((MessageModel) model).getMessage());
@@ -421,6 +537,25 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
                 m.setTvdb(((ShowModel) model).getTvdb());
                 m.setSeason(((ShowModel) model).getSeason());
                 m.setEpisode(((ShowModel) model).getEpisode());
+                m.setCreated(model.getCreated());
+                m.setModified(keepModified ? model.getModified() : null);
+                connection.update(m);
+            }
+        } else if (model instanceof UploadModel) {
+            UploadModel m = new QUploadModel(connection)
+                    .hash.equalTo(((UploadModel) model).getHash())
+                    .service.equalTo(((UploadModel) model).getService())
+                    .findOne();
+            if (m == null) {
+                m = (UploadModel) duplicateModel(model, keepModified);
+                if (m == null) {
+                    return;
+                }
+                connection.save(m);
+            } else {
+                m.setHash(((UploadModel) model).getHash());
+                m.setService(((UploadModel) model).getService());
+                m.setData(((UploadModel) model).getData());
                 m.setCreated(model.getCreated());
                 m.setModified(keepModified ? model.getModified() : null);
                 connection.update(m);
