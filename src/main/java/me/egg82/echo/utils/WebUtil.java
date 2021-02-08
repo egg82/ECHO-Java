@@ -2,21 +2,15 @@ package me.egg82.echo.utils;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.google.common.hash.HashCode;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 import me.egg82.echo.compression.GZIPCompressionStream;
-import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
-import me.egg82.echo.storage.StorageService;
-import me.egg82.echo.storage.models.UploadModel;
 import me.egg82.echo.web.WebConstants;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
@@ -32,16 +26,6 @@ public class WebUtil {
             .followRedirects(true)
             .followSslRedirects(true)
             .build();
-
-    private static final MessageDigest DIGEST;
-
-    static {
-        try {
-            DIGEST = MessageDigest.getInstance("SHA-512");
-        } catch (NoSuchAlgorithmException ex) {
-            throw new IllegalStateException("Digest could not be instantiated.", ex);
-        }
-    }
 
     private WebUtil() { }
 
@@ -114,9 +98,10 @@ public class WebUtil {
         });
     }
 
-    private static final String BYTEBIN_URL = "https://bytebin.lucko.me/%s";
     private static final GZIPCompressionStream GZIP_COMPRESSION = new GZIPCompressionStream();
-    private static final long CACHE_TIME = new TimeUtil.Time(7L, TimeUnit.DAYS).getMillis();
+
+    private static final String BYTEBIN_URL = "https://bytebin.lucko.me/%s";
+    private static final long BYTEBIN_CACHE_TIME = new TimeUtil.Time(7L, TimeUnit.DAYS).getMillis();
 
     private static final Cache<String, String> bytebinCache = Caffeine.newBuilder()
             .expireAfterWrite(1L, TimeUnit.DAYS)
@@ -124,21 +109,14 @@ public class WebUtil {
             .build();
 
     public static @NotNull CompletableFuture<String> uploadBytebinContent(byte @NotNull [] content) {
-        return CompletableFuture.supplyAsync(() -> bytebinCache.get(sha512(content), k -> uploadBytebinContentExpensive(k, content)));
+        return CompletableFuture.supplyAsync(() -> bytebinCache.get(DatabaseUtil.sha512(content), k -> uploadBytebinContentExpensive(k, content)));
     }
 
     private static @NotNull String uploadBytebinContentExpensive(@NotNull String hash, byte @NotNull [] content) {
         try {
-            CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-            if (cachedConfig == null) {
-                throw new RuntimeException("Could not get cached config.");
-            }
-
-            for (StorageService service : cachedConfig.getStorage()) {
-                UploadModel model = service.getUploadModel(hash, "bytebin", CACHE_TIME);
-                if (model != null) {
-                    return new String(model.getData(), StandardCharsets.UTF_8);
-                }
+            String retVal = DatabaseUtil.getString(hash, "bytebin", BYTEBIN_CACHE_TIME);
+            if (retVal != null) {
+                return retVal;
             }
 
             RequestBody body = RequestBody.create(GZIP_COMPRESSION.compress(content), MediaType.get("text/plain"));
@@ -157,22 +135,13 @@ public class WebUtil {
                     throw new IOException("Could not get connection (HTTP status " + response.code() + ")");
                 }
 
-                String retVal = String.format(BYTEBIN_URL, response.header("Location"));
+                retVal = String.format(BYTEBIN_URL, response.header("Location"));
                 System.out.println("Bytebin URL: " + retVal);
-                for (StorageService service : cachedConfig.getStorage()) {
-                    UploadModel model = new UploadModel();
-                    model.setHash(hash);
-                    model.setService("bytebin");
-                    model.setData(retVal.getBytes(StandardCharsets.UTF_8));
-                    service.storeModel(model);
-                }
-
+                DatabaseUtil.storeString(hash, "bytebin", retVal);
                 return retVal;
             }
         } catch (IOException ex) {
             throw new CompletionException(ex);
         }
     }
-
-    public static @NotNull String sha512(byte @NotNull [] content) { return HashCode.fromBytes(DIGEST.digest(content)).toString(); }
 }

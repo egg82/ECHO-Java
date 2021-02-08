@@ -9,14 +9,14 @@ CREATE TABLE IF NOT EXISTS "echo_show" (
     PRIMARY KEY ("id" AUTOINCREMENT)
 );
 
-CREATE TABLE IF NOT EXISTS "echo_upload" (
+CREATE TABLE IF NOT EXISTS "echo_web" (
     "id"        INTEGER NOT NULL,
     "version"   INTEGER NOT NULL,
     "created"   INTEGER NOT NULL,
     "modified"  INTEGER NOT NULL,
     "hash"      TEXT NOT NULL,
     "service"   TEXT NOT NULL,
-    "data"      BLOB NOT NULL,
+    "path"      VARCHAR(4096) NOT NULL,
     PRIMARY KEY ("id" AUTOINCREMENT),
     UNIQUE ("hash", "service")
 );

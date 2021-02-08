@@ -133,17 +133,17 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
-    public @NotNull UploadModel getOrCreateUploadModel(@NotNull String hash, @NotNull String service, byte @NotNull [] data) {
+    public @NotNull WebModel getOrCreateWebModel(@NotNull String hash, @NotNull String service, @NotNull String path) {
         queueLock.readLock().lock();
         try {
-            UploadModel model = new QUploadModel(connection)
+            WebModel model = new QUploadModel(connection)
                     .hash.equalTo(hash)
                     .service.equalTo(service)
                     .findOne();
             if (model == null) {
-                model = new UploadModel();
+                model = new WebModel();
                 model.setHash(hash);
-                model.setData(data);
+                model.setPath(path);
                 connection.save(model);
                 model = new QUploadModel(connection)
                         .hash.equalTo(hash)
@@ -153,8 +153,8 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
                     throw new PersistenceException("findOne() returned null after saving.");
                 }
             }
-            if (!Arrays.equals(model.getData(), data)) {
-                model.setData(data);
+            if (!Objects.equals(model.getPath(), path)) {
+                model.setPath(path);
                 model.setModified(null);
                 connection.save(model);
             }
@@ -164,7 +164,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
-    public @Nullable UploadModel getUploadModel(@NotNull String hash, @NotNull String service) {
+    public @Nullable WebModel getWebModel(@NotNull String hash, @NotNull String service) {
         queueLock.readLock().lock();
         try {
             return new QUploadModel(connection)
@@ -176,7 +176,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
-    public @Nullable UploadModel getUploadModel(@NotNull String hash, @NotNull String service, long cacheTimeMillis) {
+    public @Nullable WebModel getWebModel(@NotNull String hash, @NotNull String service, long cacheTimeMillis) {
         queueLock.readLock().lock();
         try {
             return new QUploadModel(connection)
@@ -189,7 +189,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
-    public @Nullable UploadModel getUploadModel(long uploadId) {
+    public @Nullable WebModel getWebModel(long uploadId) {
         queueLock.readLock().lock();
         try {
             return new QUploadModel(connection)
@@ -200,7 +200,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
-    public @Nullable UploadModel getUploadModel(long uploadId, long cacheTimeMillis) {
+    public @Nullable WebModel getWebModel(long uploadId, long cacheTimeMillis) {
         queueLock.readLock().lock();
         try {
             return new QUploadModel(connection)
@@ -212,7 +212,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
-    public @NotNull Set<UploadModel> getAllUploads(long cacheTimeMillis) {
+    public @NotNull Set<WebModel> getAllWebs(long cacheTimeMillis) {
         queueLock.readLock().lock();
         try {
             return new QUploadModel(connection)
@@ -223,7 +223,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
-    public @NotNull Set<UploadModel> getAllUploads(int start, int max) {
+    public @NotNull Set<WebModel> getAllWebs(int start, int max) {
         queueLock.readLock().lock();
         try {
             return new QUploadModel(connection)
@@ -408,7 +408,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         dbConfig.setDefaultServer(false);
         dbConfig.setRegister(false);
         dbConfig.setName(name);
-        dbConfig.setClasses(Arrays.asList(BaseModel.class, ShowModel.class, UploadModel.class, MessageModel.class, LearnModel.class, DataModel.class));
+        dbConfig.setClasses(Arrays.asList(BaseModel.class, ShowModel.class, WebModel.class, MessageModel.class, LearnModel.class, DataModel.class));
         connection = DatabaseFactory.createWithContextClassLoader(dbConfig, getClass().getClassLoader());
 
         DataModel model;
@@ -490,11 +490,11 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
             m.setSeason(((ShowModel) model).getSeason());
             m.setEpisode(((ShowModel) model).getEpisode());
             retVal = m;
-        } else if (model instanceof UploadModel) {
-            UploadModel m = new UploadModel();
-            m.setHash(((UploadModel) model).getHash());
-            m.setService(((UploadModel) model).getService());
-            m.setData(((UploadModel) model).getData());
+        } else if (model instanceof WebModel) {
+            WebModel m = new WebModel();
+            m.setHash(((WebModel) model).getHash());
+            m.setService(((WebModel) model).getService());
+            m.setPath(((WebModel) model).getPath());
             retVal = m;
         } else if (model instanceof MessageModel) {
             MessageModel m = new MessageModel();
@@ -541,21 +541,21 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
                 m.setModified(keepModified ? model.getModified() : null);
                 connection.update(m);
             }
-        } else if (model instanceof UploadModel) {
-            UploadModel m = new QUploadModel(connection)
-                    .hash.equalTo(((UploadModel) model).getHash())
-                    .service.equalTo(((UploadModel) model).getService())
+        } else if (model instanceof WebModel) {
+            WebModel m = new QUploadModel(connection)
+                    .hash.equalTo(((WebModel) model).getHash())
+                    .service.equalTo(((WebModel) model).getService())
                     .findOne();
             if (m == null) {
-                m = (UploadModel) duplicateModel(model, keepModified);
+                m = (WebModel) duplicateModel(model, keepModified);
                 if (m == null) {
                     return;
                 }
                 connection.save(m);
             } else {
-                m.setHash(((UploadModel) model).getHash());
-                m.setService(((UploadModel) model).getService());
-                m.setData(((UploadModel) model).getData());
+                m.setHash(((WebModel) model).getHash());
+                m.setService(((WebModel) model).getService());
+                m.setPath(((WebModel) model).getPath());
                 m.setCreated(model.getCreated());
                 m.setModified(keepModified ? model.getModified() : null);
                 connection.update(m);

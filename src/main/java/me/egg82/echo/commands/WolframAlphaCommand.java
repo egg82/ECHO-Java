@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.core.Pair;
 import me.egg82.echo.lang.Message;
+import me.egg82.echo.utils.DatabaseUtil;
 import me.egg82.echo.utils.WebUtil;
 import me.egg82.echo.web.models.ImgurUploadModel;
 import me.egg82.echo.web.transformers.InstantTransformer;
@@ -91,31 +92,58 @@ public class WolframAlphaCommand extends AbstractCommand {
     }
 
     private static final Cache<String, String> resultCache = Caffeine.newBuilder()
-            .expireAfterWrite(7L, TimeUnit.DAYS)
-            .expireAfterAccess(1L, TimeUnit.DAYS)
+            .expireAfterWrite(1L, TimeUnit.DAYS)
+            .expireAfterAccess(4L, TimeUnit.HOURS)
             .build();
 
-    public static @NotNull CompletableFuture<String> getResult(@NotNull String key, @NotNull String query) { return CompletableFuture.supplyAsync(() -> resultCache.get(query, q -> WebUtil.getString(String.format(RESULT_URL, key, WebUtil.urlEncode(q))).join())); }
+    public static @NotNull CompletableFuture<String> getResult(@NotNull String key, @NotNull String query) {
+        return CompletableFuture.supplyAsync(() -> resultCache.get(DatabaseUtil.sha512(query), k -> {
+            String retVal = DatabaseUtil.getString(k, "wa-result");
+            if (retVal != null) {
+                return retVal;
+            }
+
+            retVal = WebUtil.getString(String.format(RESULT_URL, key, WebUtil.urlEncode(query))).join();
+            DatabaseUtil.storeString(k, "wa-result", retVal);
+            return retVal;
+        }));
+    }
 
     private static final Cache<String, byte[]> imageCache = Caffeine.newBuilder()
-            .expireAfterWrite(7L, TimeUnit.DAYS)
-            .expireAfterAccess(1L, TimeUnit.DAYS)
+            .expireAfterWrite(1L, TimeUnit.DAYS)
+            .expireAfterAccess(4L, TimeUnit.HOURS)
             .build();
 
-    public static @NotNull CompletableFuture<byte[]> getImage(@NotNull String key, @NotNull String query) { return CompletableFuture.supplyAsync(() -> imageCache.get(query, q -> WebUtil.getBytes(String.format(IMAGE_URL, key, WebUtil.urlEncode(q))).join())); }
+    public static @NotNull CompletableFuture<byte[]> getImage(@NotNull String key, @NotNull String query) {
+        return CompletableFuture.supplyAsync(() -> imageCache.get(DatabaseUtil.sha512(query), k -> {
+            byte[] retVal = DatabaseUtil.getBytes(k, "wa-image");
+            if (retVal != null) {
+                return retVal;
+            }
 
-    private static final Cache<byte[], ImgurUploadModel> imgurCache = Caffeine.newBuilder()
-            .expireAfterWrite(7L, TimeUnit.DAYS)
-            .expireAfterAccess(1L, TimeUnit.DAYS)
+            retVal = WebUtil.getBytes(String.format(IMAGE_URL, key, WebUtil.urlEncode(query))).join();
+            DatabaseUtil.storeBytes(k, "wa-image", retVal);
+            return retVal;
+        }));
+    }
+
+    private static final Cache<String, ImgurUploadModel> imgurCache = Caffeine.newBuilder()
+            .expireAfterWrite(1L, TimeUnit.DAYS)
+            .expireAfterAccess(4L, TimeUnit.HOURS)
             .build();
 
     public static @NotNull CompletableFuture<ImgurUploadModel> uploadImage(@NotNull String key, byte @NotNull [] data) {
-        return CompletableFuture.supplyAsync(() -> imgurCache.get(data, d -> {
+        return CompletableFuture.supplyAsync(() -> imgurCache.get(DatabaseUtil.sha512(data), k -> {
             try {
+                ImgurUploadModel retVal = DatabaseUtil.getModel(k, "imgur", ImgurUploadModel.class);
+                if (retVal != null && retVal.isSuccess()) {
+                    return retVal;
+                }
+
                 RequestBody body = new MultipartBody.Builder()
                         .setType(MultipartBody.FORM)
                         .addFormDataPart("title", "Wolfram Result")
-                        .addFormDataPart("image", "wolfram.gif", RequestBody.create(d, MediaType.get("image/gif")))
+                        .addFormDataPart("image", "wolfram.gif", RequestBody.create(data, MediaType.get("image/gif")))
                         .build();
 
                 Request request = WebUtil.getDefaultRequestBuilder(new URL(IMGUR_URL))
@@ -131,7 +159,10 @@ public class WolframAlphaCommand extends AbstractCommand {
 
                     JSONDeserializer<ImgurUploadModel> modelDeserializer = new JSONDeserializer<>();
                     modelDeserializer.use(Instant.class, new InstantTransformer());
-                    ImgurUploadModel retVal = modelDeserializer.deserialize(response.body().charStream(), ImgurUploadModel.class);
+                    retVal = modelDeserializer.deserialize(response.body().charStream(), ImgurUploadModel.class);
+                    if (retVal != null && retVal.isSuccess()) {
+                        DatabaseUtil.storeModel(k, "imgur", retVal);
+                    }
                     return retVal == null || !retVal.isSuccess() ? null : retVal;
                 }
             } catch (IOException ex) {

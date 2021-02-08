@@ -22,6 +22,8 @@ import java.util.regex.Pattern;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.core.Pair;
 import me.egg82.echo.lang.Message;
+import me.egg82.echo.utils.DatabaseUtil;
+import me.egg82.echo.utils.TimeUtil;
 import me.egg82.echo.utils.WebUtil;
 import me.egg82.echo.web.models.ExtractionModel;
 import me.egg82.echo.web.models.SummaryModel;
@@ -216,32 +218,49 @@ public class SummarizeCommand extends AbstractCommand {
 
     private static final Cache<String, ExtractionModel> extractionCache = Caffeine.newBuilder()
             .expireAfterWrite(1L, TimeUnit.DAYS)
-            .expireAfterAccess(12L, TimeUnit.HOURS)
+            .expireAfterAccess(4L, TimeUnit.HOURS)
             .build();
 
+    private static final long EXTRACTOR_CACHE_TIME = new TimeUtil.Time(7L, TimeUnit.DAYS).getMillis();
+
     public static @NotNull CompletableFuture<ExtractionModel> getExtractionModel(@NotNull String key, @NotNull String url) {
-        return CompletableFuture.supplyAsync(() -> extractionCache.get(url, u -> WebUtil.getUnclosedResponse(String.format(EXTRACT_URL, key, u), "application/json").thenApplyAsync(response -> {
-            try (response) {
-                JSONDeserializer<ExtractionModel> modelDeserializer = new JSONDeserializer<>();
-                ExtractionModel retVal = modelDeserializer.deserialize(response.body().charStream(), ExtractionModel.class);
-                return retVal == null || !"COMPLETE".equalsIgnoreCase(retVal.getStatus()) ? null : retVal;
+        return CompletableFuture.supplyAsync(() -> extractionCache.get(DatabaseUtil.sha512(url), k -> {
+            ExtractionModel retVal = DatabaseUtil.getModel(k, "extractor", ExtractionModel.class, EXTRACTOR_CACHE_TIME);
+            if (retVal != null && "COMPLETE".equalsIgnoreCase(retVal.getStatus())) {
+                return retVal;
             }
-        }).join()));
+
+            return WebUtil.getUnclosedResponse(String.format(EXTRACT_URL, key, url), "application/json").thenApplyAsync(response -> {
+                try (response) {
+                    JSONDeserializer<ExtractionModel> modelDeserializer = new JSONDeserializer<>();
+                    ExtractionModel r = modelDeserializer.deserialize(response.body().charStream(), ExtractionModel.class);
+                    if (r != null && "COMPLETE".equalsIgnoreCase(r.getStatus())) {
+                        DatabaseUtil.storeModel(k, "extractor", r);
+                    }
+                    return r == null || !"COMPLETE".equalsIgnoreCase(r.getStatus()) ? null : r;
+                }
+            }).join();
+        }));
     }
 
     private static final Cache<String, SummaryModel> summaryCache = Caffeine.newBuilder()
-            .expireAfterWrite(7L, TimeUnit.DAYS)
-            .expireAfterAccess(1L, TimeUnit.DAYS)
+            .expireAfterWrite(1L, TimeUnit.DAYS)
+            .expireAfterAccess(4L, TimeUnit.HOURS)
             .build();
 
     public static @NotNull CompletableFuture<SummaryModel> getSummaryModel(@NotNull String key, @NotNull String url) {
         System.out.println("Getting summary for " + url);
 
-        return CompletableFuture.supplyAsync(() -> summaryCache.get(url, u -> {
+        return CompletableFuture.supplyAsync(() -> summaryCache.get(DatabaseUtil.sha512(url), k -> {
             try {
+                SummaryModel retVal = DatabaseUtil.getModel(k, "summarizer", SummaryModel.class);
+                if (retVal != null) {
+                    return retVal;
+                }
+
                 RequestBody body = new MultipartBody.Builder()
                         .setType(MultipartBody.FORM)
-                        .addFormDataPart("text", u)
+                        .addFormDataPart("text", url)
                         .build();
 
                 Request request = WebUtil.getDefaultRequestBuilder(new URL(SUMMARIZE_URL))
@@ -260,8 +279,11 @@ public class SummarizeCommand extends AbstractCommand {
                     }
 
                     JSONDeserializer<SummaryModel> modelDeserializer = new JSONDeserializer<>();
-                    SummaryModel retVal = modelDeserializer.deserialize(response.body().charStream(), SummaryModel.class);
+                    retVal = modelDeserializer.deserialize(response.body().charStream(), SummaryModel.class);
                     System.out.println("Summary JSON: " + retVal);
+                    if (retVal != null) {
+                        DatabaseUtil.storeModel(k, "summarizer", retVal);
+                    }
                     return retVal;
                 }
             } catch (IOException ex) {
