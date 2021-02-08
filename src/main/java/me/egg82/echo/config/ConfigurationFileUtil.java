@@ -515,7 +515,7 @@ public class ConfigurationFileUtil {
     }
 
     private static @Nullable GameStatus getGameOf(@NotNull String name, @NotNull ConfigurationNode gameNode) {
-        String displayName = gameNode.node("name").getString("").toLowerCase();
+        String displayName = gameNode.node("name").getString("");
         if (displayName.isEmpty()) {
             logger.error("Could not create game \"" + name + "\" due to invalid name.");
             return null;
