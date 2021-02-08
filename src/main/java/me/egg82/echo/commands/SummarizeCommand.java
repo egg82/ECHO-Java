@@ -12,7 +12,9 @@ import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -110,20 +112,30 @@ public class SummarizeCommand extends AbstractCommand {
 
                             event.getChannel().sendMessage(embed.build()).queue();
                         } else {
-                            MessageBuilder message = new MessageBuilder();
-                            message.append(event.getAuthor());
-                            message.append(" \u2014 ");
-                            message.append("*" + val.getT1().getTitle() + "*");
-                            message.append('\n');
-                            message.append("```");
-                            if (val.getT2().getOutput().length() > 1500) {
-                                message.append(val.getT2().getOutput().substring(0, 1500) + "...");
-                            } else {
-                                message.append(val.getT2().getOutput());
+                            List<String> messages = new ArrayList<>();
+                            String total = val.getT2().getOutput();
+                            while (total.length() > 1500) {
+                                messages.add(total.substring(0, 1500));
+                                total = total.substring(1500);
                             }
-                            message.append("```");
+                            if (!total.isEmpty()) {
+                                messages.add(total);
+                            }
 
-                            event.getChannel().sendMessage(message.build()).queue();
+                            for (int i = 0; i < messages.size(); i++) {
+                                MessageBuilder message = new MessageBuilder();
+                                if (i == 0) {
+                                    message.append(event.getAuthor());
+                                    message.append(" \u2014 ");
+                                }
+                                message.append("*" + val.getT1().getTitle() + "*");
+                                message.append('\n');
+                                message.append("```");
+                                message.append(messages.get(i));
+                                message.append("```");
+
+                                event.getChannel().sendMessage(message.build()).queue();
+                            }
                         }
                     });
         } else {
@@ -149,18 +161,28 @@ public class SummarizeCommand extends AbstractCommand {
 
                             event.getChannel().sendMessage(embed.build()).queue();
                         } else {
-                            MessageBuilder message = new MessageBuilder();
-                            message.append(event.getAuthor());
-                            message.append('\n');
-                            message.append("```");
-                            if (val.getOutput().length() > 1500) {
-                                message.append(val.getOutput().substring(0, 1500) + "...");
-                            } else {
-                                message.append(val.getOutput());
+                            List<String> messages = new ArrayList<>();
+                            String total = val.getOutput();
+                            while (total.length() > 1500) {
+                                messages.add(total.substring(0, 1500));
+                                total = total.substring(1500);
                             }
-                            message.append("```");
+                            if (!total.isEmpty()) {
+                                messages.add(total);
+                            }
 
-                            event.getChannel().sendMessage(message.build()).queue();
+                            for (int i = 0; i < messages.size(); i++) {
+                                MessageBuilder message = new MessageBuilder();
+                                if (i == 0) {
+                                    message.append(event.getAuthor());
+                                    message.append('\n');
+                                }
+                                message.append("```");
+                                message.append(messages.get(i));
+                                message.append("```");
+
+                                event.getChannel().sendMessage(message.build()).queue();
+                            }
                         }
                     });
         }

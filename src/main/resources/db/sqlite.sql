@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS "echo_web" (
     "modified"  INTEGER NOT NULL,
     "hash"      TEXT NOT NULL,
     "service"   TEXT NOT NULL,
-    "path"      VARCHAR(4096) NOT NULL,
+    "path"      VARCHAR(31) NOT NULL,
     PRIMARY KEY ("id" AUTOINCREMENT),
     UNIQUE ("hash", "service")
 );

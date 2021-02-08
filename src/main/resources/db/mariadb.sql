@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `echo_web` (
     `modified`  DATETIME NOT NULL,
     `hash`      CHAR(128) NOT NULL,
     `service`   VARCHAR(255) NOT NULL,
-    `path`      VARCHAR(4096) NOT NULL,
+    `path`      VARCHAR(31) NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE (`hash`, `service`)
 );
