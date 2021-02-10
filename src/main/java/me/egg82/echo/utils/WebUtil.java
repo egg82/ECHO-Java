@@ -95,7 +95,7 @@ public class WebUtil {
             } catch (IOException ex) {
                 throw new CompletionException(ex);
             }
-        });
+        }).exceptionally(ex -> ExceptionUtil.handleException(ex, logger));
     }
 
     private static final GZIPCompressionStream GZIP_COMPRESSION = new GZIPCompressionStream();
@@ -109,7 +109,8 @@ public class WebUtil {
             .build();
 
     public static @NotNull CompletableFuture<String> uploadBytebinContent(byte @NotNull [] content) {
-        return CompletableFuture.supplyAsync(() -> bytebinCache.get(DatabaseUtil.sha512(content), k -> uploadBytebinContentExpensive(k, content)));
+        return CompletableFuture.supplyAsync(() -> bytebinCache.get(DatabaseUtil.sha512(content), k -> uploadBytebinContentExpensive(k, content)))
+                .exceptionally(ex -> ExceptionUtil.handleException(ex, logger));
     }
 
     private static @NotNull String uploadBytebinContentExpensive(@NotNull String hash, byte @NotNull [] content) {

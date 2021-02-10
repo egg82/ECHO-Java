@@ -9,6 +9,7 @@ import edu.stanford.nlp.naturalli.NaturalLogicAnnotations;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.util.CoreMap;
+import edu.stanford.nlp.util.PropertiesUtils;
 import io.paradaux.ai.MarkovMegaHal;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -43,13 +44,9 @@ public class ChatEvents extends EventHolder {
     private static final Pattern RE_NOT_WORD = Pattern.compile("[^\\w]");
     private static final Pattern RE_URL = Pattern.compile("<url>");
 
-    private static final StanfordCoreNLP tripletNlp;
-
-    static {
-        Properties tripletProps = new Properties();
-        tripletProps.setProperty("annotators", "tokenize,ssplit,pos,lemma,ner,depparse,natlog,openie");
-        tripletNlp = new StanfordCoreNLP(tripletProps);
-    }
+    private static final StanfordCoreNLP tripletNlp = new StanfordCoreNLP(PropertiesUtils.asProperties(
+            "annotators", "tokenize,ssplit,pos,lemma,ner,depparse,natlog,openie"
+    ));
 
     private final Cache<Long, String> oldMessages = Caffeine.newBuilder()
             .expireAfterWrite(1L, TimeUnit.HOURS)

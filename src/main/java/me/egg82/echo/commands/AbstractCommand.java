@@ -11,6 +11,7 @@ import me.egg82.echo.core.Pair;
 import me.egg82.echo.lang.Message;
 import me.egg82.echo.services.lookup.PlayerInfo;
 import me.egg82.echo.services.lookup.PlayerLookup;
+import me.egg82.echo.utils.ExceptionUtil;
 import me.egg82.echo.utils.JDAUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Emote;
@@ -118,6 +119,6 @@ public abstract class AbstractCommand extends BaseCommand {
             }
 
             return retVal;
-        });
+        }).exceptionally(ex -> ExceptionUtil.handleException(ex, logger));
     }
 }

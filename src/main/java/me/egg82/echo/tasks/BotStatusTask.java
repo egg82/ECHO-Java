@@ -18,10 +18,7 @@ import me.egg82.echo.core.Pair;
 import me.egg82.echo.messaging.packets.ShowPacket;
 import me.egg82.echo.storage.StorageService;
 import me.egg82.echo.storage.models.ShowModel;
-import me.egg82.echo.utils.PacketUtil;
-import me.egg82.echo.utils.ResponseUtil;
-import me.egg82.echo.utils.TimeUtil;
-import me.egg82.echo.utils.WebUtil;
+import me.egg82.echo.utils.*;
 import me.egg82.echo.web.models.EpisodeModel;
 import me.egg82.echo.web.models.SeasonModel;
 import me.egg82.echo.web.models.TrendingShowModel;
@@ -33,8 +30,12 @@ import net.dv8tion.jda.api.entities.Member;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BotStatusTask extends AbstractTask {
+    private static final Logger logger = LoggerFactory.getLogger(BotStatusTask.class);
+
     private static final String TRENDING_URL = "https://api.trakt.tv/shows/trending";
     private static final String SEASONS_URL = "https://api.trakt.tv/shows/%d/seasons?extended=full";
     private static final String EPISODE_URL = "https://api.trakt.tv/shows/%d/seasons/%d/episodes/%d?extended=full";
@@ -194,15 +195,17 @@ public class BotStatusTask extends AbstractTask {
             }
         }
 
-        Guild guild = jda.getGuilds().get(random.nextInt(jda.getGuilds().size()));
-        guild.findMembers(m -> !m.getUser().isBot()).onSuccess(members -> {
-            if (members.isEmpty()) {
-                return;
-            }
+        if (!jda.getGuilds().isEmpty()) {
+            Guild guild = jda.getGuilds().get(random.nextInt(jda.getGuilds().size()));
+            guild.findMembers(m -> !m.getUser().isBot()).onSuccess(members -> {
+                if (members.isEmpty()) {
+                    return;
+                }
 
-            Member member = members.get(random.nextInt(members.size()));
-            jda.getPresence().setActivity(Activity.watching(member.getEffectiveName()));
-        });
+                Member member = members.get(random.nextInt(members.size()));
+                jda.getPresence().setActivity(Activity.watching(member.getEffectiveName()));
+            });
+        }
     }
 
     public static CompletableFuture<List<TrendingShowModel>> getTrendingModel(@NotNull String key) {
@@ -223,7 +226,7 @@ public class BotStatusTask extends AbstractTask {
             } catch (IOException ex) {
                 throw new CompletionException(ex);
             }
-        });
+        }).exceptionally(ex -> ExceptionUtil.handleException(ex, logger));
     }
 
     public static CompletableFuture<List<SeasonModel>> getSeasonsModel(@NotNull String key, long traktShowId) {
@@ -248,7 +251,7 @@ public class BotStatusTask extends AbstractTask {
             } catch (IOException ex) {
                 throw new CompletionException(ex);
             }
-        });
+        }).exceptionally(ex -> ExceptionUtil.handleException(ex, logger));
     }
 
     public static CompletableFuture<EpisodeModel> getEpisodeModel(@NotNull String key, long traktShowId, int season, int episode) {
@@ -268,6 +271,6 @@ public class BotStatusTask extends AbstractTask {
             } catch (IOException ex) {
                 throw new CompletionException(ex);
             }
-        });
+        }).exceptionally(ex -> ExceptionUtil.handleException(ex, logger));
     }
 }

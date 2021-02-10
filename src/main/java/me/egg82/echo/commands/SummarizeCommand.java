@@ -7,15 +7,20 @@ import co.aikar.commands.annotation.Description;
 import co.aikar.commands.annotation.Syntax;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import edu.stanford.nlp.ling.CoreAnnotations;
+import edu.stanford.nlp.pipeline.Annotation;
+import edu.stanford.nlp.pipeline.CoreDocument;
+import edu.stanford.nlp.pipeline.CoreSentence;
+import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+import edu.stanford.nlp.util.CoreMap;
+import edu.stanford.nlp.util.PropertiesUtils;
 import flexjson.JSONDeserializer;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
@@ -25,6 +30,7 @@ import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.core.Pair;
 import me.egg82.echo.lang.Message;
 import me.egg82.echo.utils.DatabaseUtil;
+import me.egg82.echo.utils.ExceptionUtil;
 import me.egg82.echo.utils.TimeUtil;
 import me.egg82.echo.utils.WebUtil;
 import me.egg82.echo.web.models.ExtractionModel;
@@ -38,9 +44,13 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @CommandAlias("summarize|summary")
 public class SummarizeCommand extends AbstractCommand {
+    private static final Logger logger = LoggerFactory.getLogger(SummarizeCommand.class);
+
     private static final String EXTRACT_URL = "https://extractorapi.com/api/v1/extractor/?apikey=%s&url=%s";
     private static final String SUMMARIZE_URL = "https://api.deepai.org/api/summarization";
 
@@ -48,6 +58,10 @@ public class SummarizeCommand extends AbstractCommand {
     private static final Pattern RE_URL_PATTERN = Pattern.compile("(https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*))");
     private static final Pattern RE_VERSION_PATTERN = Pattern.compile("\\b(\\d+\\.\\d+(?:[\\.\\d]*))\\b");
     private static final Pattern RE_DOT_PATTERN_2 = Pattern.compile("([\\.?!])+\\s*([^\\)])");
+
+    private static final StanfordCoreNLP sentenceNlp = new StanfordCoreNLP(PropertiesUtils.asProperties(
+            "annotators", "tokenize,ssplit"
+    ));
 
     public SummarizeCommand() { }
 
@@ -112,14 +126,24 @@ public class SummarizeCommand extends AbstractCommand {
 
                             event.getChannel().sendMessage(embed.build()).queue();
                         } else {
+                            CoreDocument doc = new CoreDocument(val.getT2().getOutput());
+                            sentenceNlp.annotate(doc);
+
                             List<String> messages = new ArrayList<>();
-                            String total = val.getT2().getOutput();
-                            while (total.length() > 1500) {
-                                messages.add(total.substring(0, 1500));
-                                total = total.substring(1500);
+                            StringBuilder current = new StringBuilder();
+                            for (CoreSentence sentence : doc.sentences()) {
+                                String s = sentence.text();
+                                if (current.length() > 0 && current.length() + s.length() > 1500) {
+                                    current.deleteCharAt(current.length() - 1);
+                                    messages.add(current.toString());
+                                    current = new StringBuilder();
+                                }
+                                current.append(s);
+                                current.append(' ');
                             }
-                            if (!total.isEmpty()) {
-                                messages.add(total);
+                            if (current.length() > 0) {
+                                current.deleteCharAt(current.length() - 1);
+                                messages.add(current.toString());
                             }
 
                             for (int i = 0; i < messages.size(); i++) {
@@ -161,14 +185,24 @@ public class SummarizeCommand extends AbstractCommand {
 
                             event.getChannel().sendMessage(embed.build()).queue();
                         } else {
+                            CoreDocument doc = new CoreDocument(val.getOutput());
+                            sentenceNlp.annotate(doc);
+
                             List<String> messages = new ArrayList<>();
-                            String total = val.getOutput();
-                            while (total.length() > 1500) {
-                                messages.add(total.substring(0, 1500));
-                                total = total.substring(1500);
+                            StringBuilder current = new StringBuilder();
+                            for (CoreSentence sentence : doc.sentences()) {
+                                String s = sentence.text();
+                                if (current.length() > 0 && current.length() + s.length() > 1500) {
+                                    current.deleteCharAt(current.length() - 1);
+                                    messages.add(current.toString());
+                                    current = new StringBuilder();
+                                }
+                                current.append(s);
+                                current.append(' ');
                             }
-                            if (!total.isEmpty()) {
-                                messages.add(total);
+                            if (current.length() > 0) {
+                                current.deleteCharAt(current.length() - 1);
+                                messages.add(current.toString());
                             }
 
                             for (int i = 0; i < messages.size(); i++) {
@@ -262,7 +296,7 @@ public class SummarizeCommand extends AbstractCommand {
                     return r == null || !"COMPLETE".equalsIgnoreCase(r.getStatus()) ? null : r;
                 }
             }).join();
-        }));
+        })).exceptionally(ex -> ExceptionUtil.handleException(ex, logger));
     }
 
     private static final Cache<String, SummaryModel> summaryCache = Caffeine.newBuilder()
@@ -311,6 +345,6 @@ public class SummarizeCommand extends AbstractCommand {
             } catch (IOException ex) {
                 throw new CompletionException(ex);
             }
-        }));
+        })).exceptionally(ex -> ExceptionUtil.handleException(ex, logger));
     }
 }

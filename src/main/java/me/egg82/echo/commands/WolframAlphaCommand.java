@@ -19,6 +19,7 @@ import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.core.Pair;
 import me.egg82.echo.lang.Message;
 import me.egg82.echo.utils.DatabaseUtil;
+import me.egg82.echo.utils.ExceptionUtil;
 import me.egg82.echo.utils.WebUtil;
 import me.egg82.echo.web.models.ImgurUploadModel;
 import me.egg82.echo.web.transformers.InstantTransformer;
@@ -27,9 +28,13 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @CommandAlias("wolfram|wa")
 public class WolframAlphaCommand extends AbstractCommand {
+    private static final Logger logger = LoggerFactory.getLogger(WolframAlphaCommand.class);
+
     private static final String RESULT_URL = "https://api.wolframalpha.com/v1/result?appid=%s&i=%s";
     private static final String IMAGE_URL = "https://api.wolframalpha.com/v1/simple?appid=%s&i=%s";
     private static final String QUERY_LINK = "https://www.wolframalpha.com/input/?i=%s";
@@ -106,7 +111,7 @@ public class WolframAlphaCommand extends AbstractCommand {
             retVal = WebUtil.getString(String.format(RESULT_URL, key, WebUtil.urlEncode(query))).join();
             DatabaseUtil.storeString(k, "wa-result", retVal);
             return retVal;
-        }));
+        })).exceptionally(ex -> ExceptionUtil.handleException(ex, logger));
     }
 
     private static final Cache<String, byte[]> imageCache = Caffeine.newBuilder()
@@ -124,7 +129,7 @@ public class WolframAlphaCommand extends AbstractCommand {
             retVal = WebUtil.getBytes(String.format(IMAGE_URL, key, WebUtil.urlEncode(query))).join();
             DatabaseUtil.storeBytes(k, "wa-image", retVal);
             return retVal;
-        }));
+        })).exceptionally(ex -> ExceptionUtil.handleException(ex, logger));
     }
 
     private static final Cache<String, ImgurUploadModel> imgurCache = Caffeine.newBuilder()
@@ -168,6 +173,6 @@ public class WolframAlphaCommand extends AbstractCommand {
             } catch (IOException ex) {
                 throw new CompletionException(ex);
             }
-        }));
+        })).exceptionally(ex -> ExceptionUtil.handleException(ex, logger));
     }
 }
