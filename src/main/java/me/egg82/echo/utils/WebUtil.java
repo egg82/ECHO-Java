@@ -100,8 +100,7 @@ public class WebUtil {
 
     private static final GZIPCompressionStream GZIP_COMPRESSION = new GZIPCompressionStream();
 
-    private static final String BYTEBIN_URL = "https://bytebin.lucko.me/%s";
-    private static final long BYTEBIN_CACHE_TIME = new TimeUtil.Time(7L, TimeUnit.DAYS).getMillis();
+    private static final String BYTEBIN_URL = "https://bytebin.egg82.me/%s";
 
     private static final Cache<String, String> bytebinCache = Caffeine.newBuilder()
             .expireAfterWrite(1L, TimeUnit.DAYS)
@@ -115,7 +114,7 @@ public class WebUtil {
 
     private static @NotNull String uploadBytebinContentExpensive(@NotNull String hash, byte @NotNull [] content) {
         try {
-            String retVal = DatabaseUtil.getString(hash, "bytebin", BYTEBIN_CACHE_TIME);
+            String retVal = DatabaseUtil.getString(hash, "bytebin");
             if (retVal != null) {
                 return retVal;
             }

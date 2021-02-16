@@ -136,7 +136,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
     public @NotNull WebModel getOrCreateWebModel(@NotNull String hash, @NotNull String service, @NotNull String path) {
         queueLock.readLock().lock();
         try {
-            WebModel model = new QUploadModel(connection)
+            WebModel model = new QWebModel(connection)
                     .hash.equalTo(hash)
                     .service.equalTo(service)
                     .findOne();
@@ -145,7 +145,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
                 model.setHash(hash);
                 model.setPath(path);
                 connection.save(model);
-                model = new QUploadModel(connection)
+                model = new QWebModel(connection)
                         .hash.equalTo(hash)
                         .service.equalTo(service)
                         .findOne();
@@ -167,7 +167,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
     public @Nullable WebModel getWebModel(@NotNull String hash, @NotNull String service) {
         queueLock.readLock().lock();
         try {
-            return new QUploadModel(connection)
+            return new QWebModel(connection)
                     .hash.equalTo(hash)
                     .service.equalTo(service)
                     .findOne();
@@ -179,7 +179,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
     public @Nullable WebModel getWebModel(@NotNull String hash, @NotNull String service, long cacheTimeMillis) {
         queueLock.readLock().lock();
         try {
-            return new QUploadModel(connection)
+            return new QWebModel(connection)
                     .hash.equalTo(hash)
                     .service.equalTo(service)
                     .modified.after(Instant.now().minusMillis(cacheTimeMillis))
@@ -192,7 +192,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
     public @Nullable WebModel getWebModel(long uploadId) {
         queueLock.readLock().lock();
         try {
-            return new QUploadModel(connection)
+            return new QWebModel(connection)
                     .id.equalTo(uploadId)
                     .findOne();
         } finally {
@@ -203,7 +203,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
     public @Nullable WebModel getWebModel(long uploadId, long cacheTimeMillis) {
         queueLock.readLock().lock();
         try {
-            return new QUploadModel(connection)
+            return new QWebModel(connection)
                     .id.equalTo(uploadId)
                     .modified.after(Instant.now().minusMillis(cacheTimeMillis))
                     .findOne();
@@ -215,7 +215,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
     public @NotNull Set<WebModel> getAllWebs(long cacheTimeMillis) {
         queueLock.readLock().lock();
         try {
-            return new QUploadModel(connection)
+            return new QWebModel(connection)
                     .modified.after(Instant.now().minusMillis(cacheTimeMillis))
                     .findSet();
         } finally {
@@ -226,7 +226,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
     public @NotNull Set<WebModel> getAllWebs(int start, int max) {
         queueLock.readLock().lock();
         try {
-            return new QUploadModel(connection)
+            return new QWebModel(connection)
                     .id.between(start, start + max - 1)
                     .findSet();
         } finally {
@@ -542,7 +542,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
                 connection.update(m);
             }
         } else if (model instanceof WebModel) {
-            WebModel m = new QUploadModel(connection)
+            WebModel m = new QWebModel(connection)
                     .hash.equalTo(((WebModel) model).getHash())
                     .service.equalTo(((WebModel) model).getService())
                     .findOne();
