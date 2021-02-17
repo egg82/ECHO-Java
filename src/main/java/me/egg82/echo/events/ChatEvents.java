@@ -180,7 +180,7 @@ public class ChatEvents extends EventHolder {
 
         String message;
         if (reversed) {
-            message = reverse(generateSentence(cachedConfig.getMegaHal(), cachedConfig.getGoogleKey(), reverse(event.getMessage().getContentStripped()), reverse(seed)));
+            message = reverse(generateSentence(cachedConfig.getMegaHal(), cachedConfig.getGoogleKey(), reverse(event.getMessage().getContentStripped()), seed));
         } else {
             message = generateSentence(cachedConfig.getMegaHal(), cachedConfig.getGoogleKey(), event.getMessage().getContentStripped(), seed);
         }
