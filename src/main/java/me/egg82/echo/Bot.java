@@ -38,7 +38,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
-import ninja.egg82.events.EventSubscriber;
+import ninja.egg82.events.JDAEventSubscriber;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +53,7 @@ public class Bot {
     private final JDACommandManager commandManager;
 
     private final List<EventHolder> eventHolders = new ArrayList<>();
-    private final List<EventSubscriber<?>> events = new ArrayList<>();
+    private final List<JDAEventSubscriber<?>> events = new ArrayList<>();
     private final List<BaseCommand> commands = new ArrayList<>();
     private final IntList tasks = new IntArrayList();
 
@@ -108,7 +108,7 @@ public class Bot {
             eventHolder.cancel();
         }
         eventHolders.clear();
-        for (EventSubscriber<?> event : events) {
+        for (JDAEventSubscriber<?> event : events) {
             event.cancel();
         }
         events.clear();

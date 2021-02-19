@@ -34,7 +34,7 @@ import ninja.egg82.events.JDAEvents;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ChatEvents extends EventHolder {
+public final class ChatEvents extends EventHolder {
     private final JDA jda;
     private final JDACommandManager manager;
 

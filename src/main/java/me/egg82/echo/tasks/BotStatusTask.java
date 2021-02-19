@@ -33,7 +33,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BotStatusTask extends AbstractTask {
+public final class BotStatusTask extends AbstractTask {
     private static final Logger logger = LoggerFactory.getLogger(BotStatusTask.class);
 
     private static final String TRENDING_URL = "https://api.trakt.tv/shows/trending";
