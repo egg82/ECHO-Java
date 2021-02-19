@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import ninja.egg82.events.JDAEvents;
 import org.jetbrains.annotations.NotNull;
 
-public final class ReplyEvents extends EventHolder {
+public class ReplyEvents extends EventHolder {
     private final JDA jda;
     private final JDACommandManager manager;
 

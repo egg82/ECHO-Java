@@ -49,7 +49,7 @@ public class GithubSearchModel implements Serializable {
                 '}';
     }
 
-    public static final class GithubRepositoryModel implements Serializable {
+    public static class GithubRepositoryModel implements Serializable {
         private long id = -1L;
         @JSON(name = "node_id")
         private String nodeId = "";
@@ -289,7 +289,7 @@ public class GithubSearchModel implements Serializable {
                     '}';
         }
 
-        public static final class GithubRepositoryOwnerModel implements Serializable {
+        public static class GithubRepositoryOwnerModel implements Serializable {
             private String login = "";
             private long id = -1L;
             @JSON(name = "node_id")
@@ -354,7 +354,7 @@ public class GithubSearchModel implements Serializable {
             }
         }
 
-        public static final class GithubRepositoryLicenseModel implements Serializable {
+        public static class GithubRepositoryLicenseModel implements Serializable {
             private String key = "";
             private String name = "";
             @JSON(name = "spdx_id")

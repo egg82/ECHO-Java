@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import ninja.egg82.events.JDAEvents;
 import org.jetbrains.annotations.NotNull;
 
-public final class ReactEvents extends EventHolder {
+public class ReactEvents extends EventHolder {
     private final JDA jda;
     private final JDACommandManager manager;
 

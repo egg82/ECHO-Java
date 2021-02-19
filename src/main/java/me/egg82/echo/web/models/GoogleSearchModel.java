@@ -31,7 +31,7 @@ public class GoogleSearchModel implements Serializable {
                 '}';
     }
 
-    public static final class GoogleSearchItemModel implements Serializable {
+    public static class GoogleSearchItemModel implements Serializable {
         private String title = null;
         private String link = "";
 

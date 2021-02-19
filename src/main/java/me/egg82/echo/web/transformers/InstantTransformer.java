@@ -6,7 +6,7 @@ import flexjson.transformer.AbstractTransformer;
 import java.lang.reflect.Type;
 import java.time.Instant;
 
-public final class InstantTransformer extends AbstractTransformer implements ObjectFactory {
+public class InstantTransformer extends AbstractTransformer implements ObjectFactory {
     public Object instantiate(ObjectBinder context, Object value, Type targetType, Class targetClass) {
         if (value instanceof Instant) {
             return value.toString();

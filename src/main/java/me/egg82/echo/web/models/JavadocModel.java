@@ -39,7 +39,7 @@ public class JavadocModel implements Serializable {
                 '}';
     }
 
-    public static final class JavadocObjectModel implements Serializable {
+    public static class JavadocObjectModel implements Serializable {
         private String link = "";
         private String type = "";
         @JSON(name = "package")
@@ -126,7 +126,7 @@ public class JavadocModel implements Serializable {
                     '}';
         }
 
-        public static final class JavadocMetadataModel implements Serializable {
+        public static class JavadocMetadataModel implements Serializable {
             private String owner = null;
             private List<String> parameters = null;
             @JSON(name = "parameter_descriptions")
@@ -242,7 +242,7 @@ public class JavadocModel implements Serializable {
                         '}';
             }
 
-            public static final class JavadocThrowsModel implements Serializable {
+            public static class JavadocThrowsModel implements Serializable {
                 private String key = "";
                 private String value = "";
 

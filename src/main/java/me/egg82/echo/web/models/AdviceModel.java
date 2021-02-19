@@ -28,7 +28,7 @@ public class AdviceModel implements Serializable {
                 '}';
     }
 
-    public static final class AdviceSlipModel implements Serializable {
+    public static class AdviceSlipModel implements Serializable {
         private long id = -1L;
         private String advice = "";
 
