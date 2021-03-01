@@ -34,6 +34,7 @@ public class GithubCommand extends AbstractCommand {
     private static final String README_URL = "https://github.com/%s/blob/master/README.md";
     private static final String RAW_README_URL = "https://raw.githubusercontent.com/%s/master/README.md";
 
+    // I am so very sorry.
     private static final Pattern RE_IMAGES = Pattern.compile("\\[\\!\\[([^\\[\\]\\(\\)]+)\\]\\s*\\((https?:\\/\\/[^\\[\\]\\(\\)]*)\\)\\]\\s*\\(([^\\[\\]\\(\\)]+)\\)");
     private static final Pattern RE_IMAGES_2 = Pattern.compile("\\[\\!\\[([^\\[\\]\\(\\)]+)\\]\\s*\\((https?:\\/\\/[^\\[\\]\\(\\)]*)\\)\\]\\s*\\[([^\\[\\]\\(\\)]+)\\]");
     private static final Pattern RE_IMAGES_3 = Pattern.compile("\\!\\[(.*)\\]\\s*\\((https?:\\/\\/[^\\[\\]\\(\\)]*)\\)");
@@ -114,18 +115,18 @@ public class GithubCommand extends AbstractCommand {
             embed.setAuthor(first.getOwner().getLogin(), String.format(REPO_URL, first.getOwner().getLogin()), first.getOwner().getAvatarUrl());
             embed.setTitle(first.getFullName() + (first.isFork() ? " (\u2442)" : ""), String.format(REPO_URL, first.getFullName()));
             embed.setColor(Color.YELLOW);
-            embed.addField("Description", "`" + first.getDescription() + "`", false);
+            embed.addField("Description", "```" + first.getDescription() + "```", false);
             if (first.isArchived()) {
-                embed.addField("\u2757 Status", "ARCHIVED", true);
+                embed.addField("\u2757 Status", "ARCHIVED", false);
             } else if (first.isDisabled()) {
-                embed.addField("\u2757 Status", "DISABLED", true);
+                embed.addField("\u2757 Status", "DISABLED", false);
             }
-            embed.addField("\u2605 Stars", String.valueOf(first.getStargazers()), true);
+            embed.addField("\u2605 Stars", String.valueOf(first.getStargazers()), false);
             embed.addField("\uD83D\uDC41 Watchers", String.valueOf(first.getWatchers()), true);
-            embed.addField("\u2442 Forks", String.valueOf(first.getForks()), true);
+            embed.addField("\u2442 Forks", String.valueOf(first.getForks()), false);
             embed.addField("\u2757 Issues", String.valueOf(first.getOpenIssues()), true);
             if (first.getLanguage() != null) {
-                embed.addField("Language", first.getLanguage(), true);
+                embed.addField("Language", first.getLanguage(), false);
             }
             if (first.isWiki() || first.isIssues() || first.getLicense() != null) {
                 StringBuilder builder = new StringBuilder();
