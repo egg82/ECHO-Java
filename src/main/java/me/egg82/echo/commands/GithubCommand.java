@@ -121,13 +121,11 @@ public class GithubCommand extends AbstractCommand {
             } else if (first.isDisabled()) {
                 embed.addField("\u2757 Status", "DISABLED", false);
             }
-            embed.addField("\u2605 Stars", String.valueOf(first.getStargazers()), false);
+            embed.addField("\u2605 Stars", String.valueOf(first.getStargazers()), true);
             embed.addField("\uD83D\uDC41 Watchers", String.valueOf(first.getWatchers()), true);
-            embed.addField("\u2442 Forks", String.valueOf(first.getForks()), false);
+            embed.addField("Language", first.getLanguage() != null ? first.getLanguage() : "unknown", false);
+            embed.addField("\u2442 Forks", String.valueOf(first.getForks()), true);
             embed.addField("\u2757 Issues", String.valueOf(first.getOpenIssues()), true);
-            if (first.getLanguage() != null) {
-                embed.addField("Language", first.getLanguage(), false);
-            }
             if (first.isWiki() || first.isIssues() || first.getLicense() != null) {
                 StringBuilder builder = new StringBuilder();
                 if (first.isWiki()) {
