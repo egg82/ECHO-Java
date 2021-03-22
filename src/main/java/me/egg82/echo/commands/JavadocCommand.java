@@ -6,10 +6,6 @@ import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Description;
 import co.aikar.commands.annotation.Syntax;
 import flexjson.JSONDeserializer;
-import java.awt.*;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.lang.Message;
 import me.egg82.echo.utils.WebUtil;
@@ -19,6 +15,11 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+
 @CommandAlias("javadoc|jd")
 public class JavadocCommand extends AbstractCommand {
     private static final String API_URL = "https://docdex.helpch.at/index?javadoc=%s&query=%s&limit=%d";
@@ -26,8 +27,10 @@ public class JavadocCommand extends AbstractCommand {
 
     public JavadocCommand() { }
 
+    @Override
     public boolean requiresAdmin() { return false; }
 
+    @Override
     public @Nullable EmbedBuilder getDescription() {
         EmbedBuilder retVal = new EmbedBuilder();
         retVal.addField("Examples", "```" +

@@ -1,6 +1,7 @@
 package me.egg82.echo.storage.models;
 
 import io.ebean.annotation.NotNull;
+
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
@@ -32,6 +33,7 @@ public class LearnModel extends BaseModel {
 
     public void setLearning(boolean learn) { this.learning = learn; }
 
+    @Override
     public String toString() {
         return "LearnModel{" +
                 "id=" + id +

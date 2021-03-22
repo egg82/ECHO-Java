@@ -1,11 +1,13 @@
 package me.egg82.echo.utils;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class TimeUtil {
     private TimeUtil() { }
@@ -54,9 +56,9 @@ public class TimeUtil {
         return null;
     }
 
-    public static class Time {
+    public static class Time implements Serializable {
         private final long time;
-        private final TimeUnit unit;
+        private final @NotNull TimeUnit unit;
 
         private final int hc;
 
@@ -69,10 +71,12 @@ public class TimeUtil {
 
         public long getTime() { return time; }
 
+        @NotNull
         public TimeUnit getUnit() { return unit; }
 
         public long getMillis() { return unit.toMillis(time); }
 
+        @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (!(o instanceof Time)) return false;
@@ -81,6 +85,7 @@ public class TimeUtil {
                     unit == time1.unit;
         }
 
+        @Override
         public int hashCode() { return hc; }
     }
 }

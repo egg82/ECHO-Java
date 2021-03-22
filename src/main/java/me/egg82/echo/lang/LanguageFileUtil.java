@@ -1,14 +1,15 @@
 package me.egg82.echo.lang;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.util.Locale;
-import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.loader.ConfigurationLoader;
 import org.spongepowered.configurate.yaml.NodeStyle;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.util.Locale;
+import java.util.Optional;
 
 public class LanguageFileUtil {
     private LanguageFileUtil() { }

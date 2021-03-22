@@ -1,13 +1,14 @@
 package me.egg82.echo.services.lookup;
 
-import java.io.IOException;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 import me.egg82.echo.utils.ExceptionUtil;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 public class PlayerLookup {
     private static final Logger logger = LoggerFactory.getLogger(PlayerLookup.class);

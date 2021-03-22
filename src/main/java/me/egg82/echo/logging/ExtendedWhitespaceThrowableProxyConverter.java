@@ -5,5 +5,6 @@ import ch.qos.logback.classic.spi.IThrowableProxy;
 import ch.qos.logback.core.CoreConstants;
 
 public class ExtendedWhitespaceThrowableProxyConverter extends ExtendedThrowableProxyConverter {
+    @Override
     protected final String throwableProxyToString(IThrowableProxy tp) { return CoreConstants.LINE_SEPARATOR + super.throwableProxyToString(tp) + CoreConstants.LINE_SEPARATOR; }
 }

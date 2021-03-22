@@ -2,6 +2,13 @@ package me.egg82.echo.messaging;
 
 import com.rabbitmq.client.*;
 import io.netty.buffer.ByteBuf;
+import me.egg82.echo.config.ConfigUtil;
+import me.egg82.echo.messaging.packets.Packet;
+import me.egg82.echo.utils.PacketUtil;
+import me.egg82.echo.utils.ValidationUtil;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -10,12 +17,6 @@ import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import me.egg82.echo.config.ConfigUtil;
-import me.egg82.echo.messaging.packets.Packet;
-import me.egg82.echo.utils.PacketUtil;
-import me.egg82.echo.utils.ValidationUtil;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class RabbitMQMessagingService extends AbstractMessagingService {
     // https://www.rabbitmq.com/api-guide.html#recovery
@@ -33,6 +34,7 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
         super(name);
     }
 
+    @Override
     public void close() {
         queueLock.writeLock().lock();
         try {
@@ -45,6 +47,7 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
         }
     }
 
+    @Override
     public boolean isClosed() { return closed || !connection.isOpen(); }
 
     public static Builder builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler) { return new Builder(name, serverId, handler); }
@@ -109,6 +112,7 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
         String queue = channel.queueDeclare().getQueue();
         channel.queueBind(queue, EXCHANGE_NAME, "");
         Consumer consumer = new DefaultConsumer(channel) {
+            @Override
             public void handleDelivery(String tag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
                 if (ConfigUtil.getDebugOrFalse()) {
                     logger.info("Got message from exchange: " + envelope.getExchange());
@@ -153,6 +157,7 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
         channel.basicConsume(queue, true, consumer);
     }
 
+    @Override
     public void sendPacket(@NotNull UUID messageId, @NotNull Packet packet) throws IOException, TimeoutException {
         queueLock.readLock().lock();
         try (RecoverableChannel channel = getChannel()) {

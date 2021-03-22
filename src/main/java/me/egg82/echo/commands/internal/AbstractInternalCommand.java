@@ -16,7 +16,9 @@ public abstract class AbstractInternalCommand extends AbstractCommand implements
         this.event = event;
     }
 
+    @Override
     public boolean requiresAdmin() { return true; }
 
+    @Override
     public @Nullable EmbedBuilder getDescription() { return null; }
 }

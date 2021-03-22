@@ -1,11 +1,12 @@
 package me.egg82.echo.web.models;
 
 import flexjson.JSON;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import org.jetbrains.annotations.NotNull;
 
 public class GithubLicenseModel implements Serializable {
     private String key = "";
@@ -85,6 +86,7 @@ public class GithubLicenseModel implements Serializable {
 
     public void setFeatured(boolean featured) { this.featured = featured; }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof GithubLicenseModel)) return false;
@@ -92,8 +94,10 @@ public class GithubLicenseModel implements Serializable {
         return featured == that.featured && key.equals(that.key) && name.equals(that.name) && id.equals(that.id) && url.equals(that.url) && nodeId.equals(that.nodeId) && htmlUrl.equals(that.htmlUrl) && description.equals(that.description) && implementation.equals(that.implementation) && permissions.equals(that.permissions) && conditions.equals(that.conditions) && limitations.equals(that.limitations) && body.equals(that.body);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(key, name, id, url, nodeId, htmlUrl, description, implementation, permissions, conditions, limitations, body, featured); }
 
+    @Override
     public String toString() {
         return "GithubLicenseModel{" +
                 "key='" + key + '\'' +

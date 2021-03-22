@@ -1,6 +1,5 @@
 package me.egg82.echo.utils;
 
-import java.util.List;
 import me.egg82.echo.config.CachedConfig;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Emote;
@@ -9,6 +8,8 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class JDAUtil {
     private JDAUtil() { }

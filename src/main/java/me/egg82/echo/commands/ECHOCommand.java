@@ -22,8 +22,10 @@ public class ECHOCommand extends AbstractCommand {
         this.manager = manager;
     }
 
+    @Override
     public boolean requiresAdmin() { return true; }
 
+    @Override
     public @Nullable EmbedBuilder getDescription() { return null; }
 
     @Subcommand("reload")

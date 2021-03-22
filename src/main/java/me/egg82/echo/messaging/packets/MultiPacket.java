@@ -3,24 +3,27 @@ package me.egg82.echo.messaging.packets;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.PooledByteBufAllocator;
+import me.egg82.echo.utils.PacketUtil;
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
-import me.egg82.echo.utils.PacketUtil;
-import org.jetbrains.annotations.NotNull;
 
 public class MultiPacket extends AbstractPacket {
     private static final ByteBufAllocator alloc = PooledByteBufAllocator.DEFAULT;
 
     private Set<Packet> packets = new LinkedHashSet<>();
 
+    @Override
     public byte getPacketId() { return 0x21; }
 
     public MultiPacket(@NotNull ByteBuf data) { read(data); }
 
     public MultiPacket() { }
 
+    @Override
     public void read(@NotNull ByteBuf buffer) {
         if (!checkVersion(buffer)) {
             return;
@@ -53,6 +56,7 @@ public class MultiPacket extends AbstractPacket {
         checkReadPacket(buffer);
     }
 
+    @Override
     public void write(@NotNull ByteBuf buffer) {
         buffer.writeByte(VERSION);
 
@@ -80,6 +84,7 @@ public class MultiPacket extends AbstractPacket {
 
     public void setPackets(@NotNull Set<Packet> packets) { this.packets = packets; }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof MultiPacket)) return false;
@@ -87,8 +92,10 @@ public class MultiPacket extends AbstractPacket {
         return packets.equals(that.packets);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(packets); }
 
+    @Override
     public String toString() {
         return "MultiPacket{" +
             "packets=" + packets +

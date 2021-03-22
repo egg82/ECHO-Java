@@ -24,6 +24,7 @@ public class DoNotLearnCommand extends AbstractInternalCommand {
         this.learning = learning;
     }
 
+    @Override
     public void run() {
         CachedConfig cachedConfig = getCachedConfig(issuer);
         if (cachedConfig == null || !canRun(event, cachedConfig)) {

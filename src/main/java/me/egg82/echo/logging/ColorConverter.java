@@ -4,6 +4,7 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.pattern.CompositeConverter;
 import com.google.common.collect.ImmutableMap;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,6 +32,7 @@ public class ColorConverter extends CompositeConverter<ILoggingEvent> {
         LEVELS = ImmutableMap.copyOf(levels);
     }
 
+    @Override
     protected final String transform(ILoggingEvent event, String in) {
         AnsiColor element = ELEMENTS.get(getFirstOption());
         if (element == null) {

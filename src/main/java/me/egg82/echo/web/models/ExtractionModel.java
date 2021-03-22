@@ -1,12 +1,13 @@
 package me.egg82.echo.web.models;
 
 import flexjson.JSON;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class ExtractionModel implements Serializable {
     private String url = "";
@@ -63,6 +64,7 @@ public class ExtractionModel implements Serializable {
 
     public void setHtml(@NotNull String html) { this.html = html; }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ExtractionModel)) return false;
@@ -70,8 +72,10 @@ public class ExtractionModel implements Serializable {
         return url.equals(that.url) && status.equals(that.status) && domain.equals(that.domain) && title.equals(that.title) && author.equals(that.author) && Objects.equals(datePublished, that.datePublished) && images.equals(that.images) && videos.equals(that.videos) && text.equals(that.text) && html.equals(that.html);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(url, status, domain, title, author, datePublished, images, videos, text, html); }
 
+    @Override
     public String toString() {
         return "ExtractionModel{" +
                 "url='" + url + '\'' +

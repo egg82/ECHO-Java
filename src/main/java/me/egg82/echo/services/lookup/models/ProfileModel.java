@@ -28,6 +28,7 @@ public class ProfileModel implements Serializable {
 
     public void setProperties(List<ProfilePropertyModel> properties) { this.properties = properties; }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ProfileModel)) return false;
@@ -37,8 +38,10 @@ public class ProfileModel implements Serializable {
                 Objects.equals(properties, that.properties);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(id, name, properties); }
 
+    @Override
     public String toString() {
         return "ProfileModel{" +
                 "id='" + id + '\'' +
@@ -72,6 +75,7 @@ public class ProfileModel implements Serializable {
 
         public void setSignature(String signature) { this.signature = signature; }
 
+        @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (!(o instanceof ProfilePropertyModel)) return false;
@@ -81,8 +85,10 @@ public class ProfileModel implements Serializable {
                     Objects.equals(signature, that.signature);
         }
 
+        @Override
         public int hashCode() { return Objects.hash(name, value, signature); }
 
+        @Override
         public String toString() {
             return "ProfilePropertyModel{" +
                     "name='" + name + '\'' +

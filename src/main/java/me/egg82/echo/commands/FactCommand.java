@@ -6,15 +6,8 @@ import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Description;
 import co.aikar.commands.annotation.Syntax;
 import flexjson.JSONDeserializer;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 import me.egg82.echo.config.CachedConfig;
-import me.egg82.echo.core.Pair;
+import me.egg82.echo.core.NullablePair;
 import me.egg82.echo.utils.WebUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
@@ -22,24 +15,34 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+
 @CommandAlias("fact|facts|factoid|factoids|useless")
 public class FactCommand extends AbstractCommand {
-    private static final List<Pair<String, String>> API_URLS = Arrays.asList(
-            new Pair<>("https://uselessfacts.jsph.pl/random.json?language=en", "text"),
-            new Pair<>("https://useless-facts.sameerkumar.website/api", "data"),
-            new Pair<>("https://catfact.ninja/fact", "fact"),
-            new Pair<>("http://numbersapi.com/random/trivia", null),
-            new Pair<>("http://numbersapi.com/random/year", null),
-            new Pair<>("http://numbersapi.com/random/date", null),
-            new Pair<>("http://numbersapi.com/random/math", null)
+    private static final List<NullablePair<String, String>> API_URLS = Arrays.asList(
+            new NullablePair<>("https://uselessfacts.jsph.pl/random.json?language=en", "text"),
+            new NullablePair<>("https://useless-facts.sameerkumar.website/api", "data"),
+            new NullablePair<>("https://catfact.ninja/fact", "fact"),
+            new NullablePair<>("http://numbersapi.com/random/trivia", null),
+            new NullablePair<>("http://numbersapi.com/random/year", null),
+            new NullablePair<>("http://numbersapi.com/random/date", null),
+            new NullablePair<>("http://numbersapi.com/random/math", null)
     );
 
     private static final Random random = new Random();
 
     public FactCommand() { }
 
+    @Override
     public boolean requiresAdmin() { return false; }
 
+    @Override
     public @Nullable EmbedBuilder getDescription() { return null; }
 
     @Default
@@ -66,7 +69,7 @@ public class FactCommand extends AbstractCommand {
     }
 
     public static @NotNull CompletableFuture<String> get() {
-        Pair<String, String> data = API_URLS.get(random.nextInt(API_URLS.size()));
+        NullablePair<String, String> data = API_URLS.get(random.nextInt(API_URLS.size()));
         String url = data.getT1();
         while (url.contains("%d")) {
             url = String.format(url, random.nextInt(100));

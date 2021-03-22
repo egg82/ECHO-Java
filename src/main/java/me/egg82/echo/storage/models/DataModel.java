@@ -1,9 +1,10 @@
 package me.egg82.echo.storage.models;
 
 import io.ebean.annotation.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import org.jetbrains.annotations.Nullable;
 
 @Entity
 @Table(name = "echo_data")
@@ -32,6 +33,7 @@ public class DataModel extends BaseModel {
 
     public void setValue(String value) { this.value = value; }
 
+    @Override
     public String toString() {
         return "DataModel{" +
             "id=" + id +

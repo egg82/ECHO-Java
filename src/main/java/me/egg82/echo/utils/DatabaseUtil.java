@@ -6,6 +6,19 @@ import com.github.benmanes.caffeine.cache.Weigher;
 import com.google.common.hash.HashCode;
 import flexjson.JSONDeserializer;
 import flexjson.JSONSerializer;
+import me.egg82.echo.compression.ZstdCompressionStream;
+import me.egg82.echo.config.CachedConfig;
+import me.egg82.echo.config.ConfigUtil;
+import me.egg82.echo.core.NullablePair;
+import me.egg82.echo.storage.StorageService;
+import me.egg82.echo.storage.models.WebModel;
+import me.egg82.echo.web.transformers.InstantTransformer;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -16,18 +29,6 @@ import java.time.Instant;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
-import me.egg82.echo.compression.ZstdCompressionStream;
-import me.egg82.echo.config.CachedConfig;
-import me.egg82.echo.config.ConfigUtil;
-import me.egg82.echo.core.Pair;
-import me.egg82.echo.storage.StorageService;
-import me.egg82.echo.storage.models.WebModel;
-import me.egg82.echo.web.transformers.InstantTransformer;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class DatabaseUtil {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseUtil.class);
@@ -100,15 +101,15 @@ public class DatabaseUtil {
 
     public static void storeString(@NotNull String hash, @NotNull String service, @NotNull String string) { storeBytes(hash, service, string.getBytes(StandardCharsets.UTF_8)); }
 
-    private static final Cache<Pair<String, String>, byte[]> dataCache = Caffeine.newBuilder()
+    private static final Cache<NullablePair<String, String>, byte[]> dataCache = Caffeine.newBuilder()
             .expireAfterWrite(1L, TimeUnit.DAYS)
             .expireAfterAccess(4L, TimeUnit.HOURS)
             .maximumWeight(1024L * 1024L * 2L) // 2MB
-            .weigher((Weigher<Pair<String, String>, byte[]>) (k, v) -> v.length)
+            .weigher((Weigher<NullablePair<String, String>, byte[]>) (k, v) -> v.length)
             .build();
 
     public static byte @Nullable [] getBytes(@NotNull String hash, @NotNull String service) {
-        return dataCache.get(new Pair<>(hash, service), k -> {
+        return dataCache.get(new NullablePair<>(hash, service), k -> {
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
             if (cachedConfig == null) {
                 throw new IllegalStateException("Could not get cached config.");
@@ -133,7 +134,7 @@ public class DatabaseUtil {
     }
 
     public static byte @Nullable [] getBytes(@NotNull String hash, @NotNull String service, long cacheTimeMillis) {
-        return dataCache.get(new Pair<>(hash, service), k -> {
+        return dataCache.get(new NullablePair<>(hash, service), k -> {
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
             if (cachedConfig == null) {
                 throw new IllegalStateException("Could not get cached config.");
@@ -158,7 +159,7 @@ public class DatabaseUtil {
     }
 
     public static void storeBytes(@NotNull String hash, @NotNull String service, byte @NotNull [] data) {
-        dataCache.put(new Pair<>(hash, service), data);
+        dataCache.put(new NullablePair<>(hash, service), data);
 
         String fileName;
         do {

@@ -2,8 +2,6 @@ package me.egg82.echo.utils;
 
 import co.aikar.commands.JDACommandManager;
 import io.paradaux.ai.MarkovMegaHal;
-import java.util.Collection;
-import java.util.Set;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.lang.Message;
@@ -16,6 +14,9 @@ import net.dv8tion.jda.api.entities.User;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Collection;
+import java.util.Set;
 
 public class ResponseUtil {
     private static final Logger logger = LoggerFactory.getLogger(ResponseUtil.class);

@@ -6,7 +6,6 @@ import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Description;
 import co.aikar.commands.annotation.Syntax;
 import flexjson.JSONDeserializer;
-import java.util.concurrent.CompletableFuture;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.utils.WebUtil;
 import me.egg82.echo.web.models.AdviceModel;
@@ -16,14 +15,18 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.concurrent.CompletableFuture;
+
 @CommandAlias("advice")
 public class AdviceCommand extends AbstractCommand {
     private static final String API_URL = "https://api.adviceslip.com/advice";
 
     public AdviceCommand() { }
 
+    @Override
     public boolean requiresAdmin() { return false; }
 
+    @Override
     public @Nullable EmbedBuilder getDescription() { return null; }
 
     @Default

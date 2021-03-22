@@ -2,14 +2,6 @@ package me.egg82.echo.commands.internal;
 
 import co.aikar.commands.*;
 import co.aikar.locales.MessageKey;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import me.egg82.echo.commands.AbstractCommand;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.lang.Message;
@@ -21,6 +13,15 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 public class InternalUsageCommand extends AbstractInternalCommand {
     private final CommandHelp help;
 
@@ -29,6 +30,7 @@ public class InternalUsageCommand extends AbstractInternalCommand {
         this.help = help;
     }
 
+    @Override
     public void run() {
         CachedConfig cachedConfig = getCachedConfig(issuer);
         if (cachedConfig == null || !canRun(event, cachedConfig)) {

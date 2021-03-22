@@ -1,7 +1,8 @@
 package me.egg82.echo.web;
 
-import java.util.concurrent.TimeUnit;
 import me.egg82.echo.utils.TimeUtil;
+
+import java.util.concurrent.TimeUnit;
 
 public class WebConstants {
     private WebConstants() { }

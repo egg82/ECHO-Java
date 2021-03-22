@@ -1,10 +1,5 @@
 package me.egg82.echo.reflect;
 
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import me.egg82.echo.config.ConfigUtil;
 import org.jetbrains.annotations.NotNull;
 import org.reflections.ReflectionUtils;
@@ -17,6 +12,12 @@ import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class PackageFilter {
     private static final Logger logger = LoggerFactory.getLogger(PackageFilter.class);

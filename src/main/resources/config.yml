@@ -117,13 +117,13 @@ keys:
   # Wolfram Alpha app ID
   wolfram: ''
   # Imgur client ID
-  imgur: ''
+  imgur: 'b972ecca954f246'
   # DeepAI key
   deepai: ''
   # Extractor API key
   extractor: ''
   # Trakt client ID
-  trakt: ''
+  trakt: '5c7a2eedb82073f8d182973d7d76761993f7285effb018a5db8d72fdd458d21f'
 
 # Emotes to use for various functions
 emotes:

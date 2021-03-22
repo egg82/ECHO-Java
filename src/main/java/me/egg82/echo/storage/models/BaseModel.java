@@ -3,12 +3,13 @@ package me.egg82.echo.storage.models;
 import io.ebean.Model;
 import io.ebean.annotation.WhenCreated;
 import io.ebean.annotation.WhenModified;
-import java.io.Serializable;
-import java.time.Instant;
+import org.jetbrains.annotations.Nullable;
+
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
-import org.jetbrains.annotations.Nullable;
+import java.io.Serializable;
+import java.time.Instant;
 
 @MappedSuperclass
 public abstract class BaseModel extends Model implements Serializable {
@@ -53,6 +54,7 @@ public abstract class BaseModel extends Model implements Serializable {
 
     public void setModified(Instant modified) { this.modified = modified; }
 
+    @Override
     public String toString() {
         return "BaseModel{" +
                 "id=" + id +

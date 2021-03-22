@@ -1,6 +1,7 @@
 package me.egg82.echo.storage.models;
 
 import io.ebean.annotation.NotNull;
+
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
@@ -24,6 +25,7 @@ public class MessageModel extends BaseModel {
 
     public void setMessage(@org.jetbrains.annotations.NotNull String message) { this.message = message; }
 
+    @Override
     public String toString() {
         return "MessageModel{" +
                 "id=" + id +

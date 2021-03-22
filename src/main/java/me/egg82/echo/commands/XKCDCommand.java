@@ -7,7 +7,6 @@ import co.aikar.commands.annotation.Description;
 import co.aikar.commands.annotation.Syntax;
 import flexjson.JSONDeserializer;
 import it.unimi.dsi.fastutil.ints.IntObjectImmutablePair;
-import java.util.concurrent.CompletableFuture;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.utils.WebUtil;
 import me.egg82.echo.web.models.XKCDInfoModel;
@@ -17,6 +16,8 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.concurrent.CompletableFuture;
+
 @CommandAlias("xkcd")
 public class XKCDCommand extends AbstractCommand {
     private static final String SEARCH_URL = "https://relevantxkcd.appspot.com/process?action=xkcd&query=%s";
@@ -24,8 +25,10 @@ public class XKCDCommand extends AbstractCommand {
 
     public XKCDCommand() { }
 
+    @Override
     public boolean requiresAdmin() { return false; }
 
+    @Override
     public @Nullable EmbedBuilder getDescription() { return null; }
 
     @Default

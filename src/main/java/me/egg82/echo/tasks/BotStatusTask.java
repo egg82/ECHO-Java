@@ -2,19 +2,9 @@ package me.egg82.echo.tasks;
 
 import flexjson.JSONDeserializer;
 import it.unimi.dsi.fastutil.ints.IntList;
-import java.io.IOException;
-import java.net.URL;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.TimeUnit;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.core.GameStatus;
-import me.egg82.echo.core.Pair;
+import me.egg82.echo.core.NullablePair;
 import me.egg82.echo.messaging.packets.ShowPacket;
 import me.egg82.echo.storage.StorageService;
 import me.egg82.echo.storage.models.ShowModel;
@@ -33,6 +23,17 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.net.URL;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.TimeUnit;
+
 public class BotStatusTask extends AbstractTask {
     private static final Logger logger = LoggerFactory.getLogger(BotStatusTask.class);
 
@@ -46,6 +47,7 @@ public class BotStatusTask extends AbstractTask {
         super(jda, tasks);
     }
 
+    @Override
     public void accept(int id) {
         CachedConfig cachedConfig = getCachedConfig();
         if (cachedConfig == null) {
@@ -151,7 +153,7 @@ public class BotStatusTask extends AbstractTask {
                                 return null;
                             }
 
-                            return new Pair<>(trendingModel.getShow().getTitle(), episodeModel);
+                            return new NullablePair<>(trendingModel.getShow().getTitle(), episodeModel);
                         })
                         .whenCompleteAsync((val, ex) -> {
                             if (!canCompleteContinue(val, ex)) {

@@ -1,13 +1,14 @@
 package me.egg82.echo.web.models;
 
 import flexjson.JSON;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class JavadocModel implements Serializable {
     private String name = "";
@@ -23,6 +24,7 @@ public class JavadocModel implements Serializable {
 
     public void setObject(@NotNull JavadocObjectModel object) { this.object = object; }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof JavadocModel)) return false;
@@ -30,8 +32,10 @@ public class JavadocModel implements Serializable {
         return name.equals(that.name) && object.equals(that.object);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(name, object); }
 
+    @Override
     public String toString() {
         return "JavadocModel{" +
                 "name='" + name + '\'' +
@@ -101,6 +105,7 @@ public class JavadocModel implements Serializable {
 
         public void setMetadata(@NotNull JavadocMetadataModel metadata) { this.metadata = metadata; }
 
+        @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (!(o instanceof JavadocObjectModel)) return false;
@@ -108,8 +113,10 @@ public class JavadocModel implements Serializable {
             return deprecated == that.deprecated && link.equals(that.link) && type.equals(that.type) && packageName.equals(that.packageName) && name.equals(that.name) && description.equals(that.description) && strippedDescription.equals(that.strippedDescription) && annotations.equals(that.annotations) && deprecationMessage.equals(that.deprecationMessage) && modifiers.equals(that.modifiers) && metadata.equals(that.metadata);
         }
 
+        @Override
         public int hashCode() { return Objects.hash(link, type, packageName, name, description, strippedDescription, annotations, deprecated, deprecationMessage, modifiers, metadata); }
 
+        @Override
         public String toString() {
             return "JavadocObjectModel{" +
                     "link='" + link + '\'' +
@@ -213,6 +220,7 @@ public class JavadocModel implements Serializable {
 
             public void setFields(List<String> fields) { this.fields = fields; }
 
+            @Override
             public boolean equals(Object o) {
                 if (this == o) return true;
                 if (!(o instanceof JavadocMetadataModel)) return false;
@@ -220,8 +228,10 @@ public class JavadocModel implements Serializable {
                 return Objects.equals(owner, that.owner) && Objects.equals(parameters, that.parameters) && Objects.equals(parameterDescriptions, that.parameterDescriptions) && Objects.equals(returns, that.returns) && Objects.equals(returnsDescription, that.returnsDescription) && Objects.equals(javadocThrows, that.javadocThrows) && Objects.equals(extensions, that.extensions) && Objects.equals(implementations, that.implementations) && Objects.equals(allImplementations, that.allImplementations) && Objects.equals(superInterfaces, that.superInterfaces) && Objects.equals(subInterfaces, that.subInterfaces) && Objects.equals(subClasses, that.subClasses) && Objects.equals(implementingClasses, that.implementingClasses) && Objects.equals(methods, that.methods) && Objects.equals(fields, that.fields);
             }
 
+            @Override
             public int hashCode() { return Objects.hash(owner, parameters, parameterDescriptions, returns, returnsDescription, javadocThrows, extensions, implementations, allImplementations, superInterfaces, subInterfaces, subClasses, implementingClasses, methods, fields); }
 
+            @Override
             public String toString() {
                 return "JavadocMetadataModel{" +
                         "owner='" + owner + '\'' +
@@ -256,6 +266,7 @@ public class JavadocModel implements Serializable {
 
                 public void setValue(@NotNull String value) { this.value = value; }
 
+                @Override
                 public boolean equals(Object o) {
                     if (this == o) return true;
                     if (!(o instanceof JavadocThrowsModel)) return false;
@@ -263,8 +274,10 @@ public class JavadocModel implements Serializable {
                     return key.equals(that.key) && value.equals(that.value);
                 }
 
+                @Override
                 public int hashCode() { return Objects.hash(key, value); }
 
+                @Override
                 public String toString() {
                     return "JavadocThrowsModel{" +
                             "key='" + key + '\'' +

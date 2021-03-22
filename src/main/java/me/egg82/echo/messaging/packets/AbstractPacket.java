@@ -1,12 +1,13 @@
 package me.egg82.echo.messaging.packets;
 
 import io.netty.buffer.ByteBuf;
-import java.nio.charset.StandardCharsets;
-import java.util.UUID;
 import me.egg82.echo.config.ConfigUtil;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 public abstract class AbstractPacket implements Packet {
     protected final transient Logger logger = LoggerFactory.getLogger(getClass());

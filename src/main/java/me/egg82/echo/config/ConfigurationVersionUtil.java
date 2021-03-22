@@ -1,13 +1,14 @@
 package me.egg82.echo.config;
 
 import com.google.common.io.Files;
-import java.io.File;
-import java.io.IOException;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.loader.ConfigurationLoader;
+
+import java.io.File;
+import java.io.IOException;
 
 public class ConfigurationVersionUtil {
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationVersionUtil.class);

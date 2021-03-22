@@ -1,11 +1,12 @@
 package me.egg82.echo.web.models;
 
 import it.unimi.dsi.fastutil.ints.IntObjectImmutablePair;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import org.jetbrains.annotations.NotNull;
 
 public class XKCDSearchModel implements Serializable {
     private float weight = Float.NaN;
@@ -24,6 +25,7 @@ public class XKCDSearchModel implements Serializable {
 
     public @NotNull List<IntObjectImmutablePair<String>> getComics() { return comics; }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof XKCDSearchModel)) return false;
@@ -31,8 +33,10 @@ public class XKCDSearchModel implements Serializable {
         return Float.compare(that.weight, weight) == 0 && selection == that.selection && comics.equals(that.comics);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(weight, selection, comics); }
 
+    @Override
     public String toString() {
         return "XKCDSearchModel{" +
                 "weight=" + weight +

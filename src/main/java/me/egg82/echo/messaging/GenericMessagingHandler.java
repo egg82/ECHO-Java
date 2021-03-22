@@ -3,8 +3,6 @@ package me.egg82.echo.messaging;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import io.paradaux.ai.MarkovMegaHal;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.messaging.packets.*;
@@ -16,6 +14,9 @@ import me.egg82.echo.utils.PacketUtil;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class GenericMessagingHandler implements MessagingHandler {
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -29,6 +30,7 @@ public class GenericMessagingHandler implements MessagingHandler {
 
     public GenericMessagingHandler() { }
 
+    @Override
     public void handlePacket(@NotNull UUID messageId, @NotNull String fromService, @NotNull Packet packet) {
         if (isDuplicate(messageId)) {
             return;
@@ -144,6 +146,7 @@ public class GenericMessagingHandler implements MessagingHandler {
         }
     }
 
+    @Override
     public void cancel() { }
 
     private boolean isDuplicate(@NotNull UUID messageId) {

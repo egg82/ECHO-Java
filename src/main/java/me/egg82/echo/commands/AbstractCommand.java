@@ -2,12 +2,9 @@ package me.egg82.echo.commands;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandIssuer;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
-import me.egg82.echo.core.Pair;
+import me.egg82.echo.core.NullablePair;
 import me.egg82.echo.lang.Message;
 import me.egg82.echo.services.lookup.PlayerInfo;
 import me.egg82.echo.services.lookup.PlayerLookup;
@@ -22,6 +19,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public abstract class AbstractCommand extends BaseCommand {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
@@ -76,11 +77,11 @@ public abstract class AbstractCommand extends BaseCommand {
             return false;
         }
 
-        if (val instanceof Pair && (((Pair<?, ?>) val).getT1() == null || ((Pair<?, ?>) val).getT2() == null)) {
-            if (((Pair<?, ?>) val).getT1() == null) {
+        if (val instanceof NullablePair && (((NullablePair<?, ?>) val).getT1() == null || ((NullablePair<?, ?>) val).getT2() == null)) {
+            if (((NullablePair<?, ?>) val).getT1() == null) {
                 logger.warn("Pair T1 is null.");
             }
-            if (((Pair<?, ?>) val).getT2() == null) {
+            if (((NullablePair<?, ?>) val).getT2() == null) {
                 logger.warn("Pair T2 is null.");
             }
             issuer.sendError(Message.ERROR__INTERNAL);

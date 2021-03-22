@@ -8,15 +8,8 @@ import co.aikar.commands.annotation.Syntax;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import flexjson.JSONDeserializer;
-import java.awt.*;
-import java.io.IOException;
-import java.net.URL;
-import java.time.Instant;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.TimeUnit;
 import me.egg82.echo.config.CachedConfig;
-import me.egg82.echo.core.Pair;
+import me.egg82.echo.core.NullablePair;
 import me.egg82.echo.lang.Message;
 import me.egg82.echo.utils.DatabaseUtil;
 import me.egg82.echo.utils.ExceptionUtil;
@@ -31,6 +24,14 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
+import java.io.IOException;
+import java.net.URL;
+import java.time.Instant;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.TimeUnit;
+
 @CommandAlias("wolfram|wa")
 public class WolframAlphaCommand extends AbstractCommand {
     private static final Logger logger = LoggerFactory.getLogger(WolframAlphaCommand.class);
@@ -43,8 +44,10 @@ public class WolframAlphaCommand extends AbstractCommand {
 
     public WolframAlphaCommand() { }
 
+    @Override
     public boolean requiresAdmin() { return false; }
 
+    @Override
     public @Nullable EmbedBuilder getDescription() { return null; }
 
     @Default
@@ -69,13 +72,13 @@ public class WolframAlphaCommand extends AbstractCommand {
         }
 
         getResult(cachedConfig.getWolframKey(), query)
-                .thenCombineAsync(getImage(cachedConfig.getWolframKey(), query), Pair::new)
+                .thenCombineAsync(getImage(cachedConfig.getWolframKey(), query), NullablePair::new)
                 .thenApplyAsync(v -> {
                     if (v.getT2() == null) {
-                        return new Pair<>(v.getT1(), "");
+                        return new NullablePair<>(v.getT1(), "");
                     }
                     ImgurUploadModel model = uploadImage(cachedConfig.getImgurKey(), v.getT2()).join();
-                    return new Pair<>(v.getT1(), model.getData().getLink());
+                    return new NullablePair<>(v.getT1(), model.getData().getLink());
                 })
                 .whenCompleteAsync((val, ex) -> {
                     if (!canCompleteContinue(issuer, val, ex)) {

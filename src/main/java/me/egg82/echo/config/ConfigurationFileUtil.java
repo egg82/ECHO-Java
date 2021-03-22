@@ -2,14 +2,6 @@ package me.egg82.echo.config;
 
 import co.aikar.commands.JDACommandManager;
 import io.paradaux.ai.MarkovMegaHal;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import me.egg82.echo.core.GameStatus;
 import me.egg82.echo.messaging.*;
 import me.egg82.echo.storage.*;
@@ -30,6 +22,15 @@ import org.spongepowered.configurate.serialize.SerializationException;
 import org.spongepowered.configurate.yaml.NodeStyle;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 import redis.clients.jedis.exceptions.JedisException;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class ConfigurationFileUtil {
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationFileUtil.class);

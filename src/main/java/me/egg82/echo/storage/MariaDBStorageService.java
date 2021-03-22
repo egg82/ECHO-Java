@@ -2,10 +2,11 @@ package me.egg82.echo.storage;
 
 import com.zaxxer.hikari.HikariConfig;
 import io.ebean.config.dbplatform.mariadb.MariaDbPlatform;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Properties;
-import org.jetbrains.annotations.NotNull;
 
 public class MariaDBStorageService extends AbstractJDBCStorageService {
     private MariaDBStorageService(@NotNull String name) {

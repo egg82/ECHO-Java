@@ -1,10 +1,11 @@
 package me.egg82.echo;
 
 import com.nixxcode.jvmbrotli.common.BrotliLoader;
-import javax.security.auth.login.LoginException;
 import joptsimple.OptionParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.security.auth.login.LoginException;
 
 public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);

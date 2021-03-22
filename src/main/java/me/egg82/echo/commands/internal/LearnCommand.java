@@ -18,6 +18,7 @@ public class LearnCommand extends AbstractInternalCommand {
         this.delimiter = delimiter;
     }
 
+    @Override
     public void run() {
         CachedConfig cachedConfig = getCachedConfig(issuer);
         if (cachedConfig == null || !canRun(event, cachedConfig)) {

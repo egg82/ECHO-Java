@@ -1,10 +1,11 @@
 package me.egg82.echo.storage;
 
-import java.util.Collection;
-import java.util.Set;
 import me.egg82.echo.storage.models.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Collection;
+import java.util.Set;
 
 public interface StorageService {
     @NotNull String getName();

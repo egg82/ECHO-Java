@@ -3,11 +3,12 @@ package me.egg82.echo.config;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import io.paradaux.ai.MarkovMegaHal;
-import java.util.*;
 import me.egg82.echo.core.GameStatus;
 import me.egg82.echo.messaging.MessagingService;
 import me.egg82.echo.storage.StorageService;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.*;
 
 public class CachedConfig {
     private CachedConfig() { }

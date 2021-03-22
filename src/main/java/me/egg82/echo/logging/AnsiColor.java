@@ -34,5 +34,6 @@ public enum AnsiColor {
         this.code = code;
     }
 
+    @Override
     public String toString() { return this.code; }
 }

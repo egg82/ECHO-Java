@@ -1,7 +1,6 @@
 package me.egg82.echo.events;
 
 import co.aikar.commands.JDACommandManager;
-import java.util.regex.Pattern;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.utils.JDAUtil;
@@ -10,6 +9,8 @@ import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import ninja.egg82.events.JDAEvents;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.regex.Pattern;
 
 public class ReactEvents extends EventHolder {
     private final JDA jda;

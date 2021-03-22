@@ -5,6 +5,12 @@ import com.github.luben.zstd.ZstdException;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.PooledByteBufAllocator;
+import me.egg82.echo.config.ConfigUtil;
+import me.egg82.echo.utils.MathUtil;
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.text.DecimalFormat;
@@ -12,11 +18,6 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import me.egg82.echo.config.ConfigUtil;
-import me.egg82.echo.utils.MathUtil;
-import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class AbstractMessagingService implements MessagingService {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
@@ -36,6 +37,7 @@ public abstract class AbstractMessagingService implements MessagingService {
         this.name = name;
     }
 
+    @Override
     public @NotNull String getName() { return name; }
 
     private static final double TOLERANCE = 1.1; // Compression ratio tolerance. Determines when compression should happen

@@ -4,9 +4,6 @@ import co.aikar.commands.JDACommandManager;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 import me.egg82.echo.commands.AbstractCommand;
 import me.egg82.echo.commands.ECHOCommand;
 import me.egg82.echo.config.CachedConfig;
@@ -18,6 +15,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class CollectionProvider {
     private static final Logger logger = LoggerFactory.getLogger(CollectionProvider.class);

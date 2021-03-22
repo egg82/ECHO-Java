@@ -1,11 +1,12 @@
 package me.egg82.echo.web.models;
 
 import flexjson.JSON;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import org.jetbrains.annotations.NotNull;
 
 public class QuoteModel implements Serializable {
     @JSON(name = "_id")
@@ -37,6 +38,7 @@ public class QuoteModel implements Serializable {
 
     public void setLength(long length) { this.length = length; }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof QuoteModel)) return false;
@@ -44,8 +46,10 @@ public class QuoteModel implements Serializable {
         return length == that.length && id.equals(that.id) && tags.equals(that.tags) && content.equals(that.content) && author.equals(that.author);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(id, tags, content, author, length); }
 
+    @Override
     public String toString() {
         return "QuoteModel{" +
                 "id='" + id + '\'' +

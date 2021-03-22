@@ -7,10 +7,6 @@ import io.ebean.DatabaseFactory;
 import io.ebean.Transaction;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
-import java.io.File;
-import java.time.Instant;
-import java.util.*;
-import javax.persistence.PersistenceException;
 import me.egg82.echo.storage.models.*;
 import me.egg82.echo.storage.models.query.*;
 import me.egg82.echo.utils.VersionUtil;
@@ -20,6 +16,11 @@ import org.reflections.Reflections;
 import org.reflections.ReflectionsException;
 import org.reflections.scanners.ResourcesScanner;
 
+import javax.persistence.PersistenceException;
+import java.io.File;
+import java.time.Instant;
+import java.util.*;
+
 public abstract class AbstractJDBCStorageService extends AbstractStorageService {
     protected Database connection;
     protected HikariDataSource source;
@@ -28,6 +29,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         super(name);
     }
 
+    @Override
     public void close() {
         queueLock.writeLock().lock();
         try {
@@ -39,6 +41,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public void storeModel(@NotNull BaseModel model) {
         queueLock.readLock().lock();
         try {
@@ -48,6 +51,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public void storeModels(@NotNull Collection<? extends BaseModel> models) {
         queueLock.readLock().lock();
         try (Transaction tx = connection.beginTransaction()) {
@@ -60,6 +64,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public void deleteModel(@NotNull BaseModel model) {
         BaseModel newModel = duplicateModel(model, true);
         if (newModel == null) {
@@ -74,6 +79,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public @NotNull ShowModel getOrCreateShowModel(long tvdbId, int season, int episode) {
         queueLock.readLock().lock();
         try {
@@ -105,6 +111,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public @Nullable ShowModel getShowModel(long idOrTvdbId) {
         queueLock.readLock().lock();
         try {
@@ -122,6 +129,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public @NotNull Set<ShowModel> getAllShows(int start, int max) {
         queueLock.readLock().lock();
         try {
@@ -133,6 +141,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public @NotNull WebModel getOrCreateWebModel(@NotNull String hash, @NotNull String service, @NotNull String path) {
         queueLock.readLock().lock();
         try {
@@ -164,6 +173,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public @Nullable WebModel getWebModel(@NotNull String hash, @NotNull String service) {
         queueLock.readLock().lock();
         try {
@@ -176,6 +186,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public @Nullable WebModel getWebModel(@NotNull String hash, @NotNull String service, long cacheTimeMillis) {
         queueLock.readLock().lock();
         try {
@@ -189,6 +200,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public @Nullable WebModel getWebModel(long uploadId) {
         queueLock.readLock().lock();
         try {
@@ -200,6 +212,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public @Nullable WebModel getWebModel(long uploadId, long cacheTimeMillis) {
         queueLock.readLock().lock();
         try {
@@ -212,6 +225,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public @NotNull Set<WebModel> getAllWebs(long cacheTimeMillis) {
         queueLock.readLock().lock();
         try {
@@ -223,6 +237,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public @NotNull Set<WebModel> getAllWebs(int start, int max) {
         queueLock.readLock().lock();
         try {
@@ -234,6 +249,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public @NotNull MessageModel getOrCreateMessageModel(@NotNull String message) {
         queueLock.readLock().lock();
         try {
@@ -257,6 +273,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public @Nullable MessageModel getMessageModel(@NotNull String message) {
         queueLock.readLock().lock();
         try {
@@ -268,6 +285,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public @Nullable MessageModel getMessageModel(long messageId) {
         queueLock.readLock().lock();
         try {
@@ -279,6 +297,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public @NotNull Set<MessageModel> getAllMessages(int start, int max) {
         queueLock.readLock().lock();
         try {
@@ -290,6 +309,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public @NotNull LearnModel getOrCreateLearnModel(long user, boolean learn) {
         queueLock.readLock().lock();
         try {
@@ -319,6 +339,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public @Nullable LearnModel getLearnModel(long userOrId) {
         queueLock.readLock().lock();
         try {
@@ -336,6 +357,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public @NotNull Set<LearnModel> getAllLearning(int start, int max) {
         queueLock.readLock().lock();
         try {
@@ -347,6 +369,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public @NotNull DataModel getOrCreateDataModel(@NotNull String key, String value) {
         queueLock.readLock().lock();
         try {
@@ -376,6 +399,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public @Nullable DataModel getDataModel(@NotNull String key) {
         queueLock.readLock().lock();
         try {
@@ -387,6 +411,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public @Nullable DataModel getDataModel(long dataId) {
         queueLock.readLock().lock();
         try {

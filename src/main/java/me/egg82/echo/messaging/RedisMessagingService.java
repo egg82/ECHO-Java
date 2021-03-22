@@ -2,15 +2,6 @@ package me.egg82.echo.messaging;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.buffer.ByteBuf;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.nio.charset.StandardCharsets;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.messaging.packets.Packet;
 import me.egg82.echo.utils.PacketUtil;
@@ -20,6 +11,16 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.exceptions.JedisException;
+
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class RedisMessagingService extends AbstractMessagingService {
     private final ExecutorService workPool = Executors.newFixedThreadPool(1, new ThreadFactoryBuilder().setNameFormat("ECHO-Redis-%d").build());
@@ -37,6 +38,7 @@ public class RedisMessagingService extends AbstractMessagingService {
         super(name);
     }
 
+    @Override
     public void close() {
         queueLock.writeLock().lock();
         try {
@@ -55,6 +57,7 @@ public class RedisMessagingService extends AbstractMessagingService {
         }
     }
 
+    @Override
     public boolean isClosed() { return closed || pool.isClosed(); }
 
     public static Builder builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler) { return new Builder(name, serverId, handler); }
@@ -162,6 +165,7 @@ public class RedisMessagingService extends AbstractMessagingService {
 
         private PubSub(@NotNull RedisMessagingService service) { this.service = service; }
 
+        @Override
         public void onMessage(byte @NotNull [] c, byte @NotNull [] m) {
             String channel = new String(c, StandardCharsets.UTF_8);
             if (ConfigUtil.getDebugOrFalse()) {
@@ -216,6 +220,7 @@ public class RedisMessagingService extends AbstractMessagingService {
         }
     }
 
+    @Override
     public void sendPacket(@NotNull UUID messageId, @NotNull Packet packet) throws IOException {
         queueLock.readLock().lock();
         try (Jedis redis = pool.getResource()) {

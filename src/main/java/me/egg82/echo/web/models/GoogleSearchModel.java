@@ -1,11 +1,12 @@
 package me.egg82.echo.web.models;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class GoogleSearchModel implements Serializable {
     private List<GoogleSearchItemModel> items = new ArrayList<>();
@@ -16,6 +17,7 @@ public class GoogleSearchModel implements Serializable {
 
     public void setItems(@NotNull List<GoogleSearchItemModel> items) { this.items = items; }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof GoogleSearchModel)) return false;
@@ -23,8 +25,10 @@ public class GoogleSearchModel implements Serializable {
         return items.equals(that.items);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(items); }
 
+    @Override
     public String toString() {
         return "GoogleSearchModel{" +
                 "items=" + items +
@@ -45,6 +49,7 @@ public class GoogleSearchModel implements Serializable {
 
         public void setLink(@NotNull String link) { this.link = link; }
 
+        @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (!(o instanceof GoogleSearchItemModel)) return false;
@@ -52,8 +57,10 @@ public class GoogleSearchModel implements Serializable {
             return Objects.equals(title, that.title) && link.equals(that.link);
         }
 
+        @Override
         public int hashCode() { return Objects.hash(title, link); }
 
+        @Override
         public String toString() {
             return "GoogleSearchItemModel{" +
                     "title='" + title + '\'' +

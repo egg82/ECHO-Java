@@ -1,8 +1,9 @@
 package me.egg82.echo.web.models;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.Serializable;
 import java.util.Objects;
-import org.jetbrains.annotations.NotNull;
 
 public class RoryModel implements Serializable {
     private int id = -1;
@@ -18,6 +19,7 @@ public class RoryModel implements Serializable {
 
     public void setUrl(@NotNull String url) { this.url = url; }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof RoryModel)) return false;
@@ -25,8 +27,10 @@ public class RoryModel implements Serializable {
         return id == roryModel.id && url.equals(roryModel.url);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(id, url); }
 
+    @Override
     public String toString() {
         return "RoryModel{" +
                 "id=" + id +

@@ -1,13 +1,14 @@
 package me.egg82.echo.messaging;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.util.UUID;
 import me.egg82.echo.utils.ValidationUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.util.UUID;
 
 public class ServerIDUtil {
     private static final Logger logger = LoggerFactory.getLogger(ServerIDUtil.class);

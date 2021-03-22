@@ -1,12 +1,13 @@
 package me.egg82.echo.web.models;
 
 import flexjson.JSON;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import org.jetbrains.annotations.NotNull;
 
 public class EpisodeModel implements Serializable {
     private int season = -1;
@@ -92,6 +93,7 @@ public class EpisodeModel implements Serializable {
 
     public void setRuntime(int runtime) { this.runtime = runtime; }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof EpisodeModel)) return false;
@@ -99,8 +101,10 @@ public class EpisodeModel implements Serializable {
         return season == that.season && number == that.number && rating == that.rating && votes == that.votes && commentCount == that.commentCount && runtime == that.runtime && title.equals(that.title) && ids.equals(that.ids) && Objects.equals(numAbs, that.numAbs) && overview.equals(that.overview) && firstAired.equals(that.firstAired) && updatedAt.equals(that.updatedAt) && translations.equals(that.translations);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(season, number, title, ids, numAbs, overview, firstAired, updatedAt, rating, votes, commentCount, translations, runtime); }
 
+    @Override
     public String toString() {
         return "EpisodeModel{" +
                 "season=" + season +

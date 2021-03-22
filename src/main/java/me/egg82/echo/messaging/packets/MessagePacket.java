@@ -1,12 +1,14 @@
 package me.egg82.echo.messaging.packets;
 
 import io.netty.buffer.ByteBuf;
-import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 public class MessagePacket extends AbstractPacket {
     private String message;
 
+    @Override
     public byte getPacketId() { return 0x01; }
 
     public MessagePacket(@NotNull ByteBuf data) { read(data); }
@@ -15,6 +17,7 @@ public class MessagePacket extends AbstractPacket {
         this.message = "";
     }
 
+    @Override
     public void read(@NotNull ByteBuf buffer) {
         if (!checkVersion(buffer)) {
             return;
@@ -25,6 +28,7 @@ public class MessagePacket extends AbstractPacket {
         checkReadPacket(buffer);
     }
 
+    @Override
     public void write(@NotNull ByteBuf buffer) {
         buffer.writeByte(VERSION);
 
@@ -35,6 +39,7 @@ public class MessagePacket extends AbstractPacket {
 
     public void setMessage(@NotNull String message) { this.message = message; }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof MessagePacket)) return false;
@@ -42,8 +47,10 @@ public class MessagePacket extends AbstractPacket {
         return message.equals(that.message);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(message); }
 
+    @Override
     public String toString() {
         return "MessagePacket{" +
                 "message='" + message + '\'' +

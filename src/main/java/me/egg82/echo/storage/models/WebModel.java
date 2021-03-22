@@ -1,6 +1,7 @@
 package me.egg82.echo.storage.models;
 
 import io.ebean.annotation.NotNull;
+
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -41,6 +42,7 @@ public class WebModel extends BaseModel {
 
     public void setPath(@org.jetbrains.annotations.NotNull String path) { this.path = path; }
 
+    @Override
     public String toString() {
         return "WebModel{" +
                 "id=" + id +

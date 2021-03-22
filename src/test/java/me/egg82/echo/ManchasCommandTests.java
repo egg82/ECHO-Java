@@ -1,9 +1,10 @@
 package me.egg82.echo;
 
-import java.util.concurrent.ExecutionException;
 import me.egg82.echo.commands.ManchasCommand;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.util.concurrent.ExecutionException;
 
 class ManchasCommandTests {
     @Test

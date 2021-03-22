@@ -1,13 +1,15 @@
 package me.egg82.echo.messaging.packets;
 
 import io.netty.buffer.ByteBuf;
-import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 public class LearnPacket extends AbstractPacket {
     private long user;
     private boolean learning;
 
+    @Override
     public byte getPacketId() { return 0x03; }
 
     public LearnPacket(@NotNull ByteBuf data) { read(data); }
@@ -17,6 +19,7 @@ public class LearnPacket extends AbstractPacket {
         this.learning = false;
     }
 
+    @Override
     public void read(@NotNull ByteBuf buffer) {
         if (!checkVersion(buffer)) {
             return;
@@ -28,6 +31,7 @@ public class LearnPacket extends AbstractPacket {
         checkReadPacket(buffer);
     }
 
+    @Override
     public void write(@NotNull ByteBuf buffer) {
         buffer.writeByte(VERSION);
 
@@ -43,6 +47,7 @@ public class LearnPacket extends AbstractPacket {
 
     public void setLearning(boolean learn) { this.learning = learn; }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof LearnPacket)) return false;
@@ -50,8 +55,10 @@ public class LearnPacket extends AbstractPacket {
         return user == that.user && learning == that.learning;
     }
 
+    @Override
     public int hashCode() { return Objects.hash(user, learning); }
 
+    @Override
     public String toString() {
         return "LearnPacket{" +
                 "user=" + user +

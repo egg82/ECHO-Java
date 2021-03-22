@@ -1,6 +1,7 @@
 package me.egg82.echo.storage.models;
 
 import io.ebean.annotation.NotNull;
+
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
@@ -40,6 +41,7 @@ public class ShowModel extends BaseModel {
 
     public void setEpisode(int episode) { this.episode = episode; }
 
+    @Override
     public String toString() {
         return "ShowModel{" +
                 "id=" + id +

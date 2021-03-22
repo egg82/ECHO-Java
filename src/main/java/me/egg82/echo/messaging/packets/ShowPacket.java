@@ -1,8 +1,9 @@
 package me.egg82.echo.messaging.packets;
 
 import io.netty.buffer.ByteBuf;
-import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 public class ShowPacket extends AbstractPacket {
     private long tvdb;
@@ -10,6 +11,7 @@ public class ShowPacket extends AbstractPacket {
     private int episode;
     private String overview;
 
+    @Override
     public byte getPacketId() { return 0x04; }
 
     public ShowPacket(@NotNull ByteBuf data) { read(data); }
@@ -21,6 +23,7 @@ public class ShowPacket extends AbstractPacket {
         this.overview = "";
     }
 
+    @Override
     public void read(@NotNull ByteBuf buffer) {
         if (!checkVersion(buffer)) {
             return;
@@ -34,6 +37,7 @@ public class ShowPacket extends AbstractPacket {
         checkReadPacket(buffer);
     }
 
+    @Override
     public void write(@NotNull ByteBuf buffer) {
         buffer.writeByte(VERSION);
 
@@ -59,6 +63,7 @@ public class ShowPacket extends AbstractPacket {
 
     public void setOverview(@NotNull String overview) { this.overview = overview; }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ShowPacket)) return false;
@@ -66,8 +71,10 @@ public class ShowPacket extends AbstractPacket {
         return tvdb == that.tvdb && season == that.season && episode == that.episode && overview.equals(that.overview);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(tvdb, season, episode, overview); }
 
+    @Override
     public String toString() {
         return "ShowPacket{" +
                 "tvdb=" + tvdb +

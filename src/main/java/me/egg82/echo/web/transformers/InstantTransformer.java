@@ -3,10 +3,12 @@ package me.egg82.echo.web.transformers;
 import flexjson.ObjectBinder;
 import flexjson.ObjectFactory;
 import flexjson.transformer.AbstractTransformer;
+
 import java.lang.reflect.Type;
 import java.time.Instant;
 
 public class InstantTransformer extends AbstractTransformer implements ObjectFactory {
+    @Override
     public Object instantiate(ObjectBinder context, Object value, Type targetType, Class targetClass) {
         if (value instanceof Instant) {
             return value.toString();
@@ -18,6 +20,7 @@ public class InstantTransformer extends AbstractTransformer implements ObjectFac
         return null;
     }
 
+    @Override
     public void transform(Object object) {
         if (object != null) {
             getContext().writeQuoted(object.toString());

@@ -5,7 +5,6 @@ import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Description;
 import co.aikar.commands.annotation.Syntax;
-import java.awt.*;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.utils.WebUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -13,14 +12,18 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
+
 @CommandAlias("lmgtfy")
 public class LMGTFYCommand extends AbstractCommand {
     private static final String SEARCH_URL = "https://lmgtfy.com/?q=%s&iie=1";
 
     public LMGTFYCommand() { }
 
+    @Override
     public boolean requiresAdmin() { return false; }
 
+    @Override
     public @Nullable EmbedBuilder getDescription() { return null; }
 
     @Default

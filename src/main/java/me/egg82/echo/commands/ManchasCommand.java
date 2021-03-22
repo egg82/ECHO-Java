@@ -5,8 +5,6 @@ import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Description;
 import co.aikar.commands.annotation.Syntax;
-import java.awt.*;
-import java.util.concurrent.CompletableFuture;
 import me.egg82.echo.config.CachedConfig;
 import me.egg82.echo.utils.WebUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -15,6 +13,9 @@ import okhttp3.HttpUrl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
+import java.util.concurrent.CompletableFuture;
+
 @CommandAlias("manchas")
 public class ManchasCommand extends AbstractCommand {
     private static final String CAT_URL = "https://api.manchas.cat/";
@@ -22,8 +23,10 @@ public class ManchasCommand extends AbstractCommand {
 
     public ManchasCommand() { }
 
+    @Override
     public boolean requiresAdmin() { return false; }
 
+    @Override
     public @Nullable EmbedBuilder getDescription() { return null; }
 
     @Default

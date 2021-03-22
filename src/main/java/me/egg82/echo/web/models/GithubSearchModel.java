@@ -1,13 +1,14 @@
 package me.egg82.echo.web.models;
 
 import flexjson.JSON;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class GithubSearchModel implements Serializable {
     @JSON(name = "total_count")
@@ -32,6 +33,7 @@ public class GithubSearchModel implements Serializable {
 
     public void setItems(@NotNull List<GithubRepositoryModel> items) { this.items = items; }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof GithubSearchModel)) return false;
@@ -39,8 +41,10 @@ public class GithubSearchModel implements Serializable {
         return totalCount == that.totalCount && incomplete == that.incomplete && items.equals(that.items);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(totalCount, incomplete, items); }
 
+    @Override
     public String toString() {
         return "GithubSearchModel{" +
                 "totalCount=" + totalCount +
@@ -247,6 +251,7 @@ public class GithubSearchModel implements Serializable {
 
         public void setScore(double score) { this.score = score; }
 
+        @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (!(o instanceof GithubRepositoryModel)) return false;
@@ -254,8 +259,10 @@ public class GithubSearchModel implements Serializable {
             return id == that.id && privateRepo == that.privateRepo && fork == that.fork && size == that.size && stargazers == that.stargazers && watchers == that.watchers && forks == that.forks && issues == that.issues && projects == that.projects && downloads == that.downloads && wiki == that.wiki && pages == that.pages && archived == that.archived && disabled == that.disabled && openIssues == that.openIssues && Double.compare(that.score, score) == 0 && nodeId.equals(that.nodeId) && name.equals(that.name) && fullName.equals(that.fullName) && owner.equals(that.owner) && description.equals(that.description) && createdAt.equals(that.createdAt) && updatedAt.equals(that.updatedAt) && pushedAt.equals(that.pushedAt) && Objects.equals(homepage, that.homepage) && Objects.equals(language, that.language) && Objects.equals(license, that.license) && defaultBranch.equals(that.defaultBranch);
         }
 
+        @Override
         public int hashCode() { return Objects.hash(id, nodeId, name, fullName, privateRepo, owner, description, fork, createdAt, updatedAt, pushedAt, homepage, size, stargazers, watchers, forks, language, issues, projects, downloads, wiki, pages, archived, disabled, openIssues, license, defaultBranch, score); }
 
+        @Override
         public String toString() {
             return "GithubRepositoryModel{" +
                     "id=" + id +
@@ -332,6 +339,7 @@ public class GithubSearchModel implements Serializable {
 
             public void setSiteAdmin(boolean siteAdmin) { this.siteAdmin = siteAdmin; }
 
+            @Override
             public boolean equals(Object o) {
                 if (this == o) return true;
                 if (!(o instanceof GithubRepositoryOwnerModel)) return false;
@@ -339,8 +347,10 @@ public class GithubSearchModel implements Serializable {
                 return id == that.id && siteAdmin == that.siteAdmin && login.equals(that.login) && nodeId.equals(that.nodeId) && avatarUrl.equals(that.avatarUrl) && gravatarId.equals(that.gravatarId) && type.equals(that.type);
             }
 
+            @Override
             public int hashCode() { return Objects.hash(login, id, nodeId, avatarUrl, gravatarId, type, siteAdmin); }
 
+            @Override
             public String toString() {
                 return "GithubRepositoryOwnerModel{" +
                         "login='" + login + '\'' +
@@ -389,6 +399,7 @@ public class GithubSearchModel implements Serializable {
             @JSON(name = "node_id")
             public void setNodeId(@NotNull String nodeId) { this.nodeId = nodeId; }
 
+            @Override
             public boolean equals(Object o) {
                 if (this == o) return true;
                 if (!(o instanceof GithubRepositoryLicenseModel)) return false;
@@ -396,8 +407,10 @@ public class GithubSearchModel implements Serializable {
                 return key.equals(that.key) && name.equals(that.name) && id.equals(that.id) && Objects.equals(url, that.url) && nodeId.equals(that.nodeId);
             }
 
+            @Override
             public int hashCode() { return Objects.hash(key, name, id, url, nodeId); }
 
+            @Override
             public String toString() {
                 return "GithubRepositoryLicenseModel{" +
                         "key='" + key + '\'' +

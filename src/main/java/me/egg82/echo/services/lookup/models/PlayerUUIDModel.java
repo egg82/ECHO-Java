@@ -20,6 +20,7 @@ public class PlayerUUIDModel implements Serializable {
 
     public void setId(String id) { this.id = id; }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof PlayerUUIDModel)) return false;
@@ -28,8 +29,10 @@ public class PlayerUUIDModel implements Serializable {
                 Objects.equals(id, that.id);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(name, id); }
 
+    @Override
     public String toString() {
         return "PlayerModel{" +
                 "name='" + name + '\'' +

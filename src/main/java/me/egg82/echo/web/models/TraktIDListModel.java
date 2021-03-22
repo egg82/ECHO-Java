@@ -1,8 +1,9 @@
 package me.egg82.echo.web.models;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.io.Serializable;
 import java.util.Objects;
-import org.jetbrains.annotations.Nullable;
 
 public class TraktIDListModel implements Serializable {
     private long trakt = -1L;
@@ -38,6 +39,7 @@ public class TraktIDListModel implements Serializable {
 
     public void setTvrage(Long tvrage) { this.tvrage = tvrage; }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof TraktIDListModel)) return false;
@@ -45,8 +47,10 @@ public class TraktIDListModel implements Serializable {
         return trakt == that.trakt && Objects.equals(slug, that.slug) && Objects.equals(tvdb, that.tvdb) && Objects.equals(imdb, that.imdb) && Objects.equals(tmdb, that.tmdb) && Objects.equals(tvrage, that.tvrage);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(trakt, slug, tvdb, imdb, tmdb, tvrage); }
 
+    @Override
     public String toString() {
         return "TraktIDListModel{" +
                 "trakt=" + trakt +

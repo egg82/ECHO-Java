@@ -1,8 +1,9 @@
 package me.egg82.echo.web.models;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.Serializable;
 import java.util.Objects;
-import org.jetbrains.annotations.NotNull;
 
 public class ShowModel implements Serializable {
     private String title = "";
@@ -23,6 +24,7 @@ public class ShowModel implements Serializable {
 
     public void setIds(@NotNull TraktIDListModel ids) { this.ids = ids; }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ShowModel)) return false;
@@ -30,8 +32,10 @@ public class ShowModel implements Serializable {
         return year == that.year && title.equals(that.title) && ids.equals(that.ids);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(title, year, ids); }
 
+    @Override
     public String toString() {
         return "ShowModel{" +
                 "title='" + title + '\'' +

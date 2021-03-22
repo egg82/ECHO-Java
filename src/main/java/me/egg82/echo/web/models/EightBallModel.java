@@ -1,8 +1,9 @@
 package me.egg82.echo.web.models;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.Serializable;
 import java.util.Objects;
-import org.jetbrains.annotations.NotNull;
 
 public class EightBallModel implements Serializable {
     private EightBallMagicModel magic = new EightBallMagicModel();
@@ -13,6 +14,7 @@ public class EightBallModel implements Serializable {
 
     public void setMagic(@NotNull EightBallMagicModel magic) { this.magic = magic; }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof EightBallModel)) return false;
@@ -20,8 +22,10 @@ public class EightBallModel implements Serializable {
         return magic.equals(that.magic);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(magic); }
 
+    @Override
     public String toString() {
         return "EightBallModel{" +
                 "magic=" + magic +
@@ -47,6 +51,7 @@ public class EightBallModel implements Serializable {
 
         public void setType(@NotNull String type) { this.type = type; }
 
+        @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (!(o instanceof EightBallMagicModel)) return false;
@@ -54,8 +59,10 @@ public class EightBallModel implements Serializable {
             return question.equals(that.question) && answer.equals(that.answer) && type.equals(that.type);
         }
 
+        @Override
         public int hashCode() { return Objects.hash(question, answer, type); }
 
+        @Override
         public String toString() {
             return "EightBallMagicModel{" +
                     "question='" + question + '\'' +

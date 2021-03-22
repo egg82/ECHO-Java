@@ -1,9 +1,10 @@
 package me.egg82.echo.web.models;
 
 import flexjson.JSON;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.Serializable;
 import java.util.Objects;
-import org.jetbrains.annotations.NotNull;
 
 public class XKCDInfoModel implements Serializable {
     private int num = -1;
@@ -68,6 +69,7 @@ public class XKCDInfoModel implements Serializable {
 
     public void setTranscript(@NotNull String transcript) { this.transcript = transcript; }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof XKCDInfoModel)) return false;
@@ -75,8 +77,10 @@ public class XKCDInfoModel implements Serializable {
         return num == that.num && day == that.day && month == that.month && year == that.year && link.equals(that.link) && title.equals(that.title) && safeTitle.equals(that.safeTitle) && news.equals(that.news) && img.equals(that.img) && alt.equals(that.alt) && transcript.equals(that.transcript);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(num, day, month, year, link, title, safeTitle, news, img, alt, transcript); }
 
+    @Override
     public String toString() {
         return "XKCDInfoModel{" +
                 "num=" + num +

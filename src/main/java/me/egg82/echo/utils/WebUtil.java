@@ -2,13 +2,6 @@ package me.egg82.echo.utils;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import java.io.IOException;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.TimeUnit;
 import me.egg82.echo.compression.GZIPCompressionStream;
 import me.egg82.echo.config.ConfigUtil;
 import me.egg82.echo.web.WebConstants;
@@ -16,6 +9,14 @@ import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.TimeUnit;
 
 public class WebUtil {
     private static final Logger logger = LoggerFactory.getLogger(WebUtil.class);

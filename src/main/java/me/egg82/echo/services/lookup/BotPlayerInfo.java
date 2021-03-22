@@ -4,13 +4,6 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.collect.ImmutableList;
 import flexjson.JSONDeserializer;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import me.egg82.echo.services.lookup.models.PlayerNameModel;
 import me.egg82.echo.services.lookup.models.PlayerUUIDModel;
 import me.egg82.echo.services.lookup.models.ProfileModel;
@@ -19,6 +12,14 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class BotPlayerInfo implements PlayerInfo {
     private final UUID uuid;
@@ -99,10 +100,13 @@ public class BotPlayerInfo implements PlayerInfo {
         }
     }
 
+    @Override
     public @NotNull UUID getUUID() { return uuid; }
 
+    @Override
     public @NotNull String getName() { return name; }
 
+    @Override
     public @NotNull List<ProfileModel.ProfilePropertyModel> getProperties() { return properties; }
 
     private static @Nullable String nameExpensive(@NotNull UUID uuid) throws IOException {

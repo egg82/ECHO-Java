@@ -1,8 +1,9 @@
 package me.egg82.echo.messaging.packets;
 
 import io.netty.buffer.ByteBuf;
-import java.io.Serializable;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.Serializable;
 
 public interface Packet extends Serializable {
     byte VERSION = 0x01;

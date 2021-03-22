@@ -12,21 +12,8 @@ import edu.stanford.nlp.pipeline.CoreSentence;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.util.PropertiesUtils;
 import flexjson.JSONDeserializer;
-import java.awt.*;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import me.egg82.echo.config.CachedConfig;
-import me.egg82.echo.core.Pair;
+import me.egg82.echo.core.NullablePair;
 import me.egg82.echo.lang.Message;
 import me.egg82.echo.utils.DatabaseUtil;
 import me.egg82.echo.utils.ExceptionUtil;
@@ -46,6 +33,20 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 @CommandAlias("summarize|summary")
 public class SummarizeCommand extends AbstractCommand {
     private static final Logger logger = LoggerFactory.getLogger(SummarizeCommand.class);
@@ -64,8 +65,10 @@ public class SummarizeCommand extends AbstractCommand {
 
     public SummarizeCommand() { }
 
+    @Override
     public boolean requiresAdmin() { return false; }
 
+    @Override
     public @Nullable EmbedBuilder getDescription() { return null; }
 
     @Default
@@ -100,7 +103,7 @@ public class SummarizeCommand extends AbstractCommand {
                         if (v == null) {
                             return null;
                         }
-                        return new Pair<>(v, getSummaryModel(cachedConfig.getDeepAiKey(), WebUtil.uploadBytebinContent(cleanText(v.getText()).getBytes(StandardCharsets.UTF_8)).join()).join());
+                        return new NullablePair<>(v, getSummaryModel(cachedConfig.getDeepAiKey(), WebUtil.uploadBytebinContent(cleanText(v.getText()).getBytes(StandardCharsets.UTF_8)).join()).join());
                     })
                     .whenCompleteAsync((val, ex) -> {
                         if (!canCompleteContinue(issuer, val, ex)) {
