@@ -34,6 +34,7 @@ public class CollectionProvider {
 
     private static ImmutableList<Class<AbstractCommand>> commandClasses = null;
     private static final Object commandClassesLock = new Object();
+
     public static @NotNull List<Class<AbstractCommand>> getCommandClasses() {
         ImmutableList<Class<AbstractCommand>> retVal = commandClasses;
         if (retVal == null) {
@@ -49,6 +50,7 @@ public class CollectionProvider {
 
     private static ImmutableList<AbstractCommand> commands = null;
     private static final Object commandsLock = new Object();
+
     public static @NotNull List<AbstractCommand> getCommands(@NotNull JDACommandManager commandManager) {
         ImmutableList<AbstractCommand> retVal = commands;
         if (retVal == null) {
@@ -78,7 +80,7 @@ public class CollectionProvider {
         for (AbstractCommand command : getCommands(commandManager)) {
             if (
                     (!caseSensitive && command.getName().equalsIgnoreCase(name))
-                    || (caseSensitive && command.getName().equals(name))
+                            || (caseSensitive && command.getName().equals(name))
             ) {
                 return command;
             }

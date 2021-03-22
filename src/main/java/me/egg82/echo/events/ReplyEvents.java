@@ -23,15 +23,15 @@ public class ReplyEvents extends EventHolder {
         this.manager = manager;
 
         events.add(JDAEvents.subscribe(jda, MessageReceivedEvent.class)
-                .filter(e -> {
-                    CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-                    if (cachedConfig == null) {
-                        logger.error("Could not get cached config.");
-                        return false;
-                    }
-                    return !JDAUtil.isCommand(cachedConfig, e.getMessage().getContentRaw());
-                })
-                .handler(this::replyBold));
+                           .filter(e -> {
+                               CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+                               if (cachedConfig == null) {
+                                   logger.error("Could not get cached config.");
+                                   return false;
+                               }
+                               return !JDAUtil.isCommand(cachedConfig, e.getMessage().getContentRaw());
+                           })
+                           .handler(this::replyBold));
     }
 
     private void replyBold(@NotNull MessageReceivedEvent event) {

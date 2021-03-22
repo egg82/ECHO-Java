@@ -40,8 +40,12 @@ public class QuoteModel implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof QuoteModel)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof QuoteModel)) {
+            return false;
+        }
         QuoteModel that = (QuoteModel) o;
         return length == that.length && id.equals(that.id) && tags.equals(that.tags) && content.equals(that.content) && author.equals(that.author);
     }

@@ -41,8 +41,12 @@ public class MessagePacket extends AbstractPacket {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof MessagePacket)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof MessagePacket)) {
+            return false;
+        }
         MessagePacket that = (MessagePacket) o;
         return message.equals(that.message);
     }

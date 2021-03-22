@@ -35,8 +35,12 @@ public class GithubSearchModel implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof GithubSearchModel)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof GithubSearchModel)) {
+            return false;
+        }
         GithubSearchModel that = (GithubSearchModel) o;
         return totalCount == that.totalCount && incomplete == that.incomplete && items.equals(that.items);
     }
@@ -253,14 +257,57 @@ public class GithubSearchModel implements Serializable {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof GithubRepositoryModel)) return false;
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof GithubRepositoryModel)) {
+                return false;
+            }
             GithubRepositoryModel that = (GithubRepositoryModel) o;
-            return id == that.id && privateRepo == that.privateRepo && fork == that.fork && size == that.size && stargazers == that.stargazers && watchers == that.watchers && forks == that.forks && issues == that.issues && projects == that.projects && downloads == that.downloads && wiki == that.wiki && pages == that.pages && archived == that.archived && disabled == that.disabled && openIssues == that.openIssues && Double.compare(that.score, score) == 0 && nodeId.equals(that.nodeId) && name.equals(that.name) && fullName.equals(that.fullName) && owner.equals(that.owner) && description.equals(that.description) && createdAt.equals(that.createdAt) && updatedAt.equals(that.updatedAt) && pushedAt.equals(that.pushedAt) && Objects.equals(homepage, that.homepage) && Objects.equals(language, that.language) && Objects.equals(license, that.license) && defaultBranch.equals(that.defaultBranch);
+            return id == that.id && privateRepo == that.privateRepo && fork == that.fork && size == that.size && stargazers == that.stargazers && watchers == that.watchers && forks == that.forks && issues == that.issues && projects == that.projects && downloads == that.downloads && wiki == that.wiki && pages == that.pages && archived == that.archived && disabled == that.disabled && openIssues == that.openIssues && Double
+                    .compare(
+                            that.score,
+                            score
+                    ) == 0 && nodeId.equals(that.nodeId) && name.equals(that.name) && fullName.equals(that.fullName) && owner.equals(that.owner) && description.equals(
+                    that.description) && createdAt.equals(that.createdAt) && updatedAt.equals(that.updatedAt) && pushedAt.equals(that.pushedAt) && Objects.equals(
+                    homepage,
+                    that.homepage
+            ) && Objects.equals(language, that.language) && Objects.equals(license, that.license) && defaultBranch.equals(that.defaultBranch);
         }
 
         @Override
-        public int hashCode() { return Objects.hash(id, nodeId, name, fullName, privateRepo, owner, description, fork, createdAt, updatedAt, pushedAt, homepage, size, stargazers, watchers, forks, language, issues, projects, downloads, wiki, pages, archived, disabled, openIssues, license, defaultBranch, score); }
+        public int hashCode() {
+            return Objects.hash(
+                    id,
+                    nodeId,
+                    name,
+                    fullName,
+                    privateRepo,
+                    owner,
+                    description,
+                    fork,
+                    createdAt,
+                    updatedAt,
+                    pushedAt,
+                    homepage,
+                    size,
+                    stargazers,
+                    watchers,
+                    forks,
+                    language,
+                    issues,
+                    projects,
+                    downloads,
+                    wiki,
+                    pages,
+                    archived,
+                    disabled,
+                    openIssues,
+                    license,
+                    defaultBranch,
+                    score
+            );
+        }
 
         @Override
         public String toString() {
@@ -341,10 +388,15 @@ public class GithubSearchModel implements Serializable {
 
             @Override
             public boolean equals(Object o) {
-                if (this == o) return true;
-                if (!(o instanceof GithubRepositoryOwnerModel)) return false;
+                if (this == o) {
+                    return true;
+                }
+                if (!(o instanceof GithubRepositoryOwnerModel)) {
+                    return false;
+                }
                 GithubRepositoryOwnerModel that = (GithubRepositoryOwnerModel) o;
-                return id == that.id && siteAdmin == that.siteAdmin && login.equals(that.login) && nodeId.equals(that.nodeId) && avatarUrl.equals(that.avatarUrl) && gravatarId.equals(that.gravatarId) && type.equals(that.type);
+                return id == that.id && siteAdmin == that.siteAdmin && login.equals(that.login) && nodeId.equals(that.nodeId) && avatarUrl.equals(that.avatarUrl) && gravatarId
+                        .equals(that.gravatarId) && type.equals(that.type);
             }
 
             @Override
@@ -401,8 +453,12 @@ public class GithubSearchModel implements Serializable {
 
             @Override
             public boolean equals(Object o) {
-                if (this == o) return true;
-                if (!(o instanceof GithubRepositoryLicenseModel)) return false;
+                if (this == o) {
+                    return true;
+                }
+                if (!(o instanceof GithubRepositoryLicenseModel)) {
+                    return false;
+                }
                 GithubRepositoryLicenseModel that = (GithubRepositoryLicenseModel) o;
                 return key.equals(that.key) && name.equals(that.name) && id.equals(that.id) && Objects.equals(url, that.url) && nodeId.equals(that.nodeId);
             }

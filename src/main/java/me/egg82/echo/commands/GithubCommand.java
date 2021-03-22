@@ -39,10 +39,12 @@ public class GithubCommand extends AbstractCommand {
     private static final Pattern RE_IMAGES = Pattern.compile("\\[\\!\\[([^\\[\\]\\(\\)]+)\\]\\s*\\((https?:\\/\\/[^\\[\\]\\(\\)]*)\\)\\]\\s*\\(([^\\[\\]\\(\\)]+)\\)");
     private static final Pattern RE_IMAGES_2 = Pattern.compile("\\[\\!\\[([^\\[\\]\\(\\)]+)\\]\\s*\\((https?:\\/\\/[^\\[\\]\\(\\)]*)\\)\\]\\s*\\[([^\\[\\]\\(\\)]+)\\]");
     private static final Pattern RE_IMAGES_3 = Pattern.compile("\\!\\[(.*)\\]\\s*\\((https?:\\/\\/[^\\[\\]\\(\\)]*)\\)");
-    private static final Pattern RE_LINKS_GROUP = Pattern.compile("\\[\\[([^\\[\\]\\(\\)]+)\\]\\s*\\((https?:\\/\\/[^\\[\\]\\(\\)]*)\\)\\]\\s*\\((https?:\\/\\/[^\\[\\]\\(\\)]*)\\)");
+    private static final Pattern RE_LINKS_GROUP = Pattern.compile(
+            "\\[\\[([^\\[\\]\\(\\)]+)\\]\\s*\\((https?:\\/\\/[^\\[\\]\\(\\)]*)\\)\\]\\s*\\((https?:\\/\\/[^\\[\\]\\(\\)]*)\\)");
     private static final Pattern RE_LINKS_GROUP_2 = Pattern.compile("\\[([^\\[\\]\\(\\)]+)\\]\\s*\\((https?:\\/\\/[^\\[\\]\\(\\)]*)\\)");
     private static final Pattern RE_LINKS_REPLACE_GROUP = Pattern.compile("\\[(.*)\\]:\\s*(https?:\\/\\/[^\\[\\]\\(\\)]*)");
-    private static final Pattern RE_LINKS = Pattern.compile("(https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*))");
+    private static final Pattern RE_LINKS = Pattern.compile(
+            "(https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*))");
     private static final Pattern RE_LINKS_2 = Pattern.compile("(https?:\\/\\/.*)[\\!\\.\\?]");
     private static final Pattern RE_LINKS_REPLACE_GROUP_MATCH = Pattern.compile("\\[([^\\[\\]\\(\\)]*)\\]");
     private static final Pattern RE_URL_LINE = Pattern.compile("^#*?\\s*<(?:url|img)>\\s*$", Pattern.MULTILINE);
@@ -145,7 +147,7 @@ public class GithubCommand extends AbstractCommand {
                         builder.append(" \u2014 ");
                     }
                     String licenseName = license == null ? first.getLicense().getName() + " License" : license.getName();
-                    builder.append("[" + licenseName + "](" + (license != null ? license.getHtmlUrl() : String.format(CUSTOM_LICENSE_URL, first.getFullName()) ) + ")");
+                    builder.append("[" + licenseName + "](" + (license != null ? license.getHtmlUrl() : String.format(CUSTOM_LICENSE_URL, first.getFullName())) + ")");
                 }
                 if (readme != null) {
                     if (first.isIssues() || first.isWiki() || first.getLicense() != null) {

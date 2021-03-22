@@ -21,8 +21,12 @@ public class RoryModel implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof RoryModel)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof RoryModel)) {
+            return false;
+        }
         RoryModel roryModel = (RoryModel) o;
         return id == roryModel.id && url.equals(roryModel.url);
     }

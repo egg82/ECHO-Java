@@ -88,10 +88,16 @@ public class GithubLicenseModel implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof GithubLicenseModel)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof GithubLicenseModel)) {
+            return false;
+        }
         GithubLicenseModel that = (GithubLicenseModel) o;
-        return featured == that.featured && key.equals(that.key) && name.equals(that.name) && id.equals(that.id) && url.equals(that.url) && nodeId.equals(that.nodeId) && htmlUrl.equals(that.htmlUrl) && description.equals(that.description) && implementation.equals(that.implementation) && permissions.equals(that.permissions) && conditions.equals(that.conditions) && limitations.equals(that.limitations) && body.equals(that.body);
+        return featured == that.featured && key.equals(that.key) && name.equals(that.name) && id.equals(that.id) && url.equals(that.url) && nodeId.equals(that.nodeId) && htmlUrl
+                .equals(that.htmlUrl) && description.equals(that.description) && implementation.equals(that.implementation) && permissions.equals(that.permissions) && conditions
+                .equals(that.conditions) && limitations.equals(that.limitations) && body.equals(that.body);
     }
 
     @Override

@@ -21,7 +21,9 @@ public class LanguageFileUtil {
     public static @NotNull Optional<File> getLanguage(@NotNull File dataDirectory, @NotNull Locale locale, boolean ignoreCountry) throws IOException {
         // Build resource path & file path for language
         // Use country is specified (and lang provides country)
-        String resourcePath = ignoreCountry || locale.getCountry() == null || locale.getCountry().isEmpty() ? "lang_" + locale.getLanguage() + ".yml" : "lang_" + locale.getLanguage() + "_" + locale.getCountry() + ".yml";
+        String resourcePath = ignoreCountry || locale.getCountry() == null || locale.getCountry().isEmpty()
+                              ? "lang_" + locale.getLanguage() + ".yml"
+                              : "lang_" + locale.getLanguage() + "_" + locale.getCountry() + ".yml";
         File langDir = new File(dataDirectory, "lang");
         File fileOnDisk = new File(langDir, resourcePath);
 
@@ -42,12 +44,20 @@ public class LanguageFileUtil {
         if (fileOnDisk.exists()) {
             try (InputStream inStream = LanguageFileUtil.class.getResourceAsStream("/lang/" + resourcePath)) {
                 if (inStream != null) {
-                    ConfigurationLoader<CommentedConfigurationNode> fileLoader = YamlConfigurationLoader.builder().nodeStyle(NodeStyle.BLOCK).indent(2).file(fileOnDisk).build();
+                    ConfigurationLoader<CommentedConfigurationNode> fileLoader = YamlConfigurationLoader.builder()
+                            .nodeStyle(NodeStyle.BLOCK)
+                            .indent(2)
+                            .file(fileOnDisk)
+                            .build();
                     CommentedConfigurationNode fileRoot = fileLoader.load();
                     double fileVersion = fileRoot.node("acf-minecraft", "version").getDouble(1.0d);
 
                     try (InputStreamReader reader = new InputStreamReader(inStream); BufferedReader in = new BufferedReader(reader)) {
-                        ConfigurationLoader<CommentedConfigurationNode> streamLoader = YamlConfigurationLoader.builder().nodeStyle(NodeStyle.BLOCK).indent(2).source(() -> in).build();
+                        ConfigurationLoader<CommentedConfigurationNode> streamLoader = YamlConfigurationLoader.builder()
+                                .nodeStyle(NodeStyle.BLOCK)
+                                .indent(2)
+                                .source(() -> in)
+                                .build();
                         CommentedConfigurationNode streamRoot = streamLoader.load();
                         double streamVersion = streamRoot.node("acf-minecraft", "version").getDouble(1.0d);
 

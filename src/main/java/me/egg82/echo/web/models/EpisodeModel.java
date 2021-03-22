@@ -95,14 +95,38 @@ public class EpisodeModel implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof EpisodeModel)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof EpisodeModel)) {
+            return false;
+        }
         EpisodeModel that = (EpisodeModel) o;
-        return season == that.season && number == that.number && rating == that.rating && votes == that.votes && commentCount == that.commentCount && runtime == that.runtime && title.equals(that.title) && ids.equals(that.ids) && Objects.equals(numAbs, that.numAbs) && overview.equals(that.overview) && firstAired.equals(that.firstAired) && updatedAt.equals(that.updatedAt) && translations.equals(that.translations);
+        return season == that.season && number == that.number && rating == that.rating && votes == that.votes && commentCount == that.commentCount && runtime == that.runtime && title
+                .equals(that.title) && ids.equals(that.ids) && Objects.equals(
+                numAbs,
+                that.numAbs
+        ) && overview.equals(that.overview) && firstAired.equals(that.firstAired) && updatedAt.equals(that.updatedAt) && translations.equals(that.translations);
     }
 
     @Override
-    public int hashCode() { return Objects.hash(season, number, title, ids, numAbs, overview, firstAired, updatedAt, rating, votes, commentCount, translations, runtime); }
+    public int hashCode() {
+        return Objects.hash(
+                season,
+                number,
+                title,
+                ids,
+                numAbs,
+                overview,
+                firstAired,
+                updatedAt,
+                rating,
+                votes,
+                commentCount,
+                translations,
+                runtime
+        );
+    }
 
     @Override
     public String toString() {

@@ -24,8 +24,8 @@ public class ReactEvents extends EventHolder {
         this.manager = manager;
 
         events.add(JDAEvents.subscribe(jda, GuildMessageReceivedEvent.class)
-                .filter(e -> containsWord(e.getMessage().getContentStripped(), "alot"))
-                .handler(this::reactAlot));
+                           .filter(e -> containsWord(e.getMessage().getContentStripped(), "alot"))
+                           .handler(this::reactAlot));
     }
 
     private void reactAlot(@NotNull GuildMessageReceivedEvent event) {

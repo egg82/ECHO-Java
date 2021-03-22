@@ -55,7 +55,8 @@ public class SummarizeCommand extends AbstractCommand {
     private static final String SUMMARIZE_URL = "https://api.deepai.org/api/summarization";
 
     private static final Pattern RE_DOT_PATTERN = Pattern.compile("\\.\\s*");
-    private static final Pattern RE_URL_PATTERN = Pattern.compile("(https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*))");
+    private static final Pattern RE_URL_PATTERN = Pattern.compile(
+            "(https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*))");
     private static final Pattern RE_VERSION_PATTERN = Pattern.compile("\\b(\\d+\\.\\d+(?:[\\.\\d]*))\\b");
     private static final Pattern RE_DOT_PATTERN_2 = Pattern.compile("([\\.?!])+\\s*([^\\)])");
 
@@ -103,7 +104,12 @@ public class SummarizeCommand extends AbstractCommand {
                         if (v == null) {
                             return null;
                         }
-                        return new NullablePair<>(v, getSummaryModel(cachedConfig.getDeepAiKey(), WebUtil.uploadBytebinContent(cleanText(v.getText()).getBytes(StandardCharsets.UTF_8)).join()).join());
+                        return new NullablePair<>(v,
+                                                  getSummaryModel(
+                                                          cachedConfig.getDeepAiKey(),
+                                                          WebUtil.uploadBytebinContent(cleanText(v.getText()).getBytes(StandardCharsets.UTF_8)).join()
+                                                  ).join()
+                        );
                     })
                     .whenCompleteAsync((val, ex) -> {
                         if (!canCompleteContinue(issuer, val, ex)) {

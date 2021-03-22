@@ -49,8 +49,12 @@ public class LearnPacket extends AbstractPacket {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof LearnPacket)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof LearnPacket)) {
+            return false;
+        }
         LearnPacket that = (LearnPacket) o;
         return user == that.user && learning == that.learning;
     }

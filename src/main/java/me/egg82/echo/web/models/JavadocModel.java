@@ -26,8 +26,12 @@ public class JavadocModel implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof JavadocModel)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof JavadocModel)) {
+            return false;
+        }
         JavadocModel that = (JavadocModel) o;
         return name.equals(that.name) && object.equals(that.object);
     }
@@ -107,14 +111,34 @@ public class JavadocModel implements Serializable {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof JavadocObjectModel)) return false;
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof JavadocObjectModel)) {
+                return false;
+            }
             JavadocObjectModel that = (JavadocObjectModel) o;
-            return deprecated == that.deprecated && link.equals(that.link) && type.equals(that.type) && packageName.equals(that.packageName) && name.equals(that.name) && description.equals(that.description) && strippedDescription.equals(that.strippedDescription) && annotations.equals(that.annotations) && deprecationMessage.equals(that.deprecationMessage) && modifiers.equals(that.modifiers) && metadata.equals(that.metadata);
+            return deprecated == that.deprecated && link.equals(that.link) && type.equals(that.type) && packageName.equals(that.packageName) && name.equals(that.name) && description
+                    .equals(that.description) && strippedDescription.equals(that.strippedDescription) && annotations.equals(that.annotations) && deprecationMessage.equals(
+                    that.deprecationMessage) && modifiers.equals(that.modifiers) && metadata.equals(that.metadata);
         }
 
         @Override
-        public int hashCode() { return Objects.hash(link, type, packageName, name, description, strippedDescription, annotations, deprecated, deprecationMessage, modifiers, metadata); }
+        public int hashCode() {
+            return Objects.hash(
+                    link,
+                    type,
+                    packageName,
+                    name,
+                    description,
+                    strippedDescription,
+                    annotations,
+                    deprecated,
+                    deprecationMessage,
+                    modifiers,
+                    metadata
+            );
+        }
 
         @Override
         public String toString() {
@@ -222,14 +246,48 @@ public class JavadocModel implements Serializable {
 
             @Override
             public boolean equals(Object o) {
-                if (this == o) return true;
-                if (!(o instanceof JavadocMetadataModel)) return false;
+                if (this == o) {
+                    return true;
+                }
+                if (!(o instanceof JavadocMetadataModel)) {
+                    return false;
+                }
                 JavadocMetadataModel that = (JavadocMetadataModel) o;
-                return Objects.equals(owner, that.owner) && Objects.equals(parameters, that.parameters) && Objects.equals(parameterDescriptions, that.parameterDescriptions) && Objects.equals(returns, that.returns) && Objects.equals(returnsDescription, that.returnsDescription) && Objects.equals(javadocThrows, that.javadocThrows) && Objects.equals(extensions, that.extensions) && Objects.equals(implementations, that.implementations) && Objects.equals(allImplementations, that.allImplementations) && Objects.equals(superInterfaces, that.superInterfaces) && Objects.equals(subInterfaces, that.subInterfaces) && Objects.equals(subClasses, that.subClasses) && Objects.equals(implementingClasses, that.implementingClasses) && Objects.equals(methods, that.methods) && Objects.equals(fields, that.fields);
+                return Objects.equals(owner, that.owner) && Objects.equals(parameters, that.parameters) && Objects.equals(
+                        parameterDescriptions,
+                        that.parameterDescriptions
+                ) && Objects.equals(returns, that.returns) && Objects.equals(returnsDescription, that.returnsDescription) && Objects.equals(
+                        javadocThrows,
+                        that.javadocThrows
+                ) && Objects.equals(extensions, that.extensions) && Objects.equals(implementations, that.implementations) && Objects.equals(
+                        allImplementations,
+                        that.allImplementations
+                ) && Objects.equals(superInterfaces, that.superInterfaces) && Objects.equals(subInterfaces, that.subInterfaces) && Objects.equals(
+                        subClasses,
+                        that.subClasses
+                ) && Objects.equals(implementingClasses, that.implementingClasses) && Objects.equals(methods, that.methods) && Objects.equals(fields, that.fields);
             }
 
             @Override
-            public int hashCode() { return Objects.hash(owner, parameters, parameterDescriptions, returns, returnsDescription, javadocThrows, extensions, implementations, allImplementations, superInterfaces, subInterfaces, subClasses, implementingClasses, methods, fields); }
+            public int hashCode() {
+                return Objects.hash(
+                        owner,
+                        parameters,
+                        parameterDescriptions,
+                        returns,
+                        returnsDescription,
+                        javadocThrows,
+                        extensions,
+                        implementations,
+                        allImplementations,
+                        superInterfaces,
+                        subInterfaces,
+                        subClasses,
+                        implementingClasses,
+                        methods,
+                        fields
+                );
+            }
 
             @Override
             public String toString() {
@@ -268,8 +326,12 @@ public class JavadocModel implements Serializable {
 
                 @Override
                 public boolean equals(Object o) {
-                    if (this == o) return true;
-                    if (!(o instanceof JavadocThrowsModel)) return false;
+                    if (this == o) {
+                        return true;
+                    }
+                    if (!(o instanceof JavadocThrowsModel)) {
+                        return false;
+                    }
                     JavadocThrowsModel that = (JavadocThrowsModel) o;
                     return key.equals(that.key) && value.equals(that.value);
                 }

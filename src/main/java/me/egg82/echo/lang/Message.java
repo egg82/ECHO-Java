@@ -29,6 +29,7 @@ public enum Message implements MessageKeyProvider {
     RELOAD__END;
 
     private final MessageKey key = MessageKey.of(name().toLowerCase().replace("__", "."));
+
     @Override
     public @NotNull MessageKey getMessageKey() { return key; }
 }

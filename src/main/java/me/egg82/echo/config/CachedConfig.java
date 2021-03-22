@@ -14,75 +14,99 @@ public class CachedConfig {
     private CachedConfig() { }
 
     private MarkovMegaHal megaHal = new MarkovMegaHal();
+
     public @NotNull MarkovMegaHal getMegaHal() { return megaHal; }
 
     private ImmutableList<StorageService> storage = ImmutableList.of();
+
     public @NotNull ImmutableList<StorageService> getStorage() { return storage; }
 
     private ImmutableList<MessagingService> messaging = ImmutableList.of();
+
     public @NotNull ImmutableList<MessagingService> getMessaging() { return messaging; }
 
     private boolean debug = false;
+
     public boolean getDebug() { return debug; }
 
     private Locale language = Locale.ENGLISH;
+
     public @NotNull Locale getLanguage() { return language; }
 
     private UUID serverId = UUID.randomUUID();
+
     public @NotNull UUID getServerId() { return serverId; }
 
     private String serverIdString = serverId.toString();
+
     public @NotNull String getServerIdString() { return serverIdString; }
 
     private ImmutableSet<String> commandPrefixes = ImmutableSet.of();
+
     public @NotNull ImmutableSet<String> getCommandPrefixes() { return commandPrefixes; }
 
     private String googleKey = "";
+
     public @NotNull String getGoogleKey() { return googleKey; }
 
     private String wolframKey = "";
+
     public @NotNull String getWolframKey() { return wolframKey; }
 
     private String imgurKey = "";
+
     public @NotNull String getImgurKey() { return imgurKey; }
 
     private String deepAiKey = "";
+
     public @NotNull String getDeepAiKey() { return deepAiKey; }
 
     private String extractorKey = "";
+
     public @NotNull String getExtractorKey() { return extractorKey; }
 
     private String traktKey = "";
+
     public @NotNull String getTraktKey() { return traktKey; }
 
     private String alotEmote = "alot";
+
     public @NotNull String getAlotEmote() { return alotEmote; }
 
     private String disallowedEmote = "no";
+
     public @NotNull String getDisallowedEmote() { return disallowedEmote; }
 
     private String adminRole = "owner";
+
     public @NotNull String getAdminRole() { return adminRole; }
 
     private String disallowedRole = "";
+
     public @NotNull String getDisallowedRole() { return disallowedRole; }
 
     private ImmutableSet<String> disabledCommands = ImmutableSet.of();
+
     public @NotNull ImmutableSet<String> getDisabledCommands() { return disabledCommands; }
 
     private double replyChance = 0.15d;
+
     public double getReplyChance() { return replyChance; }
 
     private ImmutableSet<String> replyPhrases = ImmutableSet.of();
+
     public @NotNull ImmutableSet<String> getReplyPhrases() { return replyPhrases; }
 
     private ImmutableSet<String> replyPhrasesReversed = ImmutableSet.of();
+
     public @NotNull ImmutableSet<String> getReplyPhrasesReversed() { return replyPhrasesReversed; }
 
     private double laziness = 0.1d;
+
     public double getLaziness() { return laziness; }
 
     private ImmutableList<GameStatus> games = ImmutableList.of();
+
     public @NotNull ImmutableList<GameStatus> getGames() { return games; }
 
     public static @NotNull CachedConfig.Builder builder() { return new CachedConfig.Builder(); }

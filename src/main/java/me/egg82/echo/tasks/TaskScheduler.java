@@ -16,7 +16,10 @@ import java.util.function.IntConsumer;
 public class TaskScheduler {
     private static final Logger logger = LoggerFactory.getLogger(TaskScheduler.class);
 
-    private static final ScheduledExecutorService threadPool = Executors.newScheduledThreadPool(Math.max(4, Runtime.getRuntime().availableProcessors() / 2), new ThreadFactoryBuilder().setNameFormat("ECHO-%d").build());
+    private static final ScheduledExecutorService threadPool = Executors.newScheduledThreadPool(
+            Math.max(4, Runtime.getRuntime().availableProcessors() / 2),
+            new ThreadFactoryBuilder().setNameFormat("ECHO-%d").build()
+    );
     private static final IntSet aliveIds = new IntArraySet();
 
     private static final AtomicInteger currentTaskId = new AtomicInteger(0);

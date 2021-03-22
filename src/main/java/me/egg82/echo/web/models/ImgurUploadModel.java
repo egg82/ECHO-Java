@@ -31,8 +31,12 @@ public class ImgurUploadModel implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ImgurUploadModel)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ImgurUploadModel)) {
+            return false;
+        }
         ImgurUploadModel that = (ImgurUploadModel) o;
         return success == that.success && status == that.status && data.equals(that.data);
     }
@@ -196,14 +200,52 @@ public class ImgurUploadModel implements Serializable {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof ImgurUploadDataModel)) return false;
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof ImgurUploadDataModel)) {
+                return false;
+            }
             ImgurUploadDataModel that = (ImgurUploadDataModel) o;
-            return dateTime == that.dateTime && animated == that.animated && width == that.width && height == that.height && size == that.size && views == that.views && bandwidth == that.bandwidth && favorite == that.favorite && ad == that.ad && inMostViral == that.inMostViral && inGallery == that.inGallery && id.equals(that.id) && Objects.equals(title, that.title) && Objects.equals(description, that.description) && type.equals(that.type) && Objects.equals(vote, that.vote) && Objects.equals(nsfw, that.nsfw) && Objects.equals(section, that.section) && Objects.equals(accountUrl, that.accountUrl) && tags.equals(that.tags) && Objects.equals(adUrl, that.adUrl) && deleteHash.equals(that.deleteHash) && name.equals(that.name) && link.equals(that.link);
+            return dateTime == that.dateTime && animated == that.animated && width == that.width && height == that.height && size == that.size && views == that.views && bandwidth == that.bandwidth && favorite == that.favorite && ad == that.ad && inMostViral == that.inMostViral && inGallery == that.inGallery && id
+                    .equals(that.id) && Objects.equals(title, that.title) && Objects.equals(description, that.description) && type.equals(that.type) && Objects.equals(
+                    vote,
+                    that.vote
+            ) && Objects.equals(nsfw, that.nsfw) && Objects.equals(section, that.section) && Objects.equals(
+                    accountUrl,
+                    that.accountUrl
+            ) && tags.equals(that.tags) && Objects.equals(adUrl, that.adUrl) && deleteHash.equals(that.deleteHash) && name.equals(that.name) && link.equals(that.link);
         }
 
         @Override
-        public int hashCode() { return Objects.hash(id, title, description, dateTime, type, animated, width, height, size, views, bandwidth, vote, favorite, nsfw, section, accountUrl, ad, inMostViral, tags, adUrl, inGallery, deleteHash, name, link); }
+        public int hashCode() {
+            return Objects.hash(
+                    id,
+                    title,
+                    description,
+                    dateTime,
+                    type,
+                    animated,
+                    width,
+                    height,
+                    size,
+                    views,
+                    bandwidth,
+                    vote,
+                    favorite,
+                    nsfw,
+                    section,
+                    accountUrl,
+                    ad,
+                    inMostViral,
+                    tags,
+                    adUrl,
+                    inGallery,
+                    deleteHash,
+                    name,
+                    link
+            );
+        }
 
         @Override
         public String toString() {

@@ -88,7 +88,11 @@ public class BotStatusTask extends AbstractTask {
                                     if (season.getNumber() == dbModel.getSeason() && season.getAiredEpisodes() > dbModel.getEpisode()) {
                                         // Same season, new episode
                                         for (StorageService service : cachedConfig.getStorage()) {
-                                            ShowModel m = service.getOrCreateShowModel(trendingModel.getShow().getIds().getTvdb(), dbModel.getSeason(), dbModel.getEpisode() + 1);
+                                            ShowModel m = service.getOrCreateShowModel(
+                                                    trendingModel.getShow().getIds().getTvdb(),
+                                                    dbModel.getSeason(),
+                                                    dbModel.getEpisode() + 1
+                                            );
                                             boolean modified = false;
                                             if (m.getSeason() != dbModel.getSeason()) {
                                                 m.setSeason(dbModel.getSeason());

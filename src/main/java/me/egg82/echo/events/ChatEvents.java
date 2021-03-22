@@ -59,56 +59,56 @@ public class ChatEvents extends EventHolder {
         this.manager = manager;
 
         events.add(JDAEvents.subscribe(jda, GuildMessageReceivedEvent.class)
-                .filter(e -> !e.getAuthor().isBot())
-                .filter(e -> !e.isWebhookMessage())
-                .filter(e -> {
-                    CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-                    if (cachedConfig == null) {
-                        logger.error("Could not get cached config.");
-                        return false;
-                    }
-                    return !JDAUtil.isCommand(cachedConfig, e.getMessage().getContentRaw());
-                })
-                .filter(e -> {
-                    boolean retVal = ResponseUtil.canLearn(e.getAuthor());
-                    if (!retVal && ConfigUtil.getDebugOrFalse()) {
-                        logger.info("Not learning from " + e.getAuthor().getAsTag());
-                    }
-                    return retVal;
-                })
-                .handler(this::learn));
+                           .filter(e -> !e.getAuthor().isBot())
+                           .filter(e -> !e.isWebhookMessage())
+                           .filter(e -> {
+                               CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+                               if (cachedConfig == null) {
+                                   logger.error("Could not get cached config.");
+                                   return false;
+                               }
+                               return !JDAUtil.isCommand(cachedConfig, e.getMessage().getContentRaw());
+                           })
+                           .filter(e -> {
+                               boolean retVal = ResponseUtil.canLearn(e.getAuthor());
+                               if (!retVal && ConfigUtil.getDebugOrFalse()) {
+                                   logger.info("Not learning from " + e.getAuthor().getAsTag());
+                               }
+                               return retVal;
+                           })
+                           .handler(this::learn));
 
         events.add(JDAEvents.subscribe(jda, MessageReceivedEvent.class)
-                .filter(e -> !e.getAuthor().isBot())
-                .filter(e -> !e.isWebhookMessage())
-                .filter(e -> {
-                    CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-                    if (cachedConfig == null) {
-                        logger.error("Could not get cached config.");
-                        return false;
-                    }
-                    return !JDAUtil.isCommand(cachedConfig, e.getMessage().getContentRaw());
-                })
-                .handler(this::speak));
+                           .filter(e -> !e.getAuthor().isBot())
+                           .filter(e -> !e.isWebhookMessage())
+                           .filter(e -> {
+                               CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+                               if (cachedConfig == null) {
+                                   logger.error("Could not get cached config.");
+                                   return false;
+                               }
+                               return !JDAUtil.isCommand(cachedConfig, e.getMessage().getContentRaw());
+                           })
+                           .handler(this::speak));
 
         events.add(JDAEvents.subscribe(jda, GuildMessageUpdateEvent.class)
-                .filter(e -> !e.getAuthor().isBot())
-                .filter(e -> {
-                    CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-                    if (cachedConfig == null) {
-                        logger.error("Could not get cached config.");
-                        return false;
-                    }
-                    return !JDAUtil.isCommand(cachedConfig, e.getMessage().getContentRaw());
-                })
-                .filter(e -> {
-                    boolean retVal = ResponseUtil.canLearn(e.getAuthor());
-                    if (!retVal && ConfigUtil.getDebugOrFalse()) {
-                        logger.info("Not learning from " + e.getAuthor().getAsTag());
-                    }
-                    return retVal;
-                })
-                .handler(this::replace));
+                           .filter(e -> !e.getAuthor().isBot())
+                           .filter(e -> {
+                               CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+                               if (cachedConfig == null) {
+                                   logger.error("Could not get cached config.");
+                                   return false;
+                               }
+                               return !JDAUtil.isCommand(cachedConfig, e.getMessage().getContentRaw());
+                           })
+                           .filter(e -> {
+                               boolean retVal = ResponseUtil.canLearn(e.getAuthor());
+                               if (!retVal && ConfigUtil.getDebugOrFalse()) {
+                                   logger.info("Not learning from " + e.getAuthor().getAsTag());
+                               }
+                               return retVal;
+                           })
+                           .handler(this::replace));
     }
 
     private void learn(@NotNull GuildMessageReceivedEvent event) {

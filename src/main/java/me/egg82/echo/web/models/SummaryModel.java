@@ -21,8 +21,12 @@ public class SummaryModel implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof SummaryModel)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof SummaryModel)) {
+            return false;
+        }
         SummaryModel that = (SummaryModel) o;
         return id.equals(that.id) && output.equals(that.output);
     }

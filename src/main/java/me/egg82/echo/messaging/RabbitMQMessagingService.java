@@ -41,7 +41,8 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
             closed = true;
             try {
                 connection.close(8000);
-            } catch (IOException ignored) { }
+            } catch (IOException ignored) {
+            }
         } finally {
             queueLock.writeLock().unlock();
         }
@@ -108,7 +109,7 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
 
     private void bind() throws IOException {
         RecoverableChannel channel = getChannel();
-        channel.exchangeDeclare(EXCHANGE_NAME,  ExchangeType.FANOUT.getType(), true);
+        channel.exchangeDeclare(EXCHANGE_NAME, ExchangeType.FANOUT.getType(), true);
         String queue = channel.queueDeclare().getQueue();
         channel.queueBind(queue, EXCHANGE_NAME, "");
         Consumer consumer = new DefaultConsumer(channel) {
@@ -227,7 +228,9 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
         PERSISTENT(2);
 
         private final int mode;
+
         DeliveryMode(int mode) { this.mode = mode; }
+
         public int getMode() { return mode; }
     }
 
@@ -238,7 +241,9 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
         HEADERS("match"); // AMQP compatibility
 
         private final String type;
+
         ExchangeType(@NotNull String type) { this.type = type; }
+
         public @NotNull String getType() { return type; }
     }
 }

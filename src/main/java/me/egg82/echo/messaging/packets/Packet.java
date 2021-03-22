@@ -11,5 +11,6 @@ public interface Packet extends Serializable {
     byte getPacketId();
 
     void read(@NotNull ByteBuf buffer);
+
     void write(@NotNull ByteBuf buffer);
 }

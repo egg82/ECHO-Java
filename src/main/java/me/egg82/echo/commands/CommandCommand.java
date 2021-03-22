@@ -94,7 +94,11 @@ public class CommandCommand extends AbstractCommand {
                         continue;
                     }
                     String description = getDescription(issuer, help.getManager(), entry.getDescription());
-                    embed.addField(entry.getCommand() + " " + entry.getParameterSyntax(issuer), "```" + (description == null ? "No description available" : description) + "```", false);
+                    embed.addField(
+                            entry.getCommand() + " " + entry.getParameterSyntax(issuer),
+                            "```" + (description == null ? "No description available" : description) + "```",
+                            false
+                    );
                     EmbedBuilder descriptionBuilder = command.getDescription();
                     if (descriptionBuilder != null) {
                         for (MessageEmbed.Field field : descriptionBuilder.getFields()) {
@@ -112,7 +116,11 @@ public class CommandCommand extends AbstractCommand {
                     if (!help.getHelpEntries().isEmpty()) {
                         for (HelpEntry entry : help.getHelpEntries()) {
                             String description = getDescription(issuer, help.getManager(), entry.getDescription());
-                            embed.addField(entry.getCommand() + " " + entry.getParameterSyntax(issuer), "```" + (description == null ? "No description available" : description) + "```", false);
+                            embed.addField(
+                                    entry.getCommand() + " " + entry.getParameterSyntax(issuer),
+                                    "```" + (description == null ? "No description available" : description) + "```",
+                                    false
+                            );
                         }
                     }
                 }

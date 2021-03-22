@@ -16,8 +16,12 @@ public class EightBallModel implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof EightBallModel)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof EightBallModel)) {
+            return false;
+        }
         EightBallModel that = (EightBallModel) o;
         return magic.equals(that.magic);
     }
@@ -53,8 +57,12 @@ public class EightBallModel implements Serializable {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof EightBallMagicModel)) return false;
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof EightBallMagicModel)) {
+                return false;
+            }
             EightBallMagicModel that = (EightBallMagicModel) o;
             return question.equals(that.question) && answer.equals(that.answer) && type.equals(that.type);
         }

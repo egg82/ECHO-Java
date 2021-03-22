@@ -157,7 +157,8 @@ public class BotPlayerInfo implements PlayerInfo {
                 JSONDeserializer<PlayerUUIDModel> modelDeserializer = new JSONDeserializer<>();
                 PlayerUUIDModel model = modelDeserializer.deserialize(response.body().charStream(), PlayerUUIDModel.class);
 
-                UUID uuid = UUID.fromString(model.getId().replaceFirst("(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"));
+                UUID uuid = UUID.fromString(model.getId()
+                                                    .replaceFirst("(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"));
                 synchronized (uuidCacheLock) {
                     uuidCache.put(uuid, name);
                 }

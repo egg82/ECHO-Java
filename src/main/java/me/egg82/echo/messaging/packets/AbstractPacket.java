@@ -72,7 +72,7 @@ public abstract class AbstractPacket implements Packet {
     protected final @NotNull String readString(@NotNull ByteBuf buf) {
         int len = readVarInt(buf);
         if (len > Short.MAX_VALUE) {
-            throw new RuntimeException(String.format( "Cannot receive string longer than Short.MAX_VALUE (got %s characters)", len));
+            throw new RuntimeException(String.format("Cannot receive string longer than Short.MAX_VALUE (got %s characters)", len));
         }
 
         byte[] b = new byte[len];
@@ -83,7 +83,7 @@ public abstract class AbstractPacket implements Packet {
 
     protected final void writeString(@NotNull String s, @NotNull ByteBuf buf) {
         if (s.length() > Short.MAX_VALUE) {
-            throw new RuntimeException(String.format( "Cannot send string longer than Short.MAX_VALUE (got %s characters)", s.length()));
+            throw new RuntimeException(String.format("Cannot send string longer than Short.MAX_VALUE (got %s characters)", s.length()));
         }
 
         byte[] b = s.getBytes(StandardCharsets.UTF_8);
@@ -103,7 +103,10 @@ public abstract class AbstractPacket implements Packet {
     protected final boolean checkVersion(@NotNull ByteBuf buffer) {
         byte packetVersion = buffer.readByte();
         if (packetVersion != VERSION) {
-            logger.warn("Received packet version " + String.format("0x%02X ", packetVersion) + " does not match current packet version " + String.format("0x%02X ", VERSION) + ". Skipping packet.");
+            logger.warn("Received packet version " + String.format("0x%02X ", packetVersion) + " does not match current packet version " + String.format(
+                    "0x%02X ",
+                    VERSION
+            ) + ". Skipping packet.");
             return false;
         }
         return true;

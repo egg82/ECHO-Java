@@ -16,8 +16,12 @@ public class AdviceModel implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof AdviceModel)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof AdviceModel)) {
+            return false;
+        }
         AdviceModel that = (AdviceModel) o;
         return slip.equals(that.slip);
     }
@@ -48,8 +52,12 @@ public class AdviceModel implements Serializable {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof AdviceSlipModel)) return false;
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof AdviceSlipModel)) {
+                return false;
+            }
             AdviceSlipModel that = (AdviceSlipModel) o;
             return id == that.id && advice.equals(that.advice);
         }

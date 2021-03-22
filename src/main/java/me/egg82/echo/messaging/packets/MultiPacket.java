@@ -86,8 +86,12 @@ public class MultiPacket extends AbstractPacket {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof MultiPacket)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof MultiPacket)) {
+            return false;
+        }
         MultiPacket that = (MultiPacket) o;
         return packets.equals(that.packets);
     }
@@ -98,7 +102,7 @@ public class MultiPacket extends AbstractPacket {
     @Override
     public String toString() {
         return "MultiPacket{" +
-            "packets=" + packets +
-            '}';
+                "packets=" + packets +
+                '}';
     }
 }

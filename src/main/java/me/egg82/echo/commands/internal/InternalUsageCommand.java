@@ -53,7 +53,11 @@ public class InternalUsageCommand extends AbstractInternalCommand {
                     continue;
                 }
                 String description = getDescription(help.getManager(), entry.getDescription());
-                embed.addField(entry.getCommand() + " " + entry.getParameterSyntax(issuer), "```" + (description == null ? "No description available" : description) + "```", false);
+                embed.addField(
+                        entry.getCommand() + " " + entry.getParameterSyntax(issuer),
+                        "```" + (description == null ? "No description available" : description) + "```",
+                        false
+                );
                 if (command != null) {
                     EmbedBuilder descriptionBuilder = command.getDescription();
                     if (descriptionBuilder != null) {
@@ -107,7 +111,11 @@ public class InternalUsageCommand extends AbstractInternalCommand {
                         continue;
                     }
                     String description = getDescription(help.getManager(), entry.getDescription());
-                    embed.addField(entry.getCommand() + " " + entry.getParameterSyntax(issuer), "```" + (description == null ? "No description available" : description) + "```", false);
+                    embed.addField(
+                            entry.getCommand() + " " + entry.getParameterSyntax(issuer),
+                            "```" + (description == null ? "No description available" : description) + "```",
+                            false
+                    );
                 }
             }
         }

@@ -21,7 +21,13 @@ public class ReloadCommand extends AbstractInternalCommand {
     private final JDACommandManager manager;
     private final JDA jda;
 
-    public ReloadCommand(@NotNull CommandIssuer issuer, @NotNull MessageReceivedEvent event, @NotNull File dataFolder, @NotNull JDACommandManager manager, @NotNull JDA jda) {
+    public ReloadCommand(
+            @NotNull CommandIssuer issuer,
+            @NotNull MessageReceivedEvent event,
+            @NotNull File dataFolder,
+            @NotNull JDACommandManager manager,
+            @NotNull JDA jda
+    ) {
         super(issuer, event);
         this.dataFolder = dataFolder;
         this.manager = manager;

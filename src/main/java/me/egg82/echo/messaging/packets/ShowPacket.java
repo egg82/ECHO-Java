@@ -65,8 +65,12 @@ public class ShowPacket extends AbstractPacket {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ShowPacket)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ShowPacket)) {
+            return false;
+        }
         ShowPacket that = (ShowPacket) o;
         return tvdb == that.tvdb && season == that.season && episode == that.episode && overview.equals(that.overview);
     }

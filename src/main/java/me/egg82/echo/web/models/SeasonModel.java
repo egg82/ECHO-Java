@@ -81,10 +81,18 @@ public class SeasonModel implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof SeasonModel)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof SeasonModel)) {
+            return false;
+        }
         SeasonModel that = (SeasonModel) o;
-        return number == that.number && Double.compare(that.rating, rating) == 0 && votes == that.votes && episodeCount == that.episodeCount && airedEpisodes == that.airedEpisodes && ids.equals(that.ids) && title.equals(that.title) && Objects.equals(overview, that.overview) && Objects.equals(firstAired, that.firstAired) && updatedAt.equals(that.updatedAt) && network.equals(that.network);
+        return number == that.number && Double.compare(
+                that.rating,
+                rating
+        ) == 0 && votes == that.votes && episodeCount == that.episodeCount && airedEpisodes == that.airedEpisodes && ids.equals(that.ids) && title.equals(that.title) && Objects
+                .equals(overview, that.overview) && Objects.equals(firstAired, that.firstAired) && updatedAt.equals(that.updatedAt) && network.equals(that.network);
     }
 
     @Override

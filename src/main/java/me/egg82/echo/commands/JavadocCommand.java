@@ -77,7 +77,12 @@ public class JavadocCommand extends AbstractCommand {
     }
 
     public static @NotNull CompletableFuture<List<JavadocModel>> getModel(@NotNull String repo, @NotNull String query) {
-        return WebUtil.getUnclosedResponse(String.format(API_URL, WebUtil.urlEncode(repo), WebUtil.urlEncode(query.replaceAll("\\s", "").replace("#", "~").replace("%", "-")), ITEM_LIMIT), "application/json").thenApplyAsync(response -> {
+        return WebUtil.getUnclosedResponse(String.format(
+                API_URL,
+                WebUtil.urlEncode(repo),
+                WebUtil.urlEncode(query.replaceAll("\\s", "").replace("#", "~").replace("%", "-")),
+                ITEM_LIMIT
+        ), "application/json").thenApplyAsync(response -> {
             try (response) {
                 JSONDeserializer<List<JavadocModel>> modelDeserializer = new JSONDeserializer<>();
                 modelDeserializer.use("values", JavadocModel.class);
@@ -173,7 +178,11 @@ public class JavadocCommand extends AbstractCommand {
         }
 
         if (!model.getObject().getMetadata().getReturns().equals("void")) {
-            embed.addField("Returns ", "**" + model.getObject().getMetadata().getReturns() + "** *" + model.getObject().getMetadata().getReturnsDescription() + "*", false);
+            embed.addField(
+                    "Returns ",
+                    "**" + model.getObject().getMetadata().getReturns() + "** *" + model.getObject().getMetadata().getReturnsDescription() + "*",
+                    false
+            );
         }
 
         StringBuilder javadocThrows = new StringBuilder();

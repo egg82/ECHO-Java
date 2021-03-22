@@ -26,8 +26,12 @@ public class ShowModel implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ShowModel)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ShowModel)) {
+            return false;
+        }
         ShowModel that = (ShowModel) o;
         return year == that.year && title.equals(that.title) && ids.equals(that.ids);
     }

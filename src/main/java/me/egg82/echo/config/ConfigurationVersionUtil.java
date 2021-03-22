@@ -15,7 +15,11 @@ public class ConfigurationVersionUtil {
 
     private ConfigurationVersionUtil() { }
 
-    public static void conformVersion(@NotNull ConfigurationLoader<CommentedConfigurationNode> loader, @NotNull CommentedConfigurationNode config, @NotNull File fileOnDisk) throws IOException {
+    public static void conformVersion(
+            @NotNull ConfigurationLoader<CommentedConfigurationNode> loader,
+            @NotNull CommentedConfigurationNode config,
+            @NotNull File fileOnDisk
+    ) throws IOException {
         double oldVersion = config.node("version").getDouble(1.0d);
 
         /*if (config.node("version").getDouble(1.0d) == 1.0d) {

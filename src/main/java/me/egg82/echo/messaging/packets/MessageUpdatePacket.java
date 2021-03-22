@@ -49,8 +49,12 @@ public class MessageUpdatePacket extends AbstractPacket {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof MessageUpdatePacket)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof MessageUpdatePacket)) {
+            return false;
+        }
         MessageUpdatePacket that = (MessageUpdatePacket) o;
         return oldMessage.equals(that.oldMessage) && newMessage.equals(that.newMessage);
     }

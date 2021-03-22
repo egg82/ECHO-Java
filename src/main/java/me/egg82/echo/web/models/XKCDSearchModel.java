@@ -27,8 +27,12 @@ public class XKCDSearchModel implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof XKCDSearchModel)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof XKCDSearchModel)) {
+            return false;
+        }
         XKCDSearchModel that = (XKCDSearchModel) o;
         return Float.compare(that.weight, weight) == 0 && selection == that.selection && comics.equals(that.comics);
     }

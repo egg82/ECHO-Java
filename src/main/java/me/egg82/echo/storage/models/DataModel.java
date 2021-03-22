@@ -36,12 +36,12 @@ public class DataModel extends BaseModel {
     @Override
     public String toString() {
         return "DataModel{" +
-            "id=" + id +
-            ", version=" + version +
-            ", created=" + created +
-            ", modified=" + modified +
-            ", key='" + key + '\'' +
-            ", value='" + value + '\'' +
-            '}';
+                "id=" + id +
+                ", version=" + version +
+                ", created=" + created +
+                ", modified=" + modified +
+                ", key='" + key + '\'' +
+                ", value='" + value + '\'' +
+                '}';
     }
 }

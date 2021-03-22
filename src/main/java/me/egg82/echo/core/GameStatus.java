@@ -29,8 +29,12 @@ public class GameStatus implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof GameStatus)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof GameStatus)) {
+            return false;
+        }
         GameStatus that = (GameStatus) o;
         return name.equals(that.name) && displayName.equals(that.displayName) && min.equals(that.min) && max.equals(that.max);
     }

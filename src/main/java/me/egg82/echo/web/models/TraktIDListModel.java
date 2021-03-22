@@ -41,10 +41,17 @@ public class TraktIDListModel implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof TraktIDListModel)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof TraktIDListModel)) {
+            return false;
+        }
         TraktIDListModel that = (TraktIDListModel) o;
-        return trakt == that.trakt && Objects.equals(slug, that.slug) && Objects.equals(tvdb, that.tvdb) && Objects.equals(imdb, that.imdb) && Objects.equals(tmdb, that.tmdb) && Objects.equals(tvrage, that.tvrage);
+        return trakt == that.trakt && Objects.equals(slug, that.slug) && Objects.equals(tvdb, that.tvdb) && Objects.equals(imdb, that.imdb) && Objects.equals(
+                tmdb,
+                that.tmdb
+        ) && Objects.equals(tvrage, that.tvrage);
     }
 
     @Override

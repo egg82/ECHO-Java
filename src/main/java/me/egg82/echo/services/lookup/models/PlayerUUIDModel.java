@@ -22,8 +22,12 @@ public class PlayerUUIDModel implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof PlayerUUIDModel)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof PlayerUUIDModel)) {
+            return false;
+        }
         PlayerUUIDModel that = (PlayerUUIDModel) o;
         return Objects.equals(name, that.name) &&
                 Objects.equals(id, that.id);

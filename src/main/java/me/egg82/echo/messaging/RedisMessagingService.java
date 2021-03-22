@@ -130,8 +130,9 @@ public class RedisMessagingService extends AbstractMessagingService {
             service.workPool.execute(() -> {
                 while (!service.isClosed()) {
                     try (Jedis redis = service.pool.getResource()) {
-                        redis.subscribe(service.pubSub,
-                            CHANNEL_NAME_BYTES
+                        redis.subscribe(
+                                service.pubSub,
+                                CHANNEL_NAME_BYTES
                         );
                     } catch (JedisException ex) {
                         if (!service.isClosed()) {

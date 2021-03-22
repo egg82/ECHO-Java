@@ -99,7 +99,13 @@ public class DatabaseUtil {
         return new String(retVal, StandardCharsets.UTF_8);
     }
 
-    public static void storeString(@NotNull String hash, @NotNull String service, @NotNull String string) { storeBytes(hash, service, string.getBytes(StandardCharsets.UTF_8)); }
+    public static void storeString(@NotNull String hash, @NotNull String service, @NotNull String string) {
+        storeBytes(
+                hash,
+                service,
+                string.getBytes(StandardCharsets.UTF_8)
+        );
+    }
 
     private static final Cache<NullablePair<String, String>, byte[]> dataCache = Caffeine.newBuilder()
             .expireAfterWrite(1L, TimeUnit.DAYS)

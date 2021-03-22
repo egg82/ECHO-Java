@@ -66,10 +66,17 @@ public class ExtractionModel implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ExtractionModel)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ExtractionModel)) {
+            return false;
+        }
         ExtractionModel that = (ExtractionModel) o;
-        return url.equals(that.url) && status.equals(that.status) && domain.equals(that.domain) && title.equals(that.title) && author.equals(that.author) && Objects.equals(datePublished, that.datePublished) && images.equals(that.images) && videos.equals(that.videos) && text.equals(that.text) && html.equals(that.html);
+        return url.equals(that.url) && status.equals(that.status) && domain.equals(that.domain) && title.equals(that.title) && author.equals(that.author) && Objects.equals(
+                datePublished,
+                that.datePublished
+        ) && images.equals(that.images) && videos.equals(that.videos) && text.equals(that.text) && html.equals(that.html);
     }
 
     @Override

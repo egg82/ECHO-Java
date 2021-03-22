@@ -21,8 +21,12 @@ public class TrendingShowModel implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof TrendingShowModel)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof TrendingShowModel)) {
+            return false;
+        }
         TrendingShowModel showModel = (TrendingShowModel) o;
         return watchers == showModel.watchers && show.equals(showModel.show);
     }

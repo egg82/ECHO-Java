@@ -22,7 +22,9 @@ public class ValidationUtil {
         }
         try {
             return new IPAddressString(range).toAddress().isMultiple();
-        } catch (AddressStringException ignored) { return false; }
+        } catch (AddressStringException ignored) {
+            return false;
+        }
     }
 
     public static boolean isValidIp(String ip) {
@@ -31,7 +33,9 @@ public class ValidationUtil {
         }
         try {
             return !new IPAddressString(ip).toAddress().isMultiple();
-        } catch (AddressStringException ignored) { return false; }
+        } catch (AddressStringException ignored) {
+            return false;
+        }
     }
 
     public static boolean isValidUuid(String uuid) {

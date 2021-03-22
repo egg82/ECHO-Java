@@ -71,10 +71,15 @@ public class XKCDInfoModel implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof XKCDInfoModel)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof XKCDInfoModel)) {
+            return false;
+        }
         XKCDInfoModel that = (XKCDInfoModel) o;
-        return num == that.num && day == that.day && month == that.month && year == that.year && link.equals(that.link) && title.equals(that.title) && safeTitle.equals(that.safeTitle) && news.equals(that.news) && img.equals(that.img) && alt.equals(that.alt) && transcript.equals(that.transcript);
+        return num == that.num && day == that.day && month == that.month && year == that.year && link.equals(that.link) && title.equals(that.title) && safeTitle.equals(
+                that.safeTitle) && news.equals(that.news) && img.equals(that.img) && alt.equals(that.alt) && transcript.equals(that.transcript);
     }
 
     @Override

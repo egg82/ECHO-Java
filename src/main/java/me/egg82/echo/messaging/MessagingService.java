@@ -11,6 +11,7 @@ public interface MessagingService {
     String getName();
 
     void close();
+
     boolean isClosed();
 
     void sendPacket(@NotNull UUID messageId, @NotNull Packet packet) throws IOException, TimeoutException;

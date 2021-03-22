@@ -78,8 +78,12 @@ public class TimeUtil {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof Time)) return false;
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof Time)) {
+                return false;
+            }
             Time time1 = (Time) o;
             return time == time1.time &&
                     unit == time1.unit;

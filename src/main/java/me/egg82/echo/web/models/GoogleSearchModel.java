@@ -19,8 +19,12 @@ public class GoogleSearchModel implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof GoogleSearchModel)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof GoogleSearchModel)) {
+            return false;
+        }
         GoogleSearchModel that = (GoogleSearchModel) o;
         return items.equals(that.items);
     }
@@ -51,8 +55,12 @@ public class GoogleSearchModel implements Serializable {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof GoogleSearchItemModel)) return false;
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof GoogleSearchItemModel)) {
+                return false;
+            }
             GoogleSearchItemModel that = (GoogleSearchItemModel) o;
             return Objects.equals(title, that.title) && link.equals(that.link);
         }

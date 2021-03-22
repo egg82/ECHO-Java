@@ -30,8 +30,12 @@ public class ProfileModel implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ProfileModel)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ProfileModel)) {
+            return false;
+        }
         ProfileModel that = (ProfileModel) o;
         return Objects.equals(id, that.id) &&
                 Objects.equals(name, that.name) &&
@@ -77,8 +81,12 @@ public class ProfileModel implements Serializable {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof ProfilePropertyModel)) return false;
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof ProfilePropertyModel)) {
+                return false;
+            }
             ProfilePropertyModel that = (ProfilePropertyModel) o;
             return Objects.equals(name, that.name) &&
                     Objects.equals(value, that.value) &&

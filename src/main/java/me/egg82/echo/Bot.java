@@ -88,10 +88,10 @@ public class Bot {
 
         BotLogUtil.sendInfo(logger, commandManager, Message.GENERAL__ENABLED);
         BotLogUtil.sendInfo(logger, commandManager, Message.GENERAL__LOAD,
-                "{version}", version,
-                "{commands}", String.valueOf(commandManager.getRegisteredRootCommands().size()),
-                "{events}", String.valueOf(numEvents),
-                "{tasks}", String.valueOf(tasks.size())
+                            "{version}", version,
+                            "{commands}", String.valueOf(commandManager.getRegisteredRootCommands().size()),
+                            "{events}", String.valueOf(numEvents),
+                            "{tasks}", String.valueOf(tasks.size())
         );
     }
 
@@ -147,8 +147,25 @@ public class Bot {
     }
 
     private void setChatColors() {
-        commandManager.setFormat(MessageType.ERROR, AnsiColor.RED.toString(), AnsiColor.BRIGHT_YELLOW.toString(), AnsiColor.BRIGHT_BLUE.toString(), AnsiColor.WHITE.toString());
-        commandManager.setFormat(MessageType.INFO, AnsiColor.WHITE.toString(), AnsiColor.BRIGHT_YELLOW.toString(), AnsiColor.BRIGHT_BLUE.toString(), AnsiColor.GREEN.toString(), AnsiColor.BRIGHT_RED.toString(), AnsiColor.YELLOW.toString(), AnsiColor.BLUE.toString(), AnsiColor.NORMAL.toString(), AnsiColor.RED.toString());
+        commandManager.setFormat(
+                MessageType.ERROR,
+                AnsiColor.RED.toString(),
+                AnsiColor.BRIGHT_YELLOW.toString(),
+                AnsiColor.BRIGHT_BLUE.toString(),
+                AnsiColor.WHITE.toString()
+        );
+        commandManager.setFormat(
+                MessageType.INFO,
+                AnsiColor.WHITE.toString(),
+                AnsiColor.BRIGHT_YELLOW.toString(),
+                AnsiColor.BRIGHT_BLUE.toString(),
+                AnsiColor.GREEN.toString(),
+                AnsiColor.BRIGHT_RED.toString(),
+                AnsiColor.YELLOW.toString(),
+                AnsiColor.BLUE.toString(),
+                AnsiColor.NORMAL.toString(),
+                AnsiColor.RED.toString()
+        );
     }
 
     private void loadServices() {

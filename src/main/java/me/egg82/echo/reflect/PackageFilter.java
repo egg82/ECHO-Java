@@ -24,7 +24,14 @@ public class PackageFilter {
 
     private PackageFilter() { }
 
-    public static <T> @NotNull List<Class<T>> getClasses(@NotNull Class<T> clazz, @NotNull String pkg, boolean recursive, boolean keepInterfaces, boolean keepAbstracts, String... excludePackages) {
+    public static <T> @NotNull List<Class<T>> getClasses(
+            @NotNull Class<T> clazz,
+            @NotNull String pkg,
+            boolean recursive,
+            boolean keepInterfaces,
+            boolean keepAbstracts,
+            String... excludePackages
+    ) {
         String excludeString = null;
         if (excludePackages != null && excludePackages.length > 0) {
             for (int i = 0; i < excludePackages.length; i++) {
@@ -34,9 +41,11 @@ public class PackageFilter {
         }
 
         ConfigurationBuilder config = new ConfigurationBuilder()
-                .setScanners(new SubTypesScanner(false),
+                .setScanners(
+                        new SubTypesScanner(false),
                         new ResourcesScanner(),
-                        new TypeElementsScanner())
+                        new TypeElementsScanner()
+                )
                 .setUrls(ClasspathHelper.forPackage(pkg, PackageFilter.class.getClassLoader()));
 
         if (excludeString != null) {
@@ -103,7 +112,14 @@ public class PackageFilter {
         return list;
     }
 
-    public static <T> @NotNull List<Class<? extends T>> getClassesParameterized(@NotNull Class<T> clazz, @NotNull String pkg, boolean recursive, boolean keepInterfaces, boolean keepAbstracts, String... excludePackages) {
+    public static <T> @NotNull List<Class<? extends T>> getClassesParameterized(
+            @NotNull Class<T> clazz,
+            @NotNull String pkg,
+            boolean recursive,
+            boolean keepInterfaces,
+            boolean keepAbstracts,
+            String... excludePackages
+    ) {
         String excludeString = null;
         if (excludePackages != null && excludePackages.length > 0) {
             for (int i = 0; i < excludePackages.length; i++) {
@@ -113,9 +129,11 @@ public class PackageFilter {
         }
 
         ConfigurationBuilder config = new ConfigurationBuilder()
-                .setScanners(new SubTypesScanner(false),
+                .setScanners(
+                        new SubTypesScanner(false),
                         new ResourcesScanner(),
-                        new TypeElementsScanner())
+                        new TypeElementsScanner()
+                )
                 .setUrls(ClasspathHelper.forPackage(pkg, PackageFilter.class.getClassLoader()));
 
         if (excludeString != null) {

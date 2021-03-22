@@ -8,6 +8,7 @@ import java.util.UUID;
 
 public interface PlayerInfo {
     @NotNull String getName();
+
     @NotNull UUID getUUID();
 
     @NotNull List<ProfileModel.ProfilePropertyModel> getProperties();

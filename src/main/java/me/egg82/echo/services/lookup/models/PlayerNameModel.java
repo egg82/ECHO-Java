@@ -16,8 +16,12 @@ public class PlayerNameModel implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof PlayerNameModel)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof PlayerNameModel)) {
+            return false;
+        }
         PlayerNameModel that = (PlayerNameModel) o;
         return Objects.equals(name, that.name);
     }

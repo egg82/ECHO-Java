@@ -37,7 +37,12 @@ public class ConfigurationFileUtil {
 
     private ConfigurationFileUtil() { }
 
-    public static void reloadConfig(@NotNull File dataDirectory, @NotNull JDACommandManager manager, @NotNull MessagingHandler messagingHandler, @NotNull MarkovMegaHal megaHal) {
+    public static void reloadConfig(
+            @NotNull File dataDirectory,
+            @NotNull JDACommandManager manager,
+            @NotNull MessagingHandler messagingHandler,
+            @NotNull MarkovMegaHal megaHal
+    ) {
         ConfigurationNode config;
         try {
             config = getConfig("config.yml", new File(dataDirectory, "config.yml"));
@@ -163,10 +168,22 @@ public class ConfigurationFileUtil {
 
         if (retVal == null) {
             retVal = Locale.ENGLISH;
-            BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c9>lang</c9> <c1>" + configLanguage + "</c1> <c9>is not a valid language. Using default value of</c9> <c1>" + (retVal.getCountry() == null || retVal.getCountry().isEmpty() ? retVal.getLanguage() : retVal.getLanguage() + "-" + retVal.getCountry()) + "</c1>");
+            BotLogUtil.sendInfo(
+                    logger,
+                    manager,
+                    LogUtil.HEADING + "<c9>lang</c9> <c1>" + configLanguage + "</c1> <c9>is not a valid language. Using default value of</c9> <c1>" + (retVal.getCountry() == null || retVal
+                            .getCountry()
+                            .isEmpty() ? retVal.getLanguage() : retVal.getLanguage() + "-" + retVal.getCountry()) + "</c1>"
+            );
         }
         if (debug) {
-            BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Default language:</c2> <c1>" + (retVal.getCountry() == null || retVal.getCountry().isEmpty() ? retVal.getLanguage() : retVal.getLanguage() + "-" + retVal.getCountry()) + "</c1>");
+            BotLogUtil.sendInfo(
+                    logger,
+                    manager,
+                    LogUtil.HEADING + "<c2>Default language:</c2> <c1>" + (retVal.getCountry() == null || retVal.getCountry().isEmpty()
+                                                                           ? retVal.getLanguage()
+                                                                           : retVal.getLanguage() + "-" + retVal.getCountry()) + "</c1>"
+            );
         }
 
         return retVal;
@@ -190,7 +207,12 @@ public class ConfigurationFileUtil {
         return retVal;
     }
 
-    private static @NotNull List<StorageService> getStorage(@NotNull ConfigurationNode config, @NotNull File dataDirectory, boolean debug, @NotNull JDACommandManager manager) {
+    private static @NotNull List<StorageService> getStorage(
+            @NotNull ConfigurationNode config,
+            @NotNull File dataDirectory,
+            boolean debug,
+            @NotNull JDACommandManager manager
+    ) {
         List<StorageService> retVal = new ArrayList<>();
 
         PoolSettings poolSettings = new PoolSettings(config.node("storage", "settings"));
@@ -201,7 +223,11 @@ public class ConfigurationFileUtil {
             }
 
             if (debug) {
-                BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Added storage:</c2> <c1>" + service.getName() + " (" + service.getClass().getSimpleName() + ")</c1>");
+                BotLogUtil.sendInfo(
+                        logger,
+                        manager,
+                        LogUtil.HEADING + "<c2>Added storage:</c2> <c1>" + service.getName() + " (" + service.getClass().getSimpleName() + ")</c1>"
+                );
             }
             retVal.add(service);
         }
@@ -209,7 +235,14 @@ public class ConfigurationFileUtil {
         return retVal;
     }
 
-    private static @Nullable StorageService getStorageOf(@NotNull String name, @NotNull ConfigurationNode engineNode, @NotNull File dataDirectory, @NotNull PoolSettings poolSettings, boolean debug, @NotNull JDACommandManager manager) {
+    private static @Nullable StorageService getStorageOf(
+            @NotNull String name,
+            @NotNull ConfigurationNode engineNode,
+            @NotNull File dataDirectory,
+            @NotNull PoolSettings poolSettings,
+            boolean debug,
+            @NotNull JDACommandManager manager
+    ) {
         if (!engineNode.node("enabled").getBoolean()) {
             if (debug) {
                 BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c9>Storage engine</c9> <c1>" + name + "</c1> <c9>is disabled. Removing.</c9>");
@@ -223,14 +256,26 @@ public class ConfigurationFileUtil {
             case "old_mysql": {
                 AddressPort url = new AddressPort(connectionNode.key() + ".address", connectionNode.node("address").getString("127.0.0.1:3306"), 3306);
                 if (debug) {
-                    BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type old_mysql with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + "/" + connectionNode.node("database").getString("echo") + "</c1>");
+                    BotLogUtil.sendInfo(
+                            logger,
+                            manager,
+                            LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type old_mysql with address</c2> <c1>" + url.getAddress() + ":" + url
+                                    .getPort() + "/" + connectionNode.node("database").getString("echo") + "</c1>"
+                    );
                 }
                 String options = connectionNode.node("options").getString("useSSL=false&useUnicode=true&characterEncoding=utf8");
                 if (options.length() > 0 && options.charAt(0) == '?') {
                     options = options.substring(1);
                 }
                 if (debug) {
-                    BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Setting options for engine</c2> <c1>" + name + "</c1> <c2>to</c2> <c1>" + options.replace("&", "&\\") + "</c1>");
+                    BotLogUtil.sendInfo(
+                            logger,
+                            manager,
+                            LogUtil.HEADING + "<c2>Setting options for engine</c2> <c1>" + name + "</c1> <c2>to</c2> <c1>" + options.replace(
+                                    "&",
+                                    "&\\"
+                            ) + "</c1>"
+                    );
                 }
                 try {
                     return MySQL55StorageService.builder(name)
@@ -248,14 +293,26 @@ public class ConfigurationFileUtil {
             case "mysql": {
                 AddressPort url = new AddressPort(connectionNode.key() + ".address", connectionNode.node("address").getString("127.0.0.1:3306"), 3306);
                 if (debug) {
-                    BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type mysql with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + "/" + connectionNode.node("database").getString("echo") + "</c1>");
+                    BotLogUtil.sendInfo(
+                            logger,
+                            manager,
+                            LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type mysql with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + "/" + connectionNode.node("database")
+                                    .getString("echo") + "</c1>"
+                    );
                 }
                 String options = connectionNode.node("options").getString("useSSL=false&useUnicode=true&characterEncoding=utf8");
                 if (options.length() > 0 && options.charAt(0) == '?') {
                     options = options.substring(1);
                 }
                 if (debug) {
-                    BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Setting options for engine</c2> <c1>" + name + "</c1> <c2>to</c2> <c1>" + options.replace("&", "&\\") + "</c1>");
+                    BotLogUtil.sendInfo(
+                            logger,
+                            manager,
+                            LogUtil.HEADING + "<c2>Setting options for engine</c2> <c1>" + name + "</c1> <c2>to</c2> <c1>" + options.replace(
+                                    "&",
+                                    "&\\"
+                            ) + "</c1>"
+                    );
                 }
                 try {
                     return MySQLStorageService.builder(name)
@@ -273,14 +330,26 @@ public class ConfigurationFileUtil {
             case "mariadb": {
                 AddressPort url = new AddressPort(connectionNode.key() + ".address", connectionNode.node("address").getString("127.0.0.1:3306"), 3306);
                 if (debug) {
-                    BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type mariadb with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + "/" + connectionNode.node("database").getString("echo") + "</c1>");
+                    BotLogUtil.sendInfo(
+                            logger,
+                            manager,
+                            LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type mariadb with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + "/" + connectionNode.node("database")
+                                    .getString("echo") + "</c1>"
+                    );
                 }
                 String options = connectionNode.node("options").getString("useSSL=false&useUnicode=true&characterEncoding=utf8");
                 if (options.length() > 0 && options.charAt(0) == '?') {
                     options = options.substring(1);
                 }
                 if (debug) {
-                    BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Setting options for engine</c2> <c1>" + name + "</c1> <c2>to</c2> <c1>" + options.replace("&", "&\\") + "</c1>");
+                    BotLogUtil.sendInfo(
+                            logger,
+                            manager,
+                            LogUtil.HEADING + "<c2>Setting options for engine</c2> <c1>" + name + "</c1> <c2>to</c2> <c1>" + options.replace(
+                                    "&",
+                                    "&\\"
+                            ) + "</c1>"
+                    );
                 }
                 try {
                     return MariaDBStorageService.builder(name)
@@ -298,14 +367,26 @@ public class ConfigurationFileUtil {
             case "postgresql": {
                 AddressPort url = new AddressPort(connectionNode.key() + ".address", connectionNode.node("address").getString("127.0.0.1:5432"), 5432);
                 if (debug) {
-                    BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type postgresql with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + "/" + connectionNode.node("database").getString("echo") + "</c1>");
+                    BotLogUtil.sendInfo(
+                            logger,
+                            manager,
+                            LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type postgresql with address</c2> <c1>" + url.getAddress() + ":" + url
+                                    .getPort() + "/" + connectionNode.node("database").getString("echo") + "</c1>"
+                    );
                 }
                 String options = connectionNode.node("options").getString("useSSL=false&useUnicode=true&characterEncoding=utf8");
                 if (options.length() > 0 && options.charAt(0) == '?') {
                     options = options.substring(1);
                 }
                 if (debug) {
-                    BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Setting options for engine</c2> <c1>" + name + "</c1> <c2>to</c2> <c1>" + options.replace("&", "&\\") + "</c1>");
+                    BotLogUtil.sendInfo(
+                            logger,
+                            manager,
+                            LogUtil.HEADING + "<c2>Setting options for engine</c2> <c1>" + name + "</c1> <c2>to</c2> <c1>" + options.replace(
+                                    "&",
+                                    "&\\"
+                            ) + "</c1>"
+                    );
                 }
                 try {
                     return PostgreSQLStorageService.builder(name)
@@ -322,14 +403,26 @@ public class ConfigurationFileUtil {
             }
             case "h2": {
                 if (debug) {
-                    BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type h2 with file</c2> <c1>" + connectionNode.node("file").getString("echo") + "</c1>");
+                    BotLogUtil.sendInfo(
+                            logger,
+                            manager,
+                            LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type h2 with file</c2> <c1>" + connectionNode.node("file")
+                                    .getString("echo") + "</c1>"
+                    );
                 }
                 String options = connectionNode.node("options").getString("useUnicode=true&characterEncoding=utf8");
                 if (options.length() > 0 && options.charAt(0) == '?') {
                     options = options.substring(1);
                 }
                 if (debug) {
-                    BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Setting options for engine</c2> <c1>" + name + "</c1> <c2>to</c2> <c1>" + options.replace("&", "&\\") + "</c1>");
+                    BotLogUtil.sendInfo(
+                            logger,
+                            manager,
+                            LogUtil.HEADING + "<c2>Setting options for engine</c2> <c1>" + name + "</c1> <c2>to</c2> <c1>" + options.replace(
+                                    "&",
+                                    "&\\"
+                            ) + "</c1>"
+                    );
                 }
                 try {
                     return H2StorageService.builder(name)
@@ -345,14 +438,26 @@ public class ConfigurationFileUtil {
             }
             case "sqlite": {
                 if (debug) {
-                    BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type sqlite with file</c2> <c1>" + connectionNode.node("file").getString("echo.db") + "</c1>");
+                    BotLogUtil.sendInfo(
+                            logger,
+                            manager,
+                            LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type sqlite with file</c2> <c1>" + connectionNode.node("file")
+                                    .getString("echo.db") + "</c1>"
+                    );
                 }
                 String options = connectionNode.node("options").getString("useUnicode=true&characterEncoding=utf8");
                 if (options.length() > 0 && options.charAt(0) == '?') {
                     options = options.substring(1);
                 }
                 if (debug) {
-                    BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Setting options for engine</c2> <c1>" + name + "</c1> <c2>to</c2> <c1>" + options.replace("&", "&\\") + "</c1>");
+                    BotLogUtil.sendInfo(
+                            logger,
+                            manager,
+                            LogUtil.HEADING + "<c2>Setting options for engine</c2> <c1>" + name + "</c1> <c2>to</c2> <c1>" + options.replace(
+                                    "&",
+                                    "&\\"
+                            ) + "</c1>"
+                    );
                 }
                 try {
                     return SQLiteStorageService.builder(name)
@@ -374,7 +479,13 @@ public class ConfigurationFileUtil {
         return null;
     }
 
-    private static @NotNull List<MessagingService> getMessaging(@NotNull ConfigurationNode config, @NotNull UUID serverId, @NotNull MessagingHandler handler, boolean debug, @NotNull JDACommandManager manager) {
+    private static @NotNull List<MessagingService> getMessaging(
+            @NotNull ConfigurationNode config,
+            @NotNull UUID serverId,
+            @NotNull MessagingHandler handler,
+            boolean debug,
+            @NotNull JDACommandManager manager
+    ) {
         List<MessagingService> retVal = new ArrayList<>();
 
         PoolSettings poolSettings = new PoolSettings(config.node("messaging", "settings"));
@@ -385,7 +496,11 @@ public class ConfigurationFileUtil {
             }
 
             if (debug) {
-                BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Added messaging:</c2> <c1>" + service.getName() + " (" + service.getClass().getSimpleName() + ")</c1>");
+                BotLogUtil.sendInfo(
+                        logger,
+                        manager,
+                        LogUtil.HEADING + "<c2>Added messaging:</c2> <c1>" + service.getName() + " (" + service.getClass().getSimpleName() + ")</c1>"
+                );
             }
             retVal.add(service);
         }
@@ -393,7 +508,15 @@ public class ConfigurationFileUtil {
         return retVal;
     }
 
-    private static @Nullable MessagingService getMessagingOf(@NotNull String name, @NotNull ConfigurationNode engineNode, @NotNull UUID serverId, @NotNull MessagingHandler handler, @NotNull PoolSettings poolSettings, boolean debug, @NotNull JDACommandManager manager) {
+    private static @Nullable MessagingService getMessagingOf(
+            @NotNull String name,
+            @NotNull ConfigurationNode engineNode,
+            @NotNull UUID serverId,
+            @NotNull MessagingHandler handler,
+            @NotNull PoolSettings poolSettings,
+            boolean debug,
+            @NotNull JDACommandManager manager
+    ) {
         if (!engineNode.node("enabled").getBoolean()) {
             if (debug) {
                 BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c9>Messaging engine</c9> <c1>" + name + "</c1> <c9>is disabled. Removing.</c9>");
@@ -407,7 +530,12 @@ public class ConfigurationFileUtil {
             case "rabbitmq": {
                 AddressPort url = new AddressPort(connectionNode.key() + ".address", connectionNode.node("address").getString("127.0.0.1:5672"), 5672);
                 if (debug) {
-                    BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type rabbitmq with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + connectionNode.node("v-host").getString("/") + "</c1>");
+                    BotLogUtil.sendInfo(
+                            logger,
+                            manager,
+                            LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type rabbitmq with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + connectionNode.node("v-host")
+                                    .getString("/") + "</c1>"
+                    );
                 }
                 try {
                     return RabbitMQMessagingService.builder(name, serverId, handler)
@@ -423,7 +551,11 @@ public class ConfigurationFileUtil {
             case "redis": {
                 AddressPort url = new AddressPort(connectionNode.key() + ".address", connectionNode.node("address").getString("127.0.0.1:6379"), 6379);
                 if (debug) {
-                    BotLogUtil.sendInfo(logger, manager, LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type redis with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + "</c1>");
+                    BotLogUtil.sendInfo(
+                            logger,
+                            manager,
+                            LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type redis with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + "</c1>"
+                    );
                 }
                 try {
                     return RedisMessagingService.builder(name, serverId, handler)

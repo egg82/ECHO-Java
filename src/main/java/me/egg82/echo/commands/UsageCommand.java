@@ -94,7 +94,11 @@ public class UsageCommand extends AbstractCommand {
                         continue;
                     }
                     String description = getDescription(issuer, help.getManager(), entry.getDescription());
-                    embed.addField(entry.getCommand() + " " + entry.getParameterSyntax(issuer), "```" + (description == null ? "No description available" : description) + "```", false);
+                    embed.addField(
+                            entry.getCommand() + " " + entry.getParameterSyntax(issuer),
+                            "```" + (description == null ? "No description available" : description) + "```",
+                            false
+                    );
                     EmbedBuilder descriptionBuilder = command.getDescription();
                     if (descriptionBuilder != null) {
                         for (MessageEmbed.Field field : descriptionBuilder.getFields()) {
